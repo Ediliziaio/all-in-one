@@ -8,6 +8,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import Index from "./pages/Index";
 import Camere from "./pages/Camere";
 import CameraDettaglio from "./pages/CameraDettaglio";
+import Servizi from "./pages/Servizi";
+import Vantaggi from "./pages/Vantaggi";
 import NotFound from "./pages/NotFound";
 
 // Auth
