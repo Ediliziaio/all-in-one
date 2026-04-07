@@ -4,7 +4,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Check } from "lucide-react";
 import { currentUser, mockProfiles } from "@/data/mockData";
 import { getRoomById } from "@/data/rooms";
-import { PageTransition, FadeIn, StaggerContainer, StaggerItem } from "@/components/motion/MotionWrappers";
+import { PageTransition, FadeIn } from "@/components/motion/MotionWrappers";
 
 export default function MiaCamera() {
   const room = currentUser.camera_id ? getRoomById(currentUser.camera_id) : null;
