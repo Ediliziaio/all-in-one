@@ -40,8 +40,8 @@ export function Navbar() {
         </nav>
 
         <div className="hidden md:flex items-center gap-3">
-          <Button variant="ghost" size="sm">Accedi</Button>
-          <Button size="sm" className="bg-accent text-accent-foreground hover:bg-accent/90">Prenota Ora</Button>
+          <Button variant="ghost" size="sm" asChild><Link to="/login">Accedi</Link></Button>
+          <Button size="sm" className="bg-accent text-accent-foreground hover:bg-accent/90" asChild><Link to="/camere">Prenota Ora</Link></Button>
         </div>
 
         {/* Mobile toggle */}
@@ -67,8 +67,8 @@ export function Navbar() {
             </Link>
           ))}
           <div className="flex gap-2 pt-2">
-            <Button variant="ghost" size="sm" className="flex-1">Accedi</Button>
-            <Button size="sm" className="flex-1 bg-accent text-accent-foreground hover:bg-accent/90">Prenota Ora</Button>
+            <Button variant="ghost" size="sm" className="flex-1" asChild><Link to="/login">Accedi</Link></Button>
+            <Button size="sm" className="flex-1 bg-accent text-accent-foreground hover:bg-accent/90" asChild><Link to="/camere">Prenota Ora</Link></Button>
           </div>
         </div>
       )}
