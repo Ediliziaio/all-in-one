@@ -1,50 +1,43 @@
 
 
-# Studentato Padova — Fase 1: Fondamenta + Sito Pubblico
+# Aggiornamenti Sito Pubblico: Navbar, Camere, Servizi, Vantaggi
 
-## Panoramica
-Piattaforma digitale per studentato privato a Padova con sito pubblico, portale admin e area studente. Questa prima fase copre il design system, i layout globali e tutto il sito pubblico.
+## Cosa cambia
 
-## Design System
-- Palette colori: Blu scuro (#1E3A5F), Arancione (#F97316), Verde (#10B981), sfondi chiari
-- Font: Plus Jakarta Sans (titoli) + Inter (body) da Google Fonts
-- Rounded corners 12-20px, glassmorphism su navbar, shadows su hover, gradients su hero/CTA
-- Animazioni fade-up con Framer Motion su ogni sezione
+### 1. Navbar -- rimuovere "Home", aggiungere nuove voci
+- Rimuovere la voce "Home" dai link di navigazione
+- Aggiungere: **Camere**, **Servizi**, **Vantaggi**
+- Il logo "StudentatoPD" porta comunque alla home cliccandoci
 
-## Dipendenze da installare
-- framer-motion, zustand, recharts, date-fns, lucide-react
+### 2. Pagina Camere (`/camere`) -- miglioramento
+- Aggiungere hero banner in cima con titolo, sottotitolo e immagine di sfondo
+- Aggiungere filtro per **piano** nella sidebar
+- Aggiungere sezione CTA in fondo ("Non trovi la camera giusta? Contattaci")
+- Animazioni Framer Motion coerenti con il resto del sito (PageTransition, FadeIn, HoverCard)
+- Migliorare le card con icone per i servizi principali e badge prezzo più visibile
 
-## Componenti Layout Globali
-- **Navbar**: sticky glassmorphism, logo "StudentatoPD", link navigazione, CTA "Accedi"/"Prenota Ora", hamburger mobile
-- **Footer**: logo + tagline, 3 colonne link, social icons, copyright
+### 3. Nuova pagina Servizi (`/servizi`)
+- Hero section con titolo "I nostri servizi" e sottotitolo
+- Griglia di 6+ servizi dettagliati (WiFi Fibra, Lavanderia Smart, Cucina Comune, Palestra, Sicurezza 24/7, Studio Rooms) -- espansione di quelli in homepage con descrizioni lunghe, immagini Unsplash e icone
+- Sezione "Perche scegliere noi" con 3 punti chiave
+- CTA finale "Prenota la tua camera"
+- Animazioni fade-up e stagger
 
-## Sito Pubblico — HomePage (/)
-- **Hero Section**: titolo "La tua casa a Padova. Senza stress.", sottotitolo, 2 CTA, stats (45 camere, 200+ studenti, 4.9 rating), badge urgenza
-- **Sezione Servizi**: 6 card (WiFi Fibra, Lavanderia Smart, Cucina Comune, Palestra, Sicurezza 24/7, Studio Rooms)
-- **Anteprima Camere**: 3 card (Singola 480€, Singola Plus 580€, Doppia 380€) con tabs tipo camera
-- **Testimonianze**: carosello 5 recensioni con avatar, nome, corso, stelle
-- **Mappa e Posizione**: layout 2 colonne con punti distanza + iframe Google Maps
-- CTA "Vedi tutte le camere disponibili"
+### 4. Nuova pagina Vantaggi (`/vantaggi`)
+- Hero section con titolo "I vantaggi di vivere con noi"
+- Sezione con card per ogni vantaggio: Posizione strategica, Tutto incluso nel prezzo, Community studentesca, Supporto dedicato, Contratti flessibili, Eventi e networking
+- Sezione comparativa (tabella o card) "StudentatoPD vs Affitto tradizionale"
+- Testimonianze degli studenti (riuso componente)
+- CTA finale
+- Animazioni coerenti
 
-## Pagina Camere (/camere)
-- **Catalogo** con sidebar filtri (tipo, prezzo slider, disponibilità, piano, servizi)
-- **CameraCard**: immagine 16:9, badge stato, prezzo, info, hover overlay
-- 6 camere seed con dati realistici (hardcoded per ora)
+### 5. Routing
+- Aggiungere in `App.tsx` le rotte `/servizi` e `/vantaggi`
 
-## Pagina Dettaglio Camera (/camere/:id)
-- Galleria foto stile Airbnb (1 grande + 4 piccole)
-- Info complete: nome, prezzo, piano, mq, servizi con icone
-- Sidebar sticky con CTA "Richiedi Prenotazione"
-- Sezione camere simili
-
-## Routing
-- `/` → HomePage
-- `/camere` → CamereCatalogo  
-- `/camere/:id` → CameraDettaglio
-
-## UX
-- Tutte le immagini da Unsplash (camere, studenti, Padova)
-- Testo realistico in italiano (no lorem ipsum)
-- Loading skeleton, empty states, toast notifications
-- Responsive: mobile-first con breakpoint tablet/desktop
+## File coinvolti
+- **Modifica**: `src/components/Navbar.tsx` (link aggiornati)
+- **Modifica**: `src/pages/Camere.tsx` (miglioramenti UI)
+- **Modifica**: `src/App.tsx` (nuove rotte)
+- **Nuovo**: `src/pages/Servizi.tsx`
+- **Nuovo**: `src/pages/Vantaggi.tsx`
 
