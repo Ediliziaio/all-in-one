@@ -8,6 +8,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import Index from "./pages/Index";
 import Camere from "./pages/Camere";
 import CameraDettaglio from "./pages/CameraDettaglio";
+import Servizi from "./pages/Servizi";
+import Vantaggi from "./pages/Vantaggi";
 import NotFound from "./pages/NotFound";
 
 // Auth
@@ -49,6 +51,8 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/camere" element={<Camere />} />
           <Route path="/camere/:id" element={<CameraDettaglio />} />
+          <Route path="/servizi" element={<Servizi />} />
+          <Route path="/vantaggi" element={<Vantaggi />} />
 
           {/* Auth */}
           <Route path="/login" element={<LoginPage />} />
