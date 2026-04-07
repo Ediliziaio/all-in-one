@@ -51,6 +51,8 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/camere" element={<Camere />} />
           <Route path="/camere/:id" element={<CameraDettaglio />} />
+          <Route path="/servizi" element={<Servizi />} />
+          <Route path="/vantaggi" element={<Vantaggi />} />
 
           {/* Auth */}
           <Route path="/login" element={<LoginPage />} />
