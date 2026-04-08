@@ -2,12 +2,12 @@ import { motion } from "framer-motion";
 import { Wifi, WashingMachine, UtensilsCrossed, Dumbbell, ShieldCheck, BookOpen } from "lucide-react";
 
 const services = [
-  { icon: Wifi, title: "WiFi Fibra", desc: "Connessione ultraveloce in ogni stanza per studio e streaming." },
-  { icon: WashingMachine, title: "Lavanderia Smart", desc: "Lavatrici e asciugatrici moderne con prenotazione via app." },
-  { icon: UtensilsCrossed, title: "Cucina Comune", desc: "Cucine attrezzate su ogni piano, sempre pulite e accessibili." },
-  { icon: Dumbbell, title: "Palestra", desc: "Sala fitness con attrezzi cardio e pesi liberi, inclusa nel prezzo." },
-  { icon: ShieldCheck, title: "Sicurezza 24/7", desc: "Accesso con badge elettronico e videosorveglianza attiva." },
-  { icon: BookOpen, title: "Studio Rooms", desc: "Sale studio silenziose prenotabili per sessioni concentrate." },
+  { icon: Wifi, title: "WiFi che non ti lascia mai", desc: "Lezioni online, Netflix, videochiamate: tutto senza lag. Fibra 1Gbps in ogni stanza." },
+  { icon: WashingMachine, title: "Lava quando vuoi", desc: "Lavatrici e asciugatrici 24/7, prenotabili dall'app. Zero code, zero attese." },
+  { icon: UtensilsCrossed, title: "Cucina come a casa", desc: "Piani induzione, forno, frigo: cucinati i tuoi piatti preferiti, su ogni piano." },
+  { icon: Dumbbell, title: "Allenati sotto casa", desc: "Cardio e pesi liberi inclusi nel canone, dalle 6 alle 23. Niente abbonamenti extra." },
+  { icon: ShieldCheck, title: "I tuoi genitori saranno tranquilli", desc: "Badge elettronico, telecamere, portineria. Sempre al sicuro, giorno e notte." },
+  { icon: BookOpen, title: "Sessione d'esame? Ci pensiamo noi", desc: "Sale silenziose prenotabili con prese e luce perfetta per concentrarti al massimo." },
 ];
 
 const fadeUp = {
@@ -27,7 +27,7 @@ export function ServicesSection() {
         >
           <h2 className="font-heading text-3xl md:text-4xl font-bold text-foreground">Tutto incluso, zero pensieri</h2>
           <p className="text-muted-foreground mt-3 max-w-md mx-auto">
-            Ogni servizio è pensato per rendere la tua vita da studente più semplice.
+            Un canone, tutto dentro. Niente sorprese a fine mese.
           </p>
         </motion.div>
 
