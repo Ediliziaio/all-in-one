@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowRight, Star, Users, Home, AlertTriangle } from "lucide-react";
+import { ArrowRight, Star, Users, MapPin, CheckCircle, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const containerVariants = {
@@ -54,10 +54,10 @@ export function HeroSection() {
           <div className="space-y-6">
             <motion.div variants={itemVariants} className="flex flex-wrap gap-2">
               <span className="inline-flex items-center gap-2 rounded-full bg-accent/20 px-4 py-1.5 text-sm font-medium text-accent">
-                🎓 Disponibile per A.A. 2025/2026
+                🎓 Iscrizioni A.A. 2025/2026 aperte
               </span>
               <span className="inline-flex items-center gap-2 rounded-full bg-primary-foreground/10 px-4 py-1.5 text-sm font-medium text-primary-foreground/90">
-                🔥 Ultime 8 camere disponibili
+                🔥 Posti limitati — prenota ora
               </span>
             </motion.div>
 
@@ -65,16 +65,16 @@ export function HeroSection() {
               variants={itemVariants}
               className="font-heading text-4xl font-extrabold leading-tight md:text-5xl lg:text-6xl"
             >
-              La tua casa a Padova.{" "}
-              <span className="text-accent">Senza stress.</span>
+              Studia a Padova,{" "}
+              <span className="text-accent">vivi senza pensieri.</span>
             </motion.h1>
 
             <motion.p
               variants={itemVariants}
               className="max-w-lg text-lg text-primary-foreground/80"
             >
-              Camere moderne, servizi all-inclusive e una community di studenti
-              a pochi passi dall'università.
+              Camera arredata, bollette incluse, WiFi fibra e una community di studenti — tutto in un canone.
+              A 5 minuti dall'università.
             </motion.p>
 
             <motion.div variants={itemVariants} className="flex flex-wrap gap-3">
@@ -84,7 +84,7 @@ export function HeroSection() {
                 className="bg-accent text-accent-foreground hover:bg-accent/90 text-base"
               >
                 <Link to="/camere">
-                  Scopri le camere <ArrowRight className="ml-2 h-4 w-4" />
+                  Vedi camere e prezzi <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
               <Button
@@ -93,7 +93,7 @@ export function HeroSection() {
                 size="lg"
                 className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 text-base"
               >
-                <Link to="/camere">Richiedi info</Link>
+                <Link to="/contatti">Richiedi info</Link>
               </Button>
             </motion.div>
 
@@ -102,9 +102,9 @@ export function HeroSection() {
               className="flex flex-wrap gap-8 pt-6 border-t border-primary-foreground/20"
             >
               {[
-                { icon: <Home className="h-5 w-5 text-accent" />, value: "45", label: "Camere" },
-                { icon: <Users className="h-5 w-5 text-accent" />, value: "200+", label: "Studenti ospitati" },
-                { icon: <Star className="h-5 w-5 text-accent" />, value: "4.9", label: "Rating medio" },
+                { icon: <Star className="h-5 w-5 text-accent" />, value: "4.9★", label: "su Google" },
+                { icon: <Users className="h-5 w-5 text-accent" />, value: "98%", label: "rinnova il contratto" },
+                { icon: <MapPin className="h-5 w-5 text-accent" />, value: "5 min", label: "dall'università" },
               ].map((stat) => (
                 <div key={stat.label} className="flex items-center gap-2">
                   {stat.icon}
@@ -116,15 +116,20 @@ export function HeroSection() {
               ))}
             </motion.div>
 
-            {/* Urgency banner */}
+            {/* Trust badges */}
             <motion.div
               variants={itemVariants}
-              className="flex items-center gap-3 bg-accent/15 border border-accent/30 rounded-xl px-4 py-3"
+              className="flex flex-wrap gap-4 pt-2"
             >
-              <AlertTriangle className="h-5 w-5 text-accent shrink-0" />
-              <p className="text-sm font-medium text-primary-foreground/90">
-                <span className="text-accent font-bold">Posti limitati</span> — Solo 8 camere rimaste per settembre 2025. Prenota subito!
-              </p>
+              {[
+                { icon: <CheckCircle className="h-4 w-4 text-accent" />, text: "Contratto regolare" },
+                { icon: <Clock className="h-4 w-4 text-accent" />, text: "Assistenza 24/7" },
+                { icon: <CheckCircle className="h-4 w-4 text-accent" />, text: "Tutto incluso" },
+              ].map((badge) => (
+                <span key={badge.text} className="inline-flex items-center gap-1.5 text-sm text-primary-foreground/80">
+                  {badge.icon} {badge.text}
+                </span>
+              ))}
             </motion.div>
           </div>
 

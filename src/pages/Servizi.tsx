@@ -1,52 +1,58 @@
 import { Link } from "react-router-dom";
 import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
-import { Wifi, WashingMachine, UtensilsCrossed, Dumbbell, Shield, BookOpen, CheckCircle } from "lucide-react";
+import { Wifi, WashingMachine, UtensilsCrossed, Dumbbell, Shield, BookOpen, CheckCircle, ShieldCheck, Clock, FileText } from "lucide-react";
 import { PageTransition, FadeIn, StaggerContainer, StaggerItem } from "@/components/motion/MotionWrappers";
 
 const services = [
   {
     icon: Wifi,
-    title: "WiFi Fibra 1Gbps",
-    description: "Connessione ultraveloce in ogni camera e nelle aree comuni. Streaming, videochiamate e download senza limiti, perfetta per studio e svago.",
+    title: "WiFi che non ti lascia mai",
+    description: "Lezioni online, Netflix, videochiamate: tutto senza lag. Fibra 1Gbps in ogni camera e nelle aree comuni.",
     image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&h=400&fit=crop",
   },
   {
     icon: WashingMachine,
-    title: "Lavanderia Smart",
-    description: "Lavatrici e asciugatrici di ultima generazione disponibili 24/7. Controlla la disponibilità e paga direttamente dall'app.",
+    title: "Lava quando vuoi",
+    description: "Lavatrici e asciugatrici 24/7, prenotabili dall'app. Zero code, zero attese, zero monete.",
     image: "https://images.unsplash.com/photo-1545173168-9f1947eebb7f?w=600&h=400&fit=crop",
   },
   {
     icon: UtensilsCrossed,
-    title: "Cucina Comune Attrezzata",
-    description: "Cucine moderne condivise su ogni piano con piano cottura a induzione, forno, microonde e frigorifero. Perfette per cucinare i tuoi piatti preferiti.",
+    title: "Cucina come a casa",
+    description: "Piani induzione, forno, microonde e frigo su ogni piano. Cucinati i tuoi piatti preferiti quando vuoi.",
     image: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=600&h=400&fit=crop",
   },
   {
     icon: Dumbbell,
-    title: "Palestra & Fitness",
-    description: "Area fitness attrezzata con cardio e pesi liberi, aperta dalle 6 alle 23. Mantieniti in forma senza uscire dalla residenza.",
+    title: "Allenati sotto casa",
+    description: "Cardio e pesi liberi inclusi nel canone, dalle 6 alle 23. Niente abbonamenti extra, niente spostamenti.",
     image: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&h=400&fit=crop",
   },
   {
     icon: Shield,
-    title: "Sicurezza 24/7",
-    description: "Accesso con badge elettronico, videosorveglianza nelle aree comuni e portineria attiva. La tua sicurezza è la nostra priorità.",
+    title: "I tuoi genitori saranno tranquilli",
+    description: "Badge elettronico, telecamere nelle aree comuni e portineria. Sempre al sicuro, giorno e notte.",
     image: "https://images.unsplash.com/photo-1558002038-1055907df827?w=600&h=400&fit=crop",
   },
   {
     icon: BookOpen,
-    title: "Sale Studio Silenziose",
-    description: "Spazi dedicati allo studio individuale e di gruppo, con postazioni ergonomiche, prese elettriche e illuminazione ottimale per la concentrazione.",
+    title: "Sessione d'esame? Ci pensiamo noi",
+    description: "Sale silenziose prenotabili con prese, luce perfetta e postazioni ergonomiche. Concentrati, al resto pensiamo noi.",
     image: "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=600&h=400&fit=crop",
   },
 ];
 
 const whyUs = [
-  { title: "Tutto incluso", desc: "Utenze, WiFi, pulizia aree comuni e manutenzione: un unico canone mensile senza sorprese." },
-  { title: "Community attiva", desc: "Eventi settimanali, gruppi studio e attività sociali per sentirti sempre a casa." },
-  { title: "Posizione strategica", desc: "A pochi minuti dall'Università di Padova, vicino a trasporti, negozi e vita notturna." },
+  { title: "Un canone, zero sorprese", desc: "Utenze, WiFi, pulizia aree comuni e manutenzione: tutto dentro. Niente bollette extra." },
+  { title: "Community vera", desc: "Eventi settimanali, gruppi studio e attività sociali. Non sei solo un inquilino, sei parte di qualcosa." },
+  { title: "A 5 minuti dall'uni", desc: "Posizione strategica nel cuore di Padova, vicino a trasporti, negozi e tutto ciò che serve." },
+];
+
+const parentTrust = [
+  { icon: ShieldCheck, title: "Contratto regolare", desc: "Contratto di locazione registrato, conforme alla normativa. Nessuna zona grigia." },
+  { icon: Clock, title: "Assistenza sempre disponibile", desc: "Team di supporto reperibile per emergenze e manutenzione, anche nei weekend." },
+  { icon: FileText, title: "Trasparenza totale", desc: "Prezzo chiaro all'ingresso, nessun costo nascosto. Quello che vedi è quello che paghi." },
 ];
 
 const Servizi = () => (
@@ -66,7 +72,7 @@ const Servizi = () => (
           <FadeIn>
             <h1 className="font-heading text-4xl md:text-5xl font-bold text-foreground max-w-xl">I nostri servizi</h1>
             <p className="text-muted-foreground mt-3 text-lg max-w-lg">
-              Tutto ciò di cui hai bisogno per vivere, studiare e crescere. Servizi pensati per semplificarti la vita universitaria.
+              Tutto quello che serve, niente di superfluo. Un canone, zero sorprese.
             </p>
           </FadeIn>
         </div>
@@ -118,15 +124,45 @@ const Servizi = () => (
         </div>
       </section>
 
+      {/* Per i genitori */}
+      <section className="py-16">
+        <div className="container">
+          <FadeIn>
+            <h2 className="font-heading text-3xl font-bold text-foreground text-center mb-4">Per i genitori</h2>
+            <p className="text-muted-foreground text-center max-w-lg mx-auto mb-12">
+              Sappiamo che spesso siete voi a cercare e a preoccuparvi. Ecco perché potete stare tranquilli.
+            </p>
+          </FadeIn>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+            {parentTrust.map((item, i) => (
+              <FadeIn key={item.title} delay={i * 0.1}>
+                <div className="rounded-xl border bg-card p-6 text-center hover:shadow-lg transition-shadow">
+                  <div className="h-12 w-12 rounded-full bg-accent/10 flex items-center justify-center mx-auto mb-4">
+                    <item.icon className="h-6 w-6 text-accent" />
+                  </div>
+                  <h3 className="font-heading font-semibold text-lg text-card-foreground">{item.title}</h3>
+                  <p className="text-muted-foreground text-sm mt-2">{item.desc}</p>
+                </div>
+              </FadeIn>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <FadeIn>
-        <section className="py-16">
+        <section className="py-16 bg-muted/50">
           <div className="container text-center">
             <h2 className="font-heading text-2xl md:text-3xl font-bold text-foreground">Pronto a trasferirti?</h2>
-            <p className="text-muted-foreground mt-2 max-w-md mx-auto">Scopri le camere disponibili e prenota il tuo posto.</p>
-            <Button size="lg" className="mt-6 bg-accent text-accent-foreground hover:bg-accent/90" asChild>
-              <Link to="/camere">Prenota la tua camera</Link>
-            </Button>
+            <p className="text-muted-foreground mt-2 max-w-md mx-auto">Scopri le camere disponibili e richiedi il tuo posto.</p>
+            <div className="flex flex-wrap justify-center gap-3 mt-6">
+              <Button size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90" asChild>
+                <Link to="/camere">Vedi camere e prezzi</Link>
+              </Button>
+              <Button size="lg" variant="outline" asChild>
+                <Link to="/contatti">Richiedi info</Link>
+              </Button>
+            </div>
           </div>
         </section>
       </FadeIn>
