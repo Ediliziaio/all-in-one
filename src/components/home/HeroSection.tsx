@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowRight, Star, Users, Home } from "lucide-react";
+import { ArrowRight, Star, Users, Home, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const containerVariants = {
@@ -50,11 +50,14 @@ export function HeroSection() {
           animate="visible"
           className="grid items-center gap-12 lg:grid-cols-2"
         >
-          {/* Left Column: Text Content */}
+          {/* Left Column */}
           <div className="space-y-6">
-            <motion.div variants={itemVariants}>
+            <motion.div variants={itemVariants} className="flex flex-wrap gap-2">
               <span className="inline-flex items-center gap-2 rounded-full bg-accent/20 px-4 py-1.5 text-sm font-medium text-accent">
-                🔥 Ultime 8 camere disponibili per settembre
+                🎓 Disponibile per A.A. 2025/2026
+              </span>
+              <span className="inline-flex items-center gap-2 rounded-full bg-primary-foreground/10 px-4 py-1.5 text-sm font-medium text-primary-foreground/90">
+                🔥 Ultime 8 camere disponibili
               </span>
             </motion.div>
 
@@ -112,6 +115,17 @@ export function HeroSection() {
                 </div>
               ))}
             </motion.div>
+
+            {/* Urgency banner */}
+            <motion.div
+              variants={itemVariants}
+              className="flex items-center gap-3 bg-accent/15 border border-accent/30 rounded-xl px-4 py-3"
+            >
+              <AlertTriangle className="h-5 w-5 text-accent shrink-0" />
+              <p className="text-sm font-medium text-primary-foreground/90">
+                <span className="text-accent font-bold">Posti limitati</span> — Solo 8 camere rimaste per settembre 2025. Prenota subito!
+              </p>
+            </motion.div>
           </div>
 
           {/* Right Column: Image Collage */}
@@ -119,11 +133,9 @@ export function HeroSection() {
             variants={itemVariants}
             className="relative hidden lg:block"
           >
-            {/* Decorative Shapes */}
             <div className="absolute -right-4 -top-4 h-72 w-72 rounded-full bg-accent/10 blur-3xl" />
             <div className="absolute -bottom-4 -left-4 h-48 w-48 rounded-full bg-primary-foreground/5 blur-2xl" />
 
-            {/* Images */}
             <motion.div
               variants={imageVariants}
               className="relative z-10 overflow-hidden rounded-2xl shadow-2xl"
