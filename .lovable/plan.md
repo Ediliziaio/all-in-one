@@ -1,40 +1,68 @@
 
 
-# Miglioramento CameraDettaglio — Galleria Airbnb + Sidebar Sticky
+# Elementi Mancanti dal Masterprompt — Senza Cloud/Backend
 
-## Cosa cambia
+## Analisi Gap
 
-### 1. Galleria foto stile Airbnb
-- Layout **1 grande + 4 piccole** (griglia 2 colonne: immagine principale occupa metà sinistra a tutta altezza, 4 thumbnail in griglia 2x2 a destra)
-- Ogni camera ha già 5 immagini nel data — perfetto per questo layout
-- Click su qualsiasi immagine apre un **lightbox fullscreen** con navigazione frecce e contatore (es. "2/5")
-- Pulsante "Mostra tutte le foto" sovrapposto all'ultima immagine
-- Angoli arrotondati sulla griglia, hover overlay scuro sulle immagini
-- Su mobile: solo immagine principale + pulsante "Vedi tutte le foto"
+Confrontando il masterprompt con il codice attuale, mancano i seguenti elementi:
 
-### 2. Sidebar sticky migliorata
-- Card con bordo e ombra leggera, `sticky top-24`
-- Prezzo grande con "/mese" in grigio
-- Lista rapida servizi top (3-4 icone inline: WiFi, Bagno, AC...)
-- Divider
-- CTA primario "Richiedi Prenotazione" (arancione, pieno)
-- CTA secondario "Prenota una visita" (outline)
-- Badge "Risposta entro 24h" con icona
-- Info "Disponibile dal..." con icona calendario
-- Animazione entrada con Framer Motion
+### 1. Navbar — Link mancanti
+Il masterprompt specifica: **Home, Camere, Servizi, Community, Contatti**. Attualmente ci sono: Camere, Servizi, Vantaggi. 
+- Aggiungere "Community" (link a `/studente/community` o sezione ancora pubblica)
+- Aggiungere "Contatti" (scroll a footer o sezione contatti)
+- "Vantaggi" resta perché già creata, ma non è nel masterprompt originale — la teniamo come voce extra
+- Mobile: sostituire il div menu con **Sheet** di shadcn (slide da destra) come richiesto
 
-### 3. Sezione info principale migliorata
-- Breadcrumb più raffinato
-- Titolo + badge disponibilità + tipo camera su una riga
-- Separatore visivo tra sezioni (descrizione, servizi, camere simili)
-- Card camere simili con HoverCard animation
+### 2. Footer — Miglioramenti
+- Struttura 3 colonne come da spec: **Studentato** (Home, Camere, Servizi) / **Per Studenti** (Area Riservata, Community, FAQ) / **Contatti**
+- Aggiungere **icone social**: Instagram, TikTok, WhatsApp (lucide-react)
+- Aggiungere **P.IVA** e link **Privacy Policy** nel bottom bar
 
-### 4. Lightbox component
-- Nuovo componente Dialog-based per la galleria fullscreen
-- Navigazione con frecce tastiera (ArrowLeft/Right) e click
-- Overlay scuro, immagine centrata, contatore slide
+### 3. Navbar — Indicatore attivo animato
+- Aggiungere underline animato con `framer-motion layout` sul link attivo (attualmente solo cambio colore)
+
+### 4. Hero Section — "Disponibile per A.A. 2025/2026"
+- Il masterprompt indica un badge "Disponibile per A.A. 2025/2026" — attualmente c'è "Ultime 8 camere disponibili". Aggiungere anche il badge A.A.
+- Aggiungere "Posti limitati — Solo 8 rimasti" come urgency banner sotto le stats
+
+### 5. Pagina Camere — Filtri mancanti
+Il masterprompt specifica filtri aggiuntivi:
+- **Prezzo max**: slider da 200€ a 800€
+- **Disponibilità**: date picker per check-in
+- **Servizi inclusi**: checkbox Bagno privato / Balcone / TV / Aria condizionata
+- Button "Applica filtri" + "Reset"
+- Attualmente c'è solo filtro per tipo e piano
+
+### 6. Skeleton/Loading States
+- Il masterprompt richiede skeleton shimmer su tutte le liste — attualmente nessuna pagina ha loading skeleton
+- Aggiungere `Skeleton` shadcn su pagine chiave: Camere, Community, Guide, Buoni
+
+### 7. Empty States
+- Il masterprompt richiede empty state con illustrazione + testo + CTA su ogni lista vuota
+- Aggiungere empty states su: filtri camere senza risultati, ticket vuoti, buoni vuoti per categoria
+
+### 8. Pagina Contatti (opzionale)
+- Il masterprompt mette "Contatti" nella navbar ma non definisce una pagina dedicata — probabilmente scroll al footer. Implementiamo come smooth scroll al footer.
 
 ## File coinvolti
-- **Modifica**: `src/pages/CameraDettaglio.tsx` (riscrittura completa)
-- **Nessun nuovo file** — il lightbox sarà inline con Dialog di shadcn
+- **Modifica**: `src/components/Navbar.tsx` — link Community e Contatti, Sheet mobile, underline animato
+- **Modifica**: `src/components/Footer.tsx` — 3 colonne, social icons, P.IVA, Privacy
+- **Modifica**: `src/components/home/HeroSection.tsx` — badge A.A., urgency banner
+- **Modifica**: `src/pages/Camere.tsx` — filtri aggiuntivi (prezzo slider, servizi, date picker, reset)
+- **Modifica**: `src/pages/studente/Community.tsx` — skeleton loading
+- **Modifica**: `src/pages/studente/Guide.tsx` — skeleton + empty state
+- **Modifica**: `src/pages/studente/Buoni.tsx` — empty state per categoria vuota
+
+## Cose GIÀ implementate (nessun intervento)
+- Design system (colori, font) ✓
+- Routing completo ✓
+- Layout Admin con sidebar + mobile bottom nav ✓
+- Layout Studente con sidebar + mobile bottom nav ✓
+- Tutte le pagine admin (Dashboard, Camere, Prenotazioni, Studenti, Supporto, Buoni, Guide) ✓
+- Tutte le pagine studente ✓
+- Auth pages (Login, Register) ✓
+- Framer Motion animations ✓
+- Galleria Airbnb su CameraDettaglio ✓
+- Pagine Servizi e Vantaggi ✓
+- Mock data completi ✓
 
