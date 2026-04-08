@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Search, FileText, BookOpen, Smartphone, PiggyBank, Bike } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Search, FileText, BookOpen, Smartphone, PiggyBank, Bike, BookX } from "lucide-react";
 import { mockGuide, type Guida } from "@/data/mockData";
 import { PageTransition, FadeIn, StaggerContainer, StaggerItem, HoverCard } from "@/components/motion/MotionWrappers";
 
@@ -14,6 +15,12 @@ export default function Guide() {
   const [search, setSearch] = useState("");
   const [cat, setCat] = useState("Tutte");
   const [selected, setSelected] = useState<Guida | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const t = setTimeout(() => setIsLoading(false), 800);
+    return () => clearTimeout(t);
+  }, []);
 
   const filtered = mockGuide.filter((g) =>
     g.attiva && (cat === "Tutte" || g.categoria === cat) && g.titolo.toLowerCase().includes(search.toLowerCase())
@@ -47,31 +54,51 @@ export default function Guide() {
         </div>
       </FadeIn>
 
-      <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filtered.length === 0 ? (
-          <div className="col-span-full text-center py-12 text-muted-foreground">Nessuna guida trovata</div>
-        ) : filtered.map((g) => {
-          const Icon = iconMap[g.icona] || FileText;
-          return (
-            <StaggerItem key={g.id}>
-              <HoverCard>
-                <Card className="cursor-pointer" onClick={() => setSelected(g)}>
-                  <CardContent className="p-5 space-y-3">
-                    <div className="h-10 w-10 rounded-xl bg-accent/10 flex items-center justify-center">
-                      <Icon className="h-5 w-5 text-accent" />
-                    </div>
-                    <div>
-                      <p className="font-heading font-semibold">{g.titolo}</p>
-                      <p className="text-sm text-muted-foreground line-clamp-2 mt-1">{g.contenuto}</p>
-                    </div>
-                    <Badge variant="outline">{g.categoria}</Badge>
-                  </CardContent>
-                </Card>
-              </HoverCard>
-            </StaggerItem>
-          );
-        })}
-      </StaggerContainer>
+      {isLoading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <Card key={i}>
+              <CardContent className="p-5 space-y-3">
+                <Skeleton className="h-10 w-10 rounded-xl" />
+                <Skeleton className="h-5 w-3/4" />
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-1/2" />
+                <Skeleton className="h-5 w-20 rounded-full" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      ) : (
+        <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filtered.length === 0 ? (
+            <div className="col-span-full text-center py-12">
+              <BookX className="h-16 w-16 mx-auto text-muted-foreground/40 mb-4" />
+              <p className="font-heading font-semibold text-foreground">Nessuna guida trovata</p>
+              <p className="text-sm text-muted-foreground mt-1">Prova a cercare con termini diversi o cambia categoria.</p>
+            </div>
+          ) : filtered.map((g) => {
+            const Icon = iconMap[g.icona] || FileText;
+            return (
+              <StaggerItem key={g.id}>
+                <HoverCard>
+                  <Card className="cursor-pointer" onClick={() => setSelected(g)}>
+                    <CardContent className="p-5 space-y-3">
+                      <div className="h-10 w-10 rounded-xl bg-accent/10 flex items-center justify-center">
+                        <Icon className="h-5 w-5 text-accent" />
+                      </div>
+                      <div>
+                        <p className="font-heading font-semibold">{g.titolo}</p>
+                        <p className="text-sm text-muted-foreground line-clamp-2 mt-1">{g.contenuto}</p>
+                      </div>
+                      <Badge variant="outline">{g.categoria}</Badge>
+                    </CardContent>
+                  </Card>
+                </HoverCard>
+              </StaggerItem>
+            );
+          })}
+        </StaggerContainer>
+      )}
 
       <Dialog open={!!selected} onOpenChange={() => setSelected(null)}>
         <DialogContent className="max-w-lg">

@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Copy, Tag } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Copy, Tag, Gift } from "lucide-react";
 import { mockBuoni } from "@/data/mockData";
 import { useToast } from "@/hooks/use-toast";
 import { PageTransition, FadeIn, StaggerContainer, StaggerItem, HoverCard } from "@/components/motion/MotionWrappers";
@@ -11,6 +12,13 @@ const categories = ["Tutte", "Cibo", "Sport", "Libri", "Divertimento", "Servizi"
 export default function Buoni() {
   const [cat, setCat] = useState("Tutte");
   const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const t = setTimeout(() => setIsLoading(false), 800);
+    return () => clearTimeout(t);
+  }, []);
+
   const filtered = mockBuoni.filter((b) => b.attivo && (cat === "Tutte" || b.categoria === cat));
 
   return (
@@ -35,11 +43,33 @@ export default function Buoni() {
         </div>
       </FadeIn>
 
-      {filtered.length === 0 ? (
+      {isLoading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[1, 2, 3].map((i) => (
+            <Card key={i}>
+              <CardContent className="p-4 space-y-3">
+                <div className="flex items-center gap-3">
+                  <Skeleton className="h-14 w-14 rounded-xl" />
+                  <div className="flex-1 space-y-2">
+                    <Skeleton className="h-5 w-3/4" />
+                    <Skeleton className="h-4 w-16 rounded-full" />
+                  </div>
+                </div>
+                <Skeleton className="h-4 w-full" />
+                <div className="flex justify-between">
+                  <Skeleton className="h-8 w-20 rounded-full" />
+                  <Skeleton className="h-8 w-28 rounded-lg" />
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      ) : filtered.length === 0 ? (
         <FadeIn>
           <div className="text-center py-12">
-            <Tag className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
-            <p className="text-muted-foreground">Nessun buono in questa categoria</p>
+            <Gift className="h-16 w-16 mx-auto text-muted-foreground/40 mb-4" />
+            <p className="font-heading font-semibold text-foreground">Nessun buono in questa categoria</p>
+            <p className="text-sm text-muted-foreground mt-1">Prova a selezionare un'altra categoria per scoprire nuove offerte.</p>
           </div>
         </FadeIn>
       ) : (

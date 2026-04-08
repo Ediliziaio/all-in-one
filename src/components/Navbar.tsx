@@ -2,17 +2,25 @@ import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
 
 const navLinks = [
   { label: "Camere", href: "/camere" },
   { label: "Servizi", href: "/servizi" },
   { label: "Vantaggi", href: "/vantaggi" },
+  { label: "Community", href: "/studente/community" },
 ];
 
 export function Navbar() {
   const [open, setOpen] = useState(false);
   const location = useLocation();
+
+  const scrollToFooter = () => {
+    document.getElementById("footer")?.scrollIntoView({ behavior: "smooth" });
+    setOpen(false);
+  };
 
   return (
     <header className="sticky top-0 z-50 glass">
@@ -25,19 +33,35 @@ export function Navbar() {
         </Link>
 
         {/* Desktop */}
-        <nav className="hidden md:flex items-center gap-8">
-          {navLinks.map((l) => (
-            <Link
-              key={l.href}
-              to={l.href}
-              className={cn(
-                "text-sm font-medium transition-colors hover:text-accent",
-                location.pathname === l.href ? "text-accent" : "text-muted-foreground"
-              )}
-            >
-              {l.label}
-            </Link>
-          ))}
+        <nav className="hidden md:flex items-center gap-8 relative">
+          {navLinks.map((l) => {
+            const isActive = location.pathname === l.href;
+            return (
+              <Link
+                key={l.href}
+                to={l.href}
+                className={cn(
+                  "relative text-sm font-medium transition-colors hover:text-accent py-1",
+                  isActive ? "text-accent" : "text-muted-foreground"
+                )}
+              >
+                {l.label}
+                {isActive && (
+                  <motion.div
+                    layoutId="navbar-underline"
+                    className="absolute -bottom-1 left-0 right-0 h-0.5 bg-accent rounded-full"
+                    transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                  />
+                )}
+              </Link>
+            );
+          })}
+          <button
+            onClick={scrollToFooter}
+            className="text-sm font-medium text-muted-foreground hover:text-accent transition-colors"
+          >
+            Contatti
+          </button>
         </nav>
 
         <div className="hidden md:flex items-center gap-3">
@@ -45,34 +69,46 @@ export function Navbar() {
           <Button size="sm" className="bg-accent text-accent-foreground hover:bg-accent/90" asChild><Link to="/camere">Prenota Ora</Link></Button>
         </div>
 
-        {/* Mobile toggle */}
-        <button className="md:hidden" onClick={() => setOpen(!open)} aria-label="Menu">
-          {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-        </button>
+        {/* Mobile */}
+        <Sheet open={open} onOpenChange={setOpen}>
+          <SheetTrigger asChild>
+            <button className="md:hidden" aria-label="Menu">
+              <Menu className="h-6 w-6" />
+            </button>
+          </SheetTrigger>
+          <SheetContent side="right" className="w-72 pt-12">
+            <nav className="flex flex-col gap-4">
+              {navLinks.map((l) => (
+                <Link
+                  key={l.href}
+                  to={l.href}
+                  onClick={() => setOpen(false)}
+                  className={cn(
+                    "text-base font-medium py-2 border-b border-border transition-colors",
+                    location.pathname === l.href ? "text-accent" : "text-foreground"
+                  )}
+                >
+                  {l.label}
+                </Link>
+              ))}
+              <button
+                onClick={scrollToFooter}
+                className="text-base font-medium py-2 border-b border-border text-foreground text-left"
+              >
+                Contatti
+              </button>
+              <div className="flex flex-col gap-2 pt-4">
+                <Button variant="outline" asChild onClick={() => setOpen(false)}>
+                  <Link to="/login">Accedi</Link>
+                </Button>
+                <Button className="bg-accent text-accent-foreground hover:bg-accent/90" asChild onClick={() => setOpen(false)}>
+                  <Link to="/camere">Prenota Ora</Link>
+                </Button>
+              </div>
+            </nav>
+          </SheetContent>
+        </Sheet>
       </div>
-
-      {/* Mobile menu */}
-      {open && (
-        <div className="md:hidden border-t bg-background px-4 pb-4 pt-2 space-y-3">
-          {navLinks.map((l) => (
-            <Link
-              key={l.href}
-              to={l.href}
-              onClick={() => setOpen(false)}
-              className={cn(
-                "block py-2 text-sm font-medium",
-                location.pathname === l.href ? "text-accent" : "text-muted-foreground"
-              )}
-            >
-              {l.label}
-            </Link>
-          ))}
-          <div className="flex gap-2 pt-2">
-            <Button variant="ghost" size="sm" className="flex-1" asChild><Link to="/login">Accedi</Link></Button>
-            <Button size="sm" className="flex-1 bg-accent text-accent-foreground hover:bg-accent/90" asChild><Link to="/camere">Prenota Ora</Link></Button>
-          </div>
-        </div>
-      )}
     </header>
   );
 }
