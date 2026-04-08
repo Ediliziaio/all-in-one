@@ -11,6 +11,7 @@ const navLinks = [
   { label: "Servizi", href: "/servizi" },
   { label: "Vantaggi", href: "/vantaggi" },
   { label: "Community", href: "/studente/community" },
+  { label: "Contatti", href: "/contatti" },
 ];
 
 export function Navbar() {
@@ -56,12 +57,6 @@ export function Navbar() {
               </Link>
             );
           })}
-          <button
-            onClick={scrollToFooter}
-            className="text-sm font-medium text-muted-foreground hover:text-accent transition-colors"
-          >
-            Contatti
-          </button>
         </nav>
 
         <div className="hidden md:flex items-center gap-3">
@@ -91,12 +86,6 @@ export function Navbar() {
                   {l.label}
                 </Link>
               ))}
-              <button
-                onClick={scrollToFooter}
-                className="text-base font-medium py-2 border-b border-border text-foreground text-left"
-              >
-                Contatti
-              </button>
               <div className="flex flex-col gap-2 pt-4">
                 <Button variant="outline" asChild onClick={() => setOpen(false)}>
                   <Link to="/login">Accedi</Link>
