@@ -9,7 +9,6 @@ import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Skeleton } from "@/components/ui/skeleton";
 import { rooms, getRoomTypeLabel, type Room } from "@/data/rooms";
 import { SlidersHorizontal, X, Wifi, Snowflake, Bath, Tv, CalendarIcon, RotateCcw, SearchX } from "lucide-react";
 import { PageTransition, FadeIn, StaggerContainer, StaggerItem, HoverCard } from "@/components/motion/MotionWrappers";
@@ -34,7 +33,7 @@ const Camere = () => {
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [checkInDate, setCheckInDate] = useState<Date | undefined>();
   const [showFilters, setShowFilters] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+
 
   const toggleType = (t: RoomType) =>
     setTypes((prev) => (prev.includes(t) ? prev.filter((x) => x !== t) : [...prev, t]));
