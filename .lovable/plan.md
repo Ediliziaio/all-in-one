@@ -1,37 +1,35 @@
 
 
-# Pagina Contatti Dedicata
+# Sezione "Chi Siamo" nella Home Page
 
 ## Cosa viene creato
 
-Una nuova pagina `/contatti` con:
+Nuovo componente `src/components/home/AboutSection.tsx` inserito nella home tra `TestimonialsSection` e `MapSection`.
 
-### 1. Hero section
-- Titolo "Contattaci" con sottotitolo e animazione fade-up
+### Struttura della sezione
 
-### 2. Layout a 2 colonne (mobile: stacked)
-**Colonna sinistra — Form di contatto:**
-- Campi: Nome, Email, Telefono (opzionale), Oggetto (select: Info camere / Prenotazione / Supporto / Altro), Messaggio (textarea)
-- Validazione client-side con feedback errori inline
-- Submit mostra toast di conferma (mock, no backend)
-- Animazioni Framer Motion
+**Parte 1 — Storia dello studentato**
+- Layout split-screen: testo a sinistra, immagine Unsplash (edificio/studenti a Padova) a destra
+- Titolo "Chi Siamo", sottotitolo e 2-3 paragrafi sulla missione e storia (fondato nel 2018, gestione familiare, comunità)
+- 3 mini-stats inline: "7+ anni di esperienza", "500+ studenti ospitati", "98% soddisfazione"
+- Animazioni fade-up on scroll
 
-**Colonna destra — Info + Mappa:**
-- Card con info contatto (indirizzo, email, telefono, orari ufficio)
-- Mappa Google Maps embed (riuso stile MapSection esistente)
-- Card distanze dai punti di interesse (riuso dati da MapSection)
+**Parte 2 — Il Team**
+- Griglia 4 colonne (2 su mobile) con 4 membri del team
+- Ogni card: Avatar circolare (Unsplash), nome, ruolo, breve bio 1 riga
+- Ruoli: Fondatore, Responsabile Operativa, Community Manager, Manutenzione
+- Hover effect con scale e shadow
 
-### 3. Sezione FAQ rapida
-- 3-4 domande frequenti con Accordion di shadcn sotto il form
+**Parte 3 — I nostri valori**
+- 3 card con icona, titolo e descrizione (Comunità, Qualità, Trasparenza)
+- Layout a 3 colonne con animazioni staggered
 
-## Modifiche al routing e navigazione
-- Aggiungere rotta `/contatti` in `App.tsx`
-- Aggiornare "Contatti" nella Navbar: da smooth-scroll a link `/contatti`
-- Aggiungere link nel Footer
+### Stile
+- Sfondo alternato (grigio chiaro `bg-muted/30`) per contrasto con sezioni adiacenti
+- Font heading + body coerenti col design system
+- Framer Motion: fade-up, stagger sulle card team e valori
 
 ## File coinvolti
-- **Nuovo**: `src/pages/Contatti.tsx`
-- **Modifica**: `src/App.tsx` (rotta)
-- **Modifica**: `src/components/Navbar.tsx` (link diretto invece di scroll)
-- **Modifica**: `src/components/Footer.tsx` (link a /contatti)
+- **Nuovo**: `src/components/home/AboutSection.tsx`
+- **Modifica**: `src/pages/Index.tsx` (import + inserimento tra Testimonials e Map)
 
