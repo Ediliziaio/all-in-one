@@ -1,43 +1,40 @@
 
 
-# Aggiornamenti Sito Pubblico: Navbar, Camere, Servizi, Vantaggi
+# Miglioramento CameraDettaglio — Galleria Airbnb + Sidebar Sticky
 
 ## Cosa cambia
 
-### 1. Navbar -- rimuovere "Home", aggiungere nuove voci
-- Rimuovere la voce "Home" dai link di navigazione
-- Aggiungere: **Camere**, **Servizi**, **Vantaggi**
-- Il logo "StudentatoPD" porta comunque alla home cliccandoci
+### 1. Galleria foto stile Airbnb
+- Layout **1 grande + 4 piccole** (griglia 2 colonne: immagine principale occupa metà sinistra a tutta altezza, 4 thumbnail in griglia 2x2 a destra)
+- Ogni camera ha già 5 immagini nel data — perfetto per questo layout
+- Click su qualsiasi immagine apre un **lightbox fullscreen** con navigazione frecce e contatore (es. "2/5")
+- Pulsante "Mostra tutte le foto" sovrapposto all'ultima immagine
+- Angoli arrotondati sulla griglia, hover overlay scuro sulle immagini
+- Su mobile: solo immagine principale + pulsante "Vedi tutte le foto"
 
-### 2. Pagina Camere (`/camere`) -- miglioramento
-- Aggiungere hero banner in cima con titolo, sottotitolo e immagine di sfondo
-- Aggiungere filtro per **piano** nella sidebar
-- Aggiungere sezione CTA in fondo ("Non trovi la camera giusta? Contattaci")
-- Animazioni Framer Motion coerenti con il resto del sito (PageTransition, FadeIn, HoverCard)
-- Migliorare le card con icone per i servizi principali e badge prezzo più visibile
+### 2. Sidebar sticky migliorata
+- Card con bordo e ombra leggera, `sticky top-24`
+- Prezzo grande con "/mese" in grigio
+- Lista rapida servizi top (3-4 icone inline: WiFi, Bagno, AC...)
+- Divider
+- CTA primario "Richiedi Prenotazione" (arancione, pieno)
+- CTA secondario "Prenota una visita" (outline)
+- Badge "Risposta entro 24h" con icona
+- Info "Disponibile dal..." con icona calendario
+- Animazione entrada con Framer Motion
 
-### 3. Nuova pagina Servizi (`/servizi`)
-- Hero section con titolo "I nostri servizi" e sottotitolo
-- Griglia di 6+ servizi dettagliati (WiFi Fibra, Lavanderia Smart, Cucina Comune, Palestra, Sicurezza 24/7, Studio Rooms) -- espansione di quelli in homepage con descrizioni lunghe, immagini Unsplash e icone
-- Sezione "Perche scegliere noi" con 3 punti chiave
-- CTA finale "Prenota la tua camera"
-- Animazioni fade-up e stagger
+### 3. Sezione info principale migliorata
+- Breadcrumb più raffinato
+- Titolo + badge disponibilità + tipo camera su una riga
+- Separatore visivo tra sezioni (descrizione, servizi, camere simili)
+- Card camere simili con HoverCard animation
 
-### 4. Nuova pagina Vantaggi (`/vantaggi`)
-- Hero section con titolo "I vantaggi di vivere con noi"
-- Sezione con card per ogni vantaggio: Posizione strategica, Tutto incluso nel prezzo, Community studentesca, Supporto dedicato, Contratti flessibili, Eventi e networking
-- Sezione comparativa (tabella o card) "StudentatoPD vs Affitto tradizionale"
-- Testimonianze degli studenti (riuso componente)
-- CTA finale
-- Animazioni coerenti
-
-### 5. Routing
-- Aggiungere in `App.tsx` le rotte `/servizi` e `/vantaggi`
+### 4. Lightbox component
+- Nuovo componente Dialog-based per la galleria fullscreen
+- Navigazione con frecce tastiera (ArrowLeft/Right) e click
+- Overlay scuro, immagine centrata, contatore slide
 
 ## File coinvolti
-- **Modifica**: `src/components/Navbar.tsx` (link aggiornati)
-- **Modifica**: `src/pages/Camere.tsx` (miglioramenti UI)
-- **Modifica**: `src/App.tsx` (nuove rotte)
-- **Nuovo**: `src/pages/Servizi.tsx`
-- **Nuovo**: `src/pages/Vantaggi.tsx`
+- **Modifica**: `src/pages/CameraDettaglio.tsx` (riscrittura completa)
+- **Nessun nuovo file** — il lightbox sarà inline con Dialog di shadcn
 
