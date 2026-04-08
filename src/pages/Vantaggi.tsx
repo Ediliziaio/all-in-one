@@ -5,29 +5,29 @@ import { MapPin, Banknote, Users, HeadphonesIcon, FileText, CalendarHeart, Check
 import { PageTransition, FadeIn, StaggerContainer, StaggerItem } from "@/components/motion/MotionWrappers";
 
 const vantaggi = [
-  { icon: MapPin, title: "Posizione strategica", desc: "A 5 minuti a piedi dall'Università di Padova, vicino a Prato della Valle, trasporti e vita cittadina." },
-  { icon: Banknote, title: "Tutto incluso nel prezzo", desc: "Canone unico con utenze, WiFi, pulizia aree comuni, manutenzione e accesso a tutti i servizi." },
-  { icon: Users, title: "Community studentesca", desc: "Vivi con altri studenti, partecipa a eventi sociali, gruppi studio e attività organizzate ogni settimana." },
-  { icon: HeadphonesIcon, title: "Supporto dedicato", desc: "Team di assistenza disponibile per manutenzione, problemi tecnici e qualsiasi necessità quotidiana." },
-  { icon: FileText, title: "Contratti flessibili", desc: "Durata semestrale o annuale, senza vincoli complessi. Disdici con preavviso di un mese." },
-  { icon: CalendarHeart, title: "Eventi e networking", desc: "Serate cinema, tornei sportivi, aperitivi e workshop professionali per arricchire la tua esperienza." },
+  { icon: MapPin, title: "A 5 minuti dall'uni", desc: "Esci di casa e sei in aula. Niente bus affollati, niente sveglie alle 6. Più sonno, più studio." },
+  { icon: Banknote, title: "Un prezzo, tutto dentro", desc: "Canone unico con utenze, WiFi, pulizia, manutenzione e accesso a tutti i servizi. Zero sorprese a fine mese." },
+  { icon: Users, title: "Community, non coinquilini a caso", desc: "Vivi con altri studenti, partecipa a eventi, gruppi studio e attività. Qui le amicizie nascono da sole." },
+  { icon: HeadphonesIcon, title: "Supporto vero", desc: "Si è rotto qualcosa? Scrivi su WhatsApp e interveniamo. Niente attese, niente rincorrere il proprietario." },
+  { icon: FileText, title: "Contratti senza trappole", desc: "Durata semestrale o annuale, disdici con un mese di preavviso. Tutto registrato e regolare." },
+  { icon: CalendarHeart, title: "Eventi ogni settimana", desc: "Serate cinema, tornei, aperitivi, workshop. La tua esperienza universitaria non è solo lezioni." },
 ];
 
 const comparison = [
   { feature: "Utenze incluse", us: true, trad: false },
   { feature: "WiFi Fibra 1Gbps", us: true, trad: false },
   { feature: "Manutenzione inclusa", us: true, trad: false },
-  { feature: "Pulizia aree comuni", us: true, trad: false },
   { feature: "Community e eventi", us: true, trad: false },
   { feature: "Contratto flessibile", us: true, trad: false },
-  { feature: "Nessun deposito cauzionale", us: true, trad: false },
   { feature: "Palestra e sale studio", us: true, trad: false },
+  { feature: "Libertà di scelta zona", us: false, trad: true },
+  { feature: "Nessuna regola condominiale", us: false, trad: true },
 ];
 
 const testimonials = [
-  { name: "Giulia R.", course: "Medicina, 3° anno", text: "Vivere allo studentato è stata la scelta migliore. Ho trovato compagni di studio e amici per la vita." },
-  { name: "Marco T.", course: "Ingegneria, 2° anno", text: "Il rapporto qualità-prezzo è imbattibile. WiFi veloce, camera pulita e zero pensieri per le bollette." },
-  { name: "Sofia L.", course: "Psicologia, 1° anno", text: "Mi sono ambientata subito grazie agli eventi della community. Mi sento davvero a casa!" },
+  { name: "Giulia R.", course: "Medicina, 3° anno", text: "Dopo un anno in affitto con bollette impazzite, qui ho finalmente la testa libera per studiare. Tutto incluso, zero stress." },
+  { name: "Marco T.", course: "Ingegneria, 2° anno", text: "Il rapporto qualità-prezzo è assurdo. WiFi veloce, camera pulita, palestra gratis. Provate a trovare tutto questo in un affitto." },
+  { name: "Sofia L.", course: "Psicologia, 1° anno", text: "Ero terrorizzata all'idea di trasferirmi da sola. Qui mi sono ambientata in una settimana, grazie agli eventi e alla community." },
 ];
 
 const Vantaggi = () => (
@@ -45,9 +45,9 @@ const Vantaggi = () => (
         </div>
         <div className="container relative z-10">
           <FadeIn>
-            <h1 className="font-heading text-4xl md:text-5xl font-bold text-foreground max-w-xl">I vantaggi di vivere con noi</h1>
+            <h1 className="font-heading text-4xl md:text-5xl font-bold text-foreground max-w-xl">Perché scegliere StudentatoPD</h1>
             <p className="text-muted-foreground mt-3 text-lg max-w-lg">
-              Molto più di un posto letto. Un'esperienza completa pensata per il tuo percorso universitario.
+              Non è solo un posto letto. È la base da cui parte la tua vita universitaria.
             </p>
           </FadeIn>
         </div>
@@ -76,7 +76,8 @@ const Vantaggi = () => (
       <section className="py-16 bg-muted/50">
         <div className="container max-w-2xl">
           <FadeIn>
-            <h2 className="font-heading text-3xl font-bold text-foreground text-center mb-10">StudentatoPD vs Affitto tradizionale</h2>
+            <h2 className="font-heading text-3xl font-bold text-foreground text-center mb-3">StudentatoPD vs Affitto tradizionale</h2>
+            <p className="text-muted-foreground text-center mb-10 text-sm">Un confronto onesto. Ogni soluzione ha i suoi pro.</p>
           </FadeIn>
           <FadeIn delay={0.1}>
             <div className="rounded-xl border bg-card overflow-hidden">
@@ -101,7 +102,7 @@ const Vantaggi = () => (
       <section className="py-16">
         <div className="container">
           <FadeIn>
-            <h2 className="font-heading text-3xl font-bold text-foreground text-center mb-10">Cosa dicono i nostri studenti</h2>
+            <h2 className="font-heading text-3xl font-bold text-foreground text-center mb-10">Parola di chi ci vive</h2>
           </FadeIn>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
             {testimonials.map((t, i) => (
@@ -123,11 +124,16 @@ const Vantaggi = () => (
       <FadeIn>
         <section className="py-16 bg-muted/50">
           <div className="container text-center">
-            <h2 className="font-heading text-2xl md:text-3xl font-bold text-foreground">Convinto? Inizia da qui</h2>
-            <p className="text-muted-foreground mt-2 max-w-md mx-auto">Esplora le camere disponibili e prenota il tuo posto allo StudentatoPD.</p>
-            <Button size="lg" className="mt-6 bg-accent text-accent-foreground hover:bg-accent/90" asChild>
-              <Link to="/camere">Vedi le camere</Link>
-            </Button>
+            <h2 className="font-heading text-2xl md:text-3xl font-bold text-foreground">Pronto? Il tuo posto ti aspetta</h2>
+            <p className="text-muted-foreground mt-2 max-w-md mx-auto">Esplora le camere disponibili e richiedi il tuo posto allo StudentatoPD.</p>
+            <div className="flex flex-wrap justify-center gap-3 mt-6">
+              <Button size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90" asChild>
+                <Link to="/camere">Vedi le camere</Link>
+              </Button>
+              <Button size="lg" variant="outline" asChild>
+                <Link to="/contatti">Scrivici</Link>
+              </Button>
+            </div>
           </div>
         </section>
       </FadeIn>

@@ -22,7 +22,7 @@ export function RoomsPreview() {
           className="text-center mb-12"
         >
           <h2 className="font-heading text-3xl md:text-4xl font-bold text-foreground">Le nostre camere</h2>
-          <p className="text-muted-foreground mt-3">Scegli la soluzione perfetta per te.</p>
+          <p className="text-muted-foreground mt-3">Prezzi chiari, tutto incluso. Confronta e scegli.</p>
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -54,6 +54,7 @@ export function RoomsPreview() {
                       <div>
                         <span className="text-2xl font-bold text-accent">€{room.price}</span>
                         <span className="text-sm text-muted-foreground">/mese</span>
+                        <p className="text-xs text-success font-medium">tutto incluso</p>
                       </div>
                       <span className="text-sm text-accent font-medium group-hover:underline">Dettagli →</span>
                     </div>

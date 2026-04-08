@@ -61,7 +61,7 @@ export function Navbar() {
 
         <div className="hidden md:flex items-center gap-3">
           <Button variant="ghost" size="sm" asChild><Link to="/login">Accedi</Link></Button>
-          <Button size="sm" className="bg-accent text-accent-foreground hover:bg-accent/90" asChild><Link to="/camere">Prenota Ora</Link></Button>
+          <Button size="sm" className="bg-accent text-accent-foreground hover:bg-accent/90" asChild><Link to="/contatti">Richiedi info</Link></Button>
         </div>
 
         {/* Mobile */}
@@ -91,7 +91,7 @@ export function Navbar() {
                   <Link to="/login">Accedi</Link>
                 </Button>
                 <Button className="bg-accent text-accent-foreground hover:bg-accent/90" asChild onClick={() => setOpen(false)}>
-                  <Link to="/camere">Prenota Ora</Link>
+                  <Link to="/contatti">Richiedi info</Link>
                 </Button>
               </div>
             </nav>

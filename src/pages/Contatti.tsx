@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { toast } from "sonner";
-import { MapPin, Mail, Phone, Clock, GraduationCap, Train, ShoppingBag, TreePine, Send } from "lucide-react";
+import { MapPin, Mail, Phone, Clock, GraduationCap, Train, ShoppingBag, TreePine, Send, MessageCircle } from "lucide-react";
 
 const distances = [
   { icon: GraduationCap, label: "Università di Padova (Bo)", distance: "5 min a piedi" },
@@ -70,7 +70,7 @@ export default function Contatti() {
         <div className="container">
           <motion.div initial="hidden" animate="visible" variants={fade} transition={{ duration: 0.6 }} className="text-center max-w-2xl mx-auto">
             <h1 className="font-heading text-4xl md:text-5xl font-bold text-foreground">Contattaci</h1>
-            <p className="text-muted-foreground mt-4 text-lg">Hai domande sulle camere o sulla prenotazione? Scrivici e ti risponderemo entro 24 ore.</p>
+            <p className="text-muted-foreground mt-4 text-lg">Scrivici — rispondiamo davvero entro 24 ore (sì, anche su WhatsApp).</p>
           </motion.div>
         </div>
       </section>
@@ -135,6 +135,7 @@ export default function Contatti() {
                   { icon: Mail, label: "info@studentatopd.it", href: "mailto:info@studentatopd.it" },
                   { icon: Phone, label: "+39 049 123 4567", href: "tel:+390491234567" },
                   { icon: Clock, label: "Lun–Ven: 9:00–18:00" },
+                  { icon: MessageCircle, label: "WhatsApp: +39 049 123 4567", href: "https://wa.me/390491234567" },
                 ].map((item) => (
                   <div key={item.label} className="flex items-center gap-3">
                     <div className="h-9 w-9 rounded-lg bg-accent/10 flex items-center justify-center shrink-0">
