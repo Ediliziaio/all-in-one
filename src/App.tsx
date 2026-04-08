@@ -10,6 +10,7 @@ import Camere from "./pages/Camere";
 import CameraDettaglio from "./pages/CameraDettaglio";
 import Servizi from "./pages/Servizi";
 import Vantaggi from "./pages/Vantaggi";
+import Contatti from "./pages/Contatti";
 import NotFound from "./pages/NotFound";
 
 // Auth
@@ -53,6 +54,7 @@ const App = () => (
           <Route path="/camere/:id" element={<CameraDettaglio />} />
           <Route path="/servizi" element={<Servizi />} />
           <Route path="/vantaggi" element={<Vantaggi />} />
+          <Route path="/contatti" element={<Contatti />} />
 
           {/* Auth */}
           <Route path="/login" element={<LoginPage />} />
