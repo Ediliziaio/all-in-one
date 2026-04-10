@@ -42,7 +42,7 @@ const floatingVariants = {
 
 export function HeroSection() {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-primary via-primary to-primary/90 text-primary-foreground">
+    <section className="relative overflow-hidden bg-gradient-to-br from-muted via-background to-muted">
       <div className="container relative py-16 md:py-24">
         <motion.div
           variants={containerVariants}
@@ -53,25 +53,25 @@ export function HeroSection() {
           {/* Left Column */}
           <div className="space-y-6">
             <motion.div variants={itemVariants} className="flex flex-wrap gap-2">
-              <span className="inline-flex items-center gap-2 rounded-full bg-accent/20 px-4 py-1.5 text-sm font-medium text-accent">
+              <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary">
                 🎓 Iscrizioni A.A. 2025/2026 aperte
               </span>
-              <span className="inline-flex items-center gap-2 rounded-full bg-primary-foreground/10 px-4 py-1.5 text-sm font-medium text-primary-foreground/90">
+              <span className="inline-flex items-center gap-2 rounded-full bg-destructive/10 px-4 py-1.5 text-sm font-medium text-destructive">
                 🔥 Posti limitati — prenota ora
               </span>
             </motion.div>
 
             <motion.h1
               variants={itemVariants}
-              className="font-heading text-4xl font-extrabold leading-tight md:text-5xl lg:text-6xl"
+              className="font-heading text-4xl font-extrabold leading-tight md:text-5xl lg:text-6xl text-foreground"
             >
               Studia a Padova,{" "}
-              <span className="text-accent">vivi senza pensieri.</span>
+              <span className="text-primary">vivi senza pensieri.</span>
             </motion.h1>
 
             <motion.p
               variants={itemVariants}
-              className="max-w-lg text-lg text-primary-foreground/80"
+              className="max-w-lg text-lg text-muted-foreground"
             >
               Camera arredata, bollette incluse, WiFi fibra e una community di studenti — tutto in un canone.
               A 5 minuti dall'università.
@@ -81,7 +81,7 @@ export function HeroSection() {
               <Button
                 asChild
                 size="lg"
-                className="bg-accent text-accent-foreground hover:bg-accent/90 text-base"
+                className="text-base"
               >
                 <Link to="/camere">
                   Vedi camere e prezzi <ArrowRight className="ml-2 h-4 w-4" />
@@ -91,7 +91,7 @@ export function HeroSection() {
                 asChild
                 variant="outline"
                 size="lg"
-                className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 text-base"
+                className="text-base"
               >
                 <Link to="/contatti">Richiedi info</Link>
               </Button>
@@ -99,18 +99,18 @@ export function HeroSection() {
 
             <motion.div
               variants={itemVariants}
-              className="flex flex-wrap gap-8 pt-6 border-t border-primary-foreground/20"
+              className="flex flex-wrap gap-8 pt-6 border-t border-border"
             >
               {[
-                { icon: <Star className="h-5 w-5 text-accent" />, value: "4.9★", label: "su Google" },
-                { icon: <Users className="h-5 w-5 text-accent" />, value: "98%", label: "rinnova il contratto" },
-                { icon: <MapPin className="h-5 w-5 text-accent" />, value: "5 min", label: "dall'università" },
+                { icon: <Star className="h-5 w-5 text-[hsl(var(--google-yellow))]" />, value: "4.9★", label: "su Google" },
+                { icon: <Users className="h-5 w-5 text-[hsl(var(--google-blue))]" />, value: "98%", label: "rinnova il contratto" },
+                { icon: <MapPin className="h-5 w-5 text-[hsl(var(--google-red))]" />, value: "5 min", label: "dall'università" },
               ].map((stat) => (
                 <div key={stat.label} className="flex items-center gap-2">
                   {stat.icon}
                   <div>
-                    <p className="text-2xl font-bold">{stat.value}</p>
-                    <p className="text-xs text-primary-foreground/60">{stat.label}</p>
+                    <p className="text-2xl font-bold text-foreground">{stat.value}</p>
+                    <p className="text-xs text-muted-foreground">{stat.label}</p>
                   </div>
                 </div>
               ))}
@@ -122,11 +122,11 @@ export function HeroSection() {
               className="flex flex-wrap gap-4 pt-2"
             >
               {[
-                { icon: <CheckCircle className="h-4 w-4 text-accent" />, text: "Contratto regolare" },
-                { icon: <Clock className="h-4 w-4 text-accent" />, text: "Assistenza 24/7" },
-                { icon: <CheckCircle className="h-4 w-4 text-accent" />, text: "Tutto incluso" },
+                { icon: <CheckCircle className="h-4 w-4 text-success" />, text: "Contratto regolare" },
+                { icon: <Clock className="h-4 w-4 text-primary" />, text: "Assistenza 24/7" },
+                { icon: <CheckCircle className="h-4 w-4 text-success" />, text: "Tutto incluso" },
               ].map((badge) => (
-                <span key={badge.text} className="inline-flex items-center gap-1.5 text-sm text-primary-foreground/80">
+                <span key={badge.text} className="inline-flex items-center gap-1.5 text-sm text-muted-foreground">
                   {badge.icon} {badge.text}
                 </span>
               ))}
@@ -138,8 +138,8 @@ export function HeroSection() {
             variants={itemVariants}
             className="relative hidden lg:block"
           >
-            <div className="absolute -right-4 -top-4 h-72 w-72 rounded-full bg-accent/10 blur-3xl" />
-            <div className="absolute -bottom-4 -left-4 h-48 w-48 rounded-full bg-primary-foreground/5 blur-2xl" />
+            <div className="absolute -right-4 -top-4 h-72 w-72 rounded-full bg-primary/10 blur-3xl" />
+            <div className="absolute -bottom-4 -left-4 h-48 w-48 rounded-full bg-[hsl(var(--google-green))]/10 blur-2xl" />
 
             <motion.div
               variants={imageVariants}

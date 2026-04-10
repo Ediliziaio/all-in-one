@@ -14,23 +14,40 @@ const navLinks = [
   { label: "Contatti", href: "/contatti" },
 ];
 
+function GoogleLogo() {
+  return (
+    <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center relative overflow-hidden">
+      <span className="font-heading font-bold text-sm">
+        <span className="text-[hsl(var(--google-blue))]">S</span>
+        <span className="text-[hsl(var(--google-red))]">P</span>
+      </span>
+    </div>
+  );
+}
+
 export function Navbar() {
   const [open, setOpen] = useState(false);
   const location = useLocation();
-
-  const scrollToFooter = () => {
-    document.getElementById("footer")?.scrollIntoView({ behavior: "smooth" });
-    setOpen(false);
-  };
 
   return (
     <header className="sticky top-0 z-50 glass">
       <div className="container flex h-16 items-center justify-between">
         <Link to="/" className="flex items-center gap-2">
-          <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-            <span className="text-primary-foreground font-heading font-bold text-sm">SP</span>
+          <div className="h-8 w-8 rounded-lg bg-muted flex items-center justify-center">
+            <span className="font-heading font-bold text-sm">
+              <span className="text-[hsl(var(--google-blue))]">S</span>
+              <span className="text-[hsl(var(--google-red))]">P</span>
+            </span>
           </div>
-          <span className="font-heading font-bold text-xl text-foreground">StudentatoPD</span>
+          <span className="font-heading font-bold text-xl text-foreground">
+            <span className="text-[hsl(var(--google-blue))]">S</span>
+            <span className="text-[hsl(var(--google-red))]">t</span>
+            <span className="text-[hsl(var(--google-yellow))]">u</span>
+            <span className="text-[hsl(var(--google-blue))]">d</span>
+            <span className="text-[hsl(var(--google-green))]">e</span>
+            <span className="text-[hsl(var(--google-red))]">n</span>
+            <span className="text-foreground">tatoPD</span>
+          </span>
         </Link>
 
         {/* Desktop */}
@@ -42,15 +59,15 @@ export function Navbar() {
                 key={l.href}
                 to={l.href}
                 className={cn(
-                  "relative text-sm font-medium transition-colors hover:text-accent py-1",
-                  isActive ? "text-accent" : "text-muted-foreground"
+                  "relative text-sm font-medium transition-colors hover:text-primary py-1",
+                  isActive ? "text-primary" : "text-muted-foreground"
                 )}
               >
                 {l.label}
                 {isActive && (
                   <motion.div
                     layoutId="navbar-underline"
-                    className="absolute -bottom-1 left-0 right-0 h-0.5 bg-accent rounded-full"
+                    className="absolute -bottom-1 left-0 right-0 h-0.5 bg-primary rounded-full"
                     transition={{ type: "spring", stiffness: 350, damping: 30 }}
                   />
                 )}
@@ -61,7 +78,7 @@ export function Navbar() {
 
         <div className="hidden md:flex items-center gap-3">
           <Button variant="ghost" size="sm" asChild><Link to="/login">Accedi</Link></Button>
-          <Button size="sm" className="bg-accent text-accent-foreground hover:bg-accent/90" asChild><Link to="/contatti">Richiedi info</Link></Button>
+          <Button size="sm" asChild><Link to="/contatti">Richiedi info</Link></Button>
         </div>
 
         {/* Mobile */}
@@ -80,7 +97,7 @@ export function Navbar() {
                   onClick={() => setOpen(false)}
                   className={cn(
                     "text-base font-medium py-2 border-b border-border transition-colors",
-                    location.pathname === l.href ? "text-accent" : "text-foreground"
+                    location.pathname === l.href ? "text-primary" : "text-foreground"
                   )}
                 >
                   {l.label}
@@ -90,7 +107,7 @@ export function Navbar() {
                 <Button variant="outline" asChild onClick={() => setOpen(false)}>
                   <Link to="/login">Accedi</Link>
                 </Button>
-                <Button className="bg-accent text-accent-foreground hover:bg-accent/90" asChild onClick={() => setOpen(false)}>
+                <Button asChild onClick={() => setOpen(false)}>
                   <Link to="/contatti">Richiedi info</Link>
                 </Button>
               </div>
