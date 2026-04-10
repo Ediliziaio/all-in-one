@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { Layout } from "@/components/Layout";
 import { Button } from "@/components/ui/button";
-import { Wifi, WashingMachine, UtensilsCrossed, Dumbbell, Shield, BookOpen, CheckCircle, ShieldCheck, Clock, FileText } from "lucide-react";
+import { Wifi, WashingMachine, UtensilsCrossed, Dumbbell, Shield, BookOpen, CheckCircle, ShieldCheck, Clock, FileText, CalendarHeart } from "lucide-react";
 import { PageTransition, FadeIn, StaggerContainer, StaggerItem } from "@/components/motion/MotionWrappers";
 
 const services = [
@@ -121,6 +121,12 @@ const Servizi = () => (
               </FadeIn>
             ))}
           </div>
+          <FadeIn delay={0.3}>
+            <div className="mt-12 text-center">
+              <p className="text-foreground font-heading font-semibold text-lg">Tutto questo è incluso nel canone — da €480/mese.</p>
+              <p className="text-muted-foreground text-sm mt-1">Nessun costo extra, mai.</p>
+            </div>
+          </FadeIn>
         </div>
       </section>
 
@@ -155,9 +161,13 @@ const Servizi = () => (
           <div className="container text-center">
             <h2 className="font-heading text-2xl md:text-3xl font-bold text-foreground">Pronto a trasferirti?</h2>
             <p className="text-muted-foreground mt-2 max-w-md mx-auto">Scopri le camere disponibili e richiedi il tuo posto.</p>
+            <div className="inline-flex items-center gap-2 mt-4 px-4 py-2 rounded-full bg-accent/10 text-accent text-sm font-medium">
+              <CalendarHeart className="h-4 w-4" />
+              Posti limitati per Settembre 2025
+            </div>
             <div className="flex flex-wrap justify-center gap-3 mt-6">
               <Button size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90" asChild>
-                <Link to="/camere">Vedi camere e prezzi</Link>
+                <Link to="/camere">Scopri le camere</Link>
               </Button>
               <Button size="lg" variant="outline" asChild>
                 <Link to="/contatti">Richiedi info</Link>
