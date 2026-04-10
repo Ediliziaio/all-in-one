@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { AlertTriangle, Thermometer, PhoneOff, Users, WifiOff, FileWarning } from "lucide-react";
+import { Lightbulb, Thermometer, PhoneOff, Users, WifiOff, FileWarning } from "lucide-react";
 
 const problems = [
   { icon: Thermometer, text: "Bollette che raddoppiano d'inverno — e nessuno ti avvisa" },
@@ -19,16 +19,16 @@ export function ProblemSection() {
           viewport={{ once: true }}
           className="text-center mb-12"
         >
-          <span className="inline-flex items-center gap-2 rounded-full bg-destructive/10 px-4 py-1.5 text-sm font-semibold text-destructive mb-4">
-            <AlertTriangle className="h-4 w-4" /> La verità che nessuno ti dice
+          <span className="inline-flex items-center gap-2 rounded-full bg-muted px-4 py-1.5 text-sm font-semibold text-muted-foreground mb-4">
+            <Lightbulb className="h-4 w-4" /> Lo sappiamo bene
           </span>
           <h2 className="font-heading text-3xl md:text-4xl font-bold text-foreground">
-            L'affitto tradizionale a Padova<br />
-            <span className="text-destructive">è un incubo.</span>
+            Trovare casa a Padova<br />
+            <span className="text-destructive">può essere complicato.</span>
           </h2>
           <p className="text-muted-foreground mt-4 max-w-2xl mx-auto text-lg">
-            Ogni anno centinaia di studenti firmano contratti alla cieca, pagano troppo e vivono male. 
-            Ti suona familiare?
+            Ogni anno tanti studenti si ritrovano a fare i conti con situazioni che rendono 
+            la vita universitaria più difficile del necessario.
           </p>
         </motion.div>
 

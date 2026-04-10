@@ -8,22 +8,19 @@ const steps = [
     icon: Search,
     number: "1",
     title: "Scegli la camera",
-    desc: "Sfoglia il catalogo, confronta prezzi e servizi. Ci vogliono 2 minuti.",
-    time: "2 min",
+    desc: "Sfoglia il catalogo, confronta le opzioni e trova quella giusta per te.",
   },
   {
     icon: FileText,
     number: "2",
-    title: "Ti confermiamo in 24h",
-    desc: "Niente settimane di attesa. Ti rispondiamo entro un giorno lavorativo con tutti i dettagli.",
-    time: "24 ore",
+    title: "Ricevi conferma",
+    desc: "Ti rispondiamo rapidamente con tutti i dettagli e le informazioni necessarie.",
   },
   {
     icon: Key,
     number: "3",
     title: "Firma e trasferisciti",
-    desc: "Contratto chiaro, 2 pagine, zero clausole nascoste. Prendi le chiavi e sei a casa.",
-    time: "72 ore",
+    desc: "Contratto chiaro e trasparente. Prendi le chiavi e sei a casa.",
   },
 ];
 
@@ -38,11 +35,10 @@ export function HowItWorksSection() {
           className="text-center mb-14"
         >
           <h2 className="font-heading text-3xl md:text-4xl font-bold text-foreground">
-            Dalla Richiesta alle Chiavi<br />
-            <span className="text-primary">in 72 Ore</span>
+            Come <span className="text-primary">Funziona</span>
           </h2>
           <p className="text-muted-foreground mt-3 max-w-md mx-auto">
-            Niente burocrazia infinita. Tre passi e sei a casa.
+            Tre semplici passi per trovare la tua nuova casa.
           </p>
         </motion.div>
 
@@ -68,9 +64,6 @@ export function HowItWorksSection() {
               </div>
               <h3 className="font-heading font-semibold text-lg text-foreground">{step.title}</h3>
               <p className="text-sm text-muted-foreground mt-2 max-w-xs mx-auto">{step.desc}</p>
-              <span className="inline-block mt-3 text-xs font-bold text-primary bg-primary/10 px-3 py-1 rounded-full">
-                ⏱ {step.time}
-              </span>
             </motion.div>
           ))}
         </div>
@@ -82,10 +75,10 @@ export function HowItWorksSection() {
           transition={{ delay: 0.5 }}
           className="text-center mt-10"
         >
-          <p className="text-muted-foreground mb-4">Non sei convinto? Nessun problema.</p>
+          <p className="text-muted-foreground mb-4">Vuoi vedere gli spazi di persona?</p>
           <Button asChild variant="outline" size="lg">
             <Link to="/contatti">
-              <Eye className="mr-2 h-4 w-4" /> Prenota una visita gratuita (senza impegno)
+              <Eye className="mr-2 h-4 w-4" /> Prenota una visita gratuita
             </Link>
           </Button>
         </motion.div>

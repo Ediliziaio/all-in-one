@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowRight, Star, Users, MapPin, CheckCircle, Clock, AlertTriangle } from "lucide-react";
+import { ArrowRight, Star, Users, MapPin, CheckCircle, Clock, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const containerVariants = {
@@ -38,8 +38,8 @@ export function HeroSection() {
           {/* Left Column */}
           <div className="space-y-6">
             <motion.div variants={itemVariants} className="flex flex-wrap gap-2">
-              <span className="inline-flex items-center gap-2 rounded-full bg-destructive/10 px-4 py-1.5 text-sm font-bold text-destructive">
-                <AlertTriangle className="h-3.5 w-3.5" /> Solo 7 posti rimasti per Settembre 2025
+              <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary">
+                <Info className="h-3.5 w-3.5" /> Posti limitati per Settembre 2025
               </span>
             </motion.div>
 
@@ -47,26 +47,26 @@ export function HeroSection() {
               variants={itemVariants}
               className="font-heading text-4xl font-extrabold leading-tight md:text-5xl lg:text-6xl text-foreground"
             >
-              Smetti di Buttare Soldi in Affitti Che Ti{" "}
-              <span className="text-primary">Rovinano l'Università.</span>
+              La Tua Casa a Padova,{" "}
+              <span className="text-primary">Senza Pensieri.</span>
             </motion.h1>
 
             <motion.p
               variants={itemVariants}
               className="max-w-lg text-lg text-muted-foreground"
             >
-              Camera privata, bollette incluse, palestra, WiFi fibra, sale studio e una community vera — 
-              <strong className="text-foreground"> da €480/mese</strong>. A 5 minuti dall'aula.
+              Camera privata con tutto incluso — WiFi, palestra, bollette — 
+              <strong className="text-foreground"> a partire da €480/mese</strong>. A pochi minuti dall'università.
             </motion.p>
 
             <motion.div variants={itemVariants} className="flex flex-wrap gap-3">
               <Button asChild size="lg" className="text-base">
                 <Link to="/camere">
-                  Blocca il Tuo Posto <ArrowRight className="ml-2 h-4 w-4" />
+                  Scopri le Camere <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
               <Button asChild variant="outline" size="lg" className="text-base">
-                <Link to="/contatti">Prenota una visita gratuita</Link>
+                <Link to="/contatti">Prenota una visita</Link>
               </Button>
             </motion.div>
 
@@ -76,7 +76,7 @@ export function HeroSection() {
             >
               {[
                 { icon: <Star className="h-5 w-5 text-[hsl(var(--google-yellow))]" />, value: "4.9★", label: "127 recensioni Google" },
-                { icon: <Users className="h-5 w-5 text-[hsl(var(--google-blue))]" />, value: "98%", label: "rinnova (non è un caso)" },
+                { icon: <Users className="h-5 w-5 text-[hsl(var(--google-blue))]" />, value: "98%", label: "rinnova il contratto" },
                 { icon: <MapPin className="h-5 w-5 text-[hsl(var(--google-red))]" />, value: "€0", label: "costi nascosti" },
               ].map((stat) => (
                 <div key={stat.label} className="flex items-center gap-2">
@@ -94,7 +94,7 @@ export function HeroSection() {
               {[
                 { icon: <CheckCircle className="h-4 w-4 text-success" />, text: "Contratto regolare" },
                 { icon: <Clock className="h-4 w-4 text-primary" />, text: "Assistenza 24/7" },
-                { icon: <CheckCircle className="h-4 w-4 text-success" />, text: "Tutto incluso, per sempre" },
+                { icon: <CheckCircle className="h-4 w-4 text-success" />, text: "Tutto incluso" },
               ].map((badge) => (
                 <span key={badge.text} className="inline-flex items-center gap-1.5 text-sm text-muted-foreground">
                   {badge.icon} {badge.text}
