@@ -1,15 +1,19 @@
 import { Link, Outlet, useLocation } from "react-router-dom";
-import { Home, BedDouble, Users, BookOpen, Gift, Headphones, UserCircle, LogOut } from "lucide-react";
+import { Home, BedDouble, Users, BookOpen, Gift, Headphones, UserCircle, FileText, CreditCard, CalendarPlus, LogOut } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { currentUser } from "@/data/mockData";
 import { cn } from "@/lib/utils";
+import { DashboardHeader } from "@/components/DashboardHeader";
 
 const menuItems = [
   { label: "Home", href: "/studente", icon: Home },
   { label: "La Mia Camera", href: "/studente/camera", icon: BedDouble },
+  { label: "Prenota", href: "/studente/prenota", icon: CalendarPlus },
   { label: "Community", href: "/studente/community", icon: Users },
   { label: "Guide", href: "/studente/guide", icon: BookOpen },
   { label: "Buoni", href: "/studente/buoni", icon: Gift },
+  { label: "Pagamenti", href: "/studente/pagamenti", icon: CreditCard },
+  { label: "Documenti", href: "/studente/documenti", icon: FileText },
   { label: "Supporto", href: "/studente/supporto", icon: Headphones },
   { label: "Profilo", href: "/studente/profilo", icon: UserCircle },
 ];
@@ -71,9 +75,16 @@ export default function StudenteLayout() {
         })}
       </div>
 
-      <main className="flex-1 overflow-auto pb-20 md:pb-0">
-        <Outlet />
-      </main>
+      <div className="flex-1 flex flex-col overflow-auto">
+        <DashboardHeader
+          userName={`${currentUser.nome} ${currentUser.cognome}`}
+          userAvatar={currentUser.avatar}
+          userInitials={`${currentUser.nome[0]}${currentUser.cognome[0]}`}
+        />
+        <main className="flex-1 pb-20 md:pb-0">
+          <Outlet />
+        </main>
+      </div>
     </div>
   );
 }
