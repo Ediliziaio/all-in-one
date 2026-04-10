@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Check, X, Eye } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { mockPrenotazioni, type Prenotazione } from "@/data/mockData";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { PageTransition, FadeIn } from "@/components/motion/MotionWrappers";
 
 const statoBadge: Record<string, string> = {
@@ -17,8 +17,15 @@ const statoBadge: Record<string, string> = {
 };
 
 export default function AdminPrenotazioni() {
+  const [prenotazioni, setPrenotazioni] = useState(mockPrenotazioni);
   const [selected, setSelected] = useState<Prenotazione | null>(null);
-  const { toast } = useToast();
+
+  const updateStato = (id: string, newStato: Prenotazione["stato"]) => {
+    setPrenotazioni((prev) =>
+      prev.map((p) => (p.id === id ? { ...p, stato: newStato } : p))
+    );
+    toast.success(newStato === "confermata" ? "Prenotazione confermata!" : "Prenotazione rifiutata");
+  };
 
   const renderTable = (items: Prenotazione[]) => (
     <div className="divide-y">
@@ -30,13 +37,13 @@ export default function AdminPrenotazioni() {
             <p className="font-medium">{p.student_nome}</p>
             <p className="text-xs text-muted-foreground">{p.camera_nome}</p>
           </div>
-          <p className="text-sm text-muted-foreground">{p.data_inizio} → {p.data_fine}</p>
+          <p className="text-sm text-muted-foreground hidden sm:block">{p.data_inizio} → {p.data_fine}</p>
           <Badge className={statoBadge[p.stato]}>{p.stato}</Badge>
           <div className="flex gap-1">
             {p.stato === "pending" && (
               <>
-                <Button size="sm" variant="ghost" className="text-green-600 hover:text-green-700 hover:bg-green-50" onClick={() => toast({ title: "Prenotazione confermata!" })}><Check className="h-4 w-4" /></Button>
-                <Button size="sm" variant="ghost" className="text-red-600 hover:text-red-700 hover:bg-red-50" onClick={() => toast({ title: "Prenotazione rifiutata" })}><X className="h-4 w-4" /></Button>
+                <Button size="sm" variant="ghost" className="text-green-600 hover:text-green-700 hover:bg-green-50" onClick={() => updateStato(p.id, "confermata")}><Check className="h-4 w-4" /></Button>
+                <Button size="sm" variant="ghost" className="text-red-600 hover:text-red-700 hover:bg-red-50" onClick={() => updateStato(p.id, "rifiutata")}><X className="h-4 w-4" /></Button>
               </>
             )}
             <Button size="sm" variant="outline" onClick={() => setSelected(p)}><Eye className="h-4 w-4" /></Button>
@@ -53,14 +60,14 @@ export default function AdminPrenotazioni() {
       <FadeIn delay={0.1}>
         <Tabs defaultValue="pending">
           <TabsList>
-            <TabsTrigger value="pending">In Attesa <Badge variant="secondary" className="ml-1.5 text-xs">{mockPrenotazioni.filter(p => p.stato === "pending").length}</Badge></TabsTrigger>
+            <TabsTrigger value="pending">In Attesa <Badge variant="secondary" className="ml-1.5 text-xs">{prenotazioni.filter(p => p.stato === "pending").length}</Badge></TabsTrigger>
             <TabsTrigger value="confermata">Confermate</TabsTrigger>
             <TabsTrigger value="conclusa">Concluse</TabsTrigger>
             <TabsTrigger value="rifiutata">Rifiutate</TabsTrigger>
           </TabsList>
           {["pending", "confermata", "conclusa", "rifiutata"].map((stato) => (
             <TabsContent key={stato} value={stato}>
-              <Card>{renderTable(mockPrenotazioni.filter(p => p.stato === stato))}</Card>
+              <Card>{renderTable(prenotazioni.filter(p => p.stato === stato))}</Card>
             </TabsContent>
           ))}
         </Tabs>

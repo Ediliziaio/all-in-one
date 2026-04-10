@@ -26,6 +26,7 @@ import AdminStudenti from "./pages/admin/AdminStudenti";
 import AdminSupporto from "./pages/admin/AdminSupporto";
 import AdminBuoni from "./pages/admin/AdminBuoni";
 import AdminGuide from "./pages/admin/AdminGuide";
+import AdminImpostazioni from "./pages/admin/AdminImpostazioni";
 
 // Studente
 import StudenteLayout from "./layouts/StudenteLayout";
@@ -38,6 +39,9 @@ import MioProfilo from "./pages/studente/MioProfilo";
 import Guide from "./pages/studente/Guide";
 import Buoni from "./pages/studente/Buoni";
 import Supporto from "./pages/studente/Supporto";
+import PrenotaCamera from "./pages/studente/PrenotaCamera";
+import Documenti from "./pages/studente/Documenti";
+import Pagamenti from "./pages/studente/Pagamenti";
 
 const queryClient = new QueryClient();
 
@@ -69,18 +73,22 @@ const App = () => (
             <Route path="supporto" element={<AdminSupporto />} />
             <Route path="buoni" element={<AdminBuoni />} />
             <Route path="guide" element={<AdminGuide />} />
+            <Route path="impostazioni" element={<AdminImpostazioni />} />
           </Route>
 
           {/* Studente */}
           <Route path="/studente" element={<StudenteLayout />}>
             <Route index element={<StudenteHome />} />
             <Route path="camera" element={<MiaCamera />} />
+            <Route path="prenota" element={<PrenotaCamera />} />
             <Route path="community" element={<Community />} />
             <Route path="community/profili" element={<Profili />} />
             <Route path="community/profilo/:id" element={<ProfiloStudente />} />
             <Route path="profilo" element={<MioProfilo />} />
             <Route path="guide" element={<Guide />} />
             <Route path="buoni" element={<Buoni />} />
+            <Route path="pagamenti" element={<Pagamenti />} />
+            <Route path="documenti" element={<Documenti />} />
             <Route path="supporto" element={<Supporto />} />
           </Route>
 

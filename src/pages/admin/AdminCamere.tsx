@@ -8,13 +8,44 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { rooms, getRoomTypeLabel } from "@/data/rooms";
-import { useToast } from "@/hooks/use-toast";
+import { rooms as initialRooms, getRoomTypeLabel, type Room } from "@/data/rooms";
+import { toast } from "sonner";
 import { PageTransition, FadeIn, StaggerContainer, StaggerItem, HoverCard } from "@/components/motion/MotionWrappers";
 
 export default function AdminCamere() {
   const [view, setView] = useState<"grid" | "list">("grid");
-  const { toast } = useToast();
+  const [roomList, setRoomList] = useState(initialRooms);
+  const [editRoom, setEditRoom] = useState<Room | null>(null);
+  const [editName, setEditName] = useState("");
+  const [editPrice, setEditPrice] = useState("");
+  const [editDesc, setEditDesc] = useState("");
+
+  const openEdit = (room: Room) => {
+    setEditRoom(room);
+    setEditName(room.name);
+    setEditPrice(String(room.price));
+    setEditDesc(room.description);
+  };
+
+  const saveEdit = () => {
+    if (!editRoom) return;
+    setRoomList((prev) =>
+      prev.map((r) =>
+        r.id === editRoom.id
+          ? { ...r, name: editName, price: Number(editPrice), description: editDesc }
+          : r
+      )
+    );
+    setEditRoom(null);
+    toast.success("Camera aggiornata!");
+  };
+
+  const toggleAvailability = (id: string) => {
+    setRoomList((prev) =>
+      prev.map((r) => (r.id === id ? { ...r, available: !r.available } : r))
+    );
+    toast.success("Disponibilità aggiornata!");
+  };
 
   return (
     <PageTransition className="p-6 space-y-6">
@@ -22,7 +53,7 @@ export default function AdminCamere() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="font-heading text-2xl font-bold">Gestione Camere</h1>
-            <p className="text-sm text-muted-foreground">{rooms.length} camere totali</p>
+            <p className="text-sm text-muted-foreground">{roomList.length} camere totali</p>
           </div>
           <div className="flex items-center gap-2">
             <div className="flex border rounded-lg">
@@ -31,7 +62,7 @@ export default function AdminCamere() {
             </div>
             <Dialog>
               <DialogTrigger asChild>
-                <Button className="bg-accent text-accent-foreground hover:bg-accent/90">
+                <Button>
                   <Plus className="h-4 w-4 mr-2" /> Aggiungi Camera
                 </Button>
               </DialogTrigger>
@@ -53,7 +84,7 @@ export default function AdminCamere() {
                     <div className="space-y-2"><Label>Mq</Label><Input type="number" placeholder="14" /></div>
                   </div>
                   <div className="space-y-2"><Label>Descrizione</Label><Textarea placeholder="Descrizione della camera..." /></div>
-                  <Button className="w-full bg-accent text-accent-foreground hover:bg-accent/90" onClick={() => toast({ title: "Camera aggiunta!" })}>Salva Camera</Button>
+                  <Button className="w-full" onClick={() => toast.success("Camera aggiunta!")}>Salva Camera</Button>
                 </div>
               </DialogContent>
             </Dialog>
@@ -63,7 +94,7 @@ export default function AdminCamere() {
 
       {view === "grid" ? (
         <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {rooms.map((room) => (
+          {roomList.map((room) => (
             <StaggerItem key={room.id}>
               <HoverCard>
                 <Card className="overflow-hidden">
@@ -78,11 +109,11 @@ export default function AdminCamere() {
                         {room.available ? "Disponibile" : "Occupata"}
                       </Badge>
                     </div>
-                    <p className="text-lg font-bold text-accent">{room.price}€<span className="text-sm font-normal text-muted-foreground">/mese</span></p>
+                    <p className="text-lg font-bold text-primary">{room.price}€<span className="text-sm font-normal text-muted-foreground">/mese</span></p>
                     <div className="flex gap-2">
-                      <Button variant="outline" size="sm"><Pencil className="h-3 w-3 mr-1" />Modifica</Button>
-                      <Button variant="outline" size="sm"><Image className="h-3 w-3 mr-1" />Foto</Button>
-                      <Button variant="ghost" size="sm"><ToggleLeft className="h-3 w-3" /></Button>
+                      <Button variant="outline" size="sm" onClick={() => openEdit(room)}><Pencil className="h-3 w-3 mr-1" />Modifica</Button>
+                      <Button variant="outline" size="sm" onClick={() => toast.success("Upload foto simulato!")}><Image className="h-3 w-3 mr-1" />Foto</Button>
+                      <Button variant="ghost" size="sm" onClick={() => toggleAvailability(room.id)}><ToggleLeft className="h-3 w-3" /></Button>
                     </div>
                   </CardContent>
                 </Card>
@@ -94,24 +125,39 @@ export default function AdminCamere() {
         <FadeIn>
           <Card>
             <div className="divide-y">
-              {rooms.map((room) => (
+              {roomList.map((room) => (
                 <div key={room.id} className="flex items-center gap-4 p-4 hover:bg-muted/50 transition-colors">
                   <img src={room.images[0]} alt={room.name} className="h-12 w-16 rounded-lg object-cover" />
                   <div className="flex-1">
                     <p className="font-medium">{room.name}</p>
                     <p className="text-xs text-muted-foreground">{getRoomTypeLabel(room.type)} · {room.sqm}mq</p>
                   </div>
-                  <p className="font-bold text-accent">{room.price}€</p>
+                  <p className="font-bold text-primary">{room.price}€</p>
                   <Badge className={room.available ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}>
                     {room.available ? "Disponibile" : "Occupata"}
                   </Badge>
-                  <Button variant="outline" size="sm"><Pencil className="h-3 w-3" /></Button>
+                  <Button variant="outline" size="sm" onClick={() => openEdit(room)}><Pencil className="h-3 w-3" /></Button>
                 </div>
               ))}
             </div>
           </Card>
         </FadeIn>
       )}
+
+      {/* Edit Dialog */}
+      <Dialog open={!!editRoom} onOpenChange={() => setEditRoom(null)}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>Modifica Camera</DialogTitle></DialogHeader>
+          {editRoom && (
+            <div className="space-y-4">
+              <div className="space-y-2"><Label>Nome</Label><Input value={editName} onChange={(e) => setEditName(e.target.value)} /></div>
+              <div className="space-y-2"><Label>Prezzo (€/mese)</Label><Input type="number" value={editPrice} onChange={(e) => setEditPrice(e.target.value)} /></div>
+              <div className="space-y-2"><Label>Descrizione</Label><Textarea value={editDesc} onChange={(e) => setEditDesc(e.target.value)} /></div>
+              <Button className="w-full" onClick={saveEdit}>Salva Modifiche</Button>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </PageTransition>
   );
 }

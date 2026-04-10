@@ -4,8 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { mockTickets, type SupportTicket } from "@/data/mockData";
-import { useToast } from "@/hooks/use-toast";
+import { mockTickets as initialTickets, type SupportTicket } from "@/data/mockData";
+import { toast } from "sonner";
 import { PageTransition, FadeIn, StaggerContainer, StaggerItem } from "@/components/motion/MotionWrappers";
 
 const prioritaColors: Record<string, string> = {
@@ -22,8 +22,32 @@ const statoColors: Record<string, string> = {
 };
 
 export default function AdminSupporto() {
+  const [tickets, setTickets] = useState(initialTickets);
   const [selected, setSelected] = useState<SupportTicket | null>(null);
-  const { toast } = useToast();
+  const [risposta, setRisposta] = useState("");
+
+  const handleRispondi = () => {
+    if (!selected || !risposta.trim()) return;
+    setTickets((prev) =>
+      prev.map((t) =>
+        t.id === selected.id
+          ? { ...t, risposta_admin: risposta, stato: "in_corso" as const }
+          : t
+      )
+    );
+    setSelected({ ...selected, risposta_admin: risposta, stato: "in_corso" });
+    setRisposta("");
+    toast.success("Risposta inviata!");
+  };
+
+  const handleChiudi = () => {
+    if (!selected) return;
+    setTickets((prev) =>
+      prev.map((t) => (t.id === selected.id ? { ...t, stato: "risolto" as const } : t))
+    );
+    setSelected({ ...selected, stato: "risolto" });
+    toast.success("Ticket chiuso");
+  };
 
   return (
     <PageTransition className="p-6 space-y-6">
@@ -31,12 +55,12 @@ export default function AdminSupporto() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <StaggerContainer className="lg:col-span-2 space-y-3">
-          {mockTickets.map((t) => (
+          {tickets.map((t) => (
             <StaggerItem key={t.id}>
               <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
                 <Card
                   className={`cursor-pointer transition-colors ${selected?.id === t.id ? "ring-2 ring-primary" : "hover:bg-muted/50"}`}
-                  onClick={() => setSelected(t)}
+                  onClick={() => { setSelected(t); setRisposta(""); }}
                 >
                   <CardContent className="p-4 flex items-center gap-4">
                     <div className="flex-1">
@@ -70,17 +94,21 @@ export default function AdminSupporto() {
                       <p><span className="text-muted-foreground">Categoria:</span> {selected.categoria}</p>
                       <p><span className="text-muted-foreground">Descrizione:</span> {selected.descrizione}</p>
                       {selected.risposta_admin && (
-                        <div className="p-3 bg-green-50 rounded-lg border border-green-200">
-                          <p className="text-xs font-medium text-green-700 mb-1">Risposta admin</p>
+                        <div className="p-3 bg-primary/5 rounded-lg border border-primary/20">
+                          <p className="text-xs font-medium text-primary mb-1">Risposta admin</p>
                           <p className="text-sm">{selected.risposta_admin}</p>
                         </div>
                       )}
                     </div>
-                    <Textarea placeholder="Scrivi una risposta..." />
-                    <div className="flex gap-2">
-                      <Button size="sm" onClick={() => toast({ title: "Risposta inviata!" })}>Rispondi</Button>
-                      <Button size="sm" variant="outline" onClick={() => toast({ title: "Ticket chiuso" })}>Chiudi ticket</Button>
-                    </div>
+                    {selected.stato !== "risolto" && (
+                      <>
+                        <Textarea placeholder="Scrivi una risposta..." value={risposta} onChange={(e) => setRisposta(e.target.value)} />
+                        <div className="flex gap-2">
+                          <Button size="sm" onClick={handleRispondi} disabled={!risposta.trim()}>Rispondi</Button>
+                          <Button size="sm" variant="outline" onClick={handleChiudi}>Chiudi ticket</Button>
+                        </div>
+                      </>
+                    )}
                   </CardContent>
                 </Card>
               </motion.div>

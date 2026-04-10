@@ -1,6 +1,7 @@
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { LayoutDashboard, BedDouble, CalendarCheck, Users, Headphones, Gift, BookOpen, Settings, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { DashboardHeader } from "@/components/DashboardHeader";
 
 const menuItems = [
   { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
@@ -71,9 +72,12 @@ export default function AdminLayout() {
       </div>
 
       {/* Main content */}
-      <main className="flex-1 overflow-auto pb-20 md:pb-0">
-        <Outlet />
-      </main>
+      <div className="flex-1 flex flex-col overflow-auto">
+        <DashboardHeader userName="Admin" userInitials="AD" />
+        <main className="flex-1 pb-20 md:pb-0">
+          <Outlet />
+        </main>
+      </div>
     </div>
   );
 }
