@@ -1,70 +1,45 @@
 
 
-# Ammorbidire il Copy — Push Solo su Urgenza e Offerte
+# Approccio bilanciato su Servizi e Vantaggi
 
-## Problema
-Il tono attuale è troppo aggressivo/push ovunque: headline con "Smetti di Buttare Soldi", ProblemSection con "è un incubo", testimonial con "Non Fidarti di Noi". Va bene per urgenza/offerte, ma il tono generale deve essere accogliente e professionale.
-
-## Filosofia
-- **Sezioni informative** (Hero, Servizi, Come Funziona, About, Testimonial): tono caldo, rassicurante, professionale. Niente paura, niente pressione.
-- **Sezioni push** (ProblemSection, UrgencySection, RoomsPreview badges, GuaranteeSection): qui si mantiene scarcity, urgenza, price anchoring. Sono i punti dove il push è appropriato.
+Le due pagine sono già abbastanza sobrie nel tono. Le modifiche principali riguardano l'aggiunta di elementi push mirati (value stack, confronto economico, urgenza nella CTA) senza rendere aggressivo il tono generale.
 
 ---
 
-## Modifiche per sezione
+## Servizi.tsx — Modifiche
 
-### 1. HeroSection — Da aggressivo a accogliente
-- **Headline**: "Smetti di Buttare Soldi..." → "La Tua Casa a Padova, Senza Pensieri."
-- **Sub**: meno pressione, più beneficio → "Camera privata con tutto incluso — WiFi, palestra, bollette — a partire da €480/mese. A pochi minuti dall'università."
-- **Badge urgenza**: si mantiene ma più soft → "Posti limitati per Settembre 2025" (senza AlertTriangle e "Solo 7")
-- **CTA**: "Blocca il Tuo Posto" → "Scopri le Camere" / "Prenota una visita"
-- **Stats**: si mantengono (sono dati, non push)
-- **Trust badges**: restano invariati
+### Sezioni informative (tono caldo, invariato)
+- Hero, Services Grid, "Per i genitori": restano come sono, tono professionale e accogliente.
 
-### 2. ProblemSection — Mantiene il push (è il suo ruolo)
-- Titolo leggermente ammorbidito: "è un incubo" → "può essere complicato"
-- Badge: "La verità che nessuno ti dice" → "Lo sappiamo bene"
-- Sottotitolo meno aggressivo
-- I pain points restano (sono il motivo per cui la sezione esiste)
-- Si mantiene il tono push ma meno drammatico
+### Sezione "Perché scegliere noi" → Value Stack sobrio
+- Aggiungere sotto i 3 punti un riepilogo valore simile alla homepage: "Tutto questo è incluso nel canone — da €480/mese. Nessun costo extra, mai."
+- Non barrato, non aggressivo. Solo il dato.
 
-### 3. ServicesSection — Tono informativo
-- **Headline**: "Ecco Cosa Ottieni (e Quanto Risparmi)" → "Tutto Incluso nel Canone"
-- Rimuovere i badge "Valore: €XX/mese" da ogni card (troppo push)
-- Mantenere il value stack summary in fondo ma con tono più sobrio: "Valore complessivo stimato" anziché il prezzo barrato gigante
-- Descrizioni dei servizi: togliere toni forzati
-
-### 4. RoomsPreview — Push sulle offerte (si mantiene)
-- Headline resta push: "Prima Che Lo Faccia Qualcun Altro" è appropriato qui
-- Badge scarcity e "tutto incluso" restano — è la sezione offerta
-
-### 5. HowItWorksSection — Tono semplice
-- Headline: "Dalla Richiesta alle Chiavi in 72 Ore" → "Come Funziona"
-- Rimuovere badge "⏱ 2 min / 24 ore / 72 ore" (troppo push)
-- Descrizioni più naturali, meno pressione sul tempo
-
-### 6. TestimonialsSection — Tono autentico
-- Headline: "Non Fidarti di Noi. Fidati di Loro." → "Cosa Dicono i Nostri Studenti"
-- Rimuovere badge "highlight" dalle card (es. "Risparmiati €180/mese")
-- Testimonial restano con risultati specifici (è social proof, non push)
-
-### 7. UrgencySection — Mantiene il push (è il suo ruolo)
-- Resta invariata. Scarcity, contatori, doppio CTA. È la sezione dedicata.
-
-### 8. GuaranteeSection — Mantiene il push moderato
-- Resta invariata. Risk reversal è appropriato.
-
-### 9. AboutSection — Resta invariata
-- Già in tono sobrio e professionale.
+### CTA finale → Push moderato
+- Aggiungere un elemento di scarcity soft: "Posti limitati per Settembre 2025" sotto il titolo.
+- CTA primaria: "Scopri le camere" (resta).
+- Aggiungere badge "Posti limitati" sopra la CTA.
 
 ---
 
-## File modificati (6)
+## Vantaggi.tsx — Modifiche
 
-- `src/components/home/HeroSection.tsx` — headline, sub, badge, CTA ammorbiditi
-- `src/components/home/ProblemSection.tsx` — titolo e intro leggermente più soft
-- `src/components/home/ServicesSection.tsx` — rimuovere value badges, tono sobrio
-- `src/components/home/HowItWorksSection.tsx` — headline semplice, no time badges
-- `src/components/home/TestimonialsSection.tsx` — headline e rimuovere highlight badges
-- `src/components/home/RoomsPreview.tsx` — nessuna modifica (push appropriato qui)
+### Tabella comparativa → Elemento centrale con push
+- Aggiungere riga con valore economico: "Costo mensile medio" — "da €480 tutto incluso" vs "€350 + €150 bollette"
+- Aggiungere nota sotto la tabella: "Il confronto si basa su dati medi del mercato immobiliare studentesco a Padova."
+
+### Testimonials → Risultati specifici
+- Aggiornare i testi con outcome misurabili (come fatto nella homepage):
+  - Giulia: menzionare risparmio concreto
+  - Marco: menzionare confronto con affitto precedente
+  - Sofia: menzionare velocità di ambientamento
+
+### CTA finale → Push con urgenza
+- Aggiungere: "I posti per Settembre 2025 stanno finendo" + contatore soft delle disponibilità.
+
+---
+
+## File modificati (2)
+- `src/pages/Servizi.tsx` — value stack nella sezione "Perché noi", CTA con scarcity
+- `src/pages/Vantaggi.tsx` — tabella comparativa arricchita, testimonial con risultati, CTA con urgenza
 
