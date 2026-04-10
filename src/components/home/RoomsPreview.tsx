@@ -6,9 +6,9 @@ import { Badge } from "@/components/ui/badge";
 import { rooms } from "@/data/rooms";
 
 const previewRooms = [
-  rooms.find((r) => r.type === "singola")!,
-  rooms.find((r) => r.type === "singola-plus")!,
-  rooms.find((r) => r.type === "doppia")!,
+  { room: rooms.find((r) => r.type === "singola")!, remaining: 7, badge: null },
+  { room: rooms.find((r) => r.type === "singola-plus")!, remaining: 3, badge: "Più richiesta" },
+  { room: rooms.find((r) => r.type === "doppia")!, remaining: 2, badge: null },
 ];
 
 export function RoomsPreview() {
@@ -21,12 +21,15 @@ export function RoomsPreview() {
           viewport={{ once: true }}
           className="text-center mb-12"
         >
-          <h2 className="font-heading text-3xl md:text-4xl font-bold text-foreground">Le nostre camere</h2>
-          <p className="text-muted-foreground mt-3">Prezzi chiari, tutto incluso. Confronta e scegli.</p>
+          <h2 className="font-heading text-3xl md:text-4xl font-bold text-foreground">
+            Scegli la Tua Camera<br />
+            <span className="text-primary">(Prima Che Lo Faccia Qualcun Altro)</span>
+          </h2>
+          <p className="text-muted-foreground mt-3">Prezzi chiari. Tutto incluso. €0 extra, mai.</p>
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {previewRooms.map((room, i) => (
+          {previewRooms.map(({ room, remaining, badge }, i) => (
             <motion.div
               key={room.id}
               initial={{ opacity: 0, y: 20 }}
@@ -43,8 +46,13 @@ export function RoomsPreview() {
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       loading="lazy"
                     />
-                    <Badge className="absolute top-3 left-3 bg-accent text-accent-foreground">
-                      {room.available ? "Disponibile" : "Occupata"}
+                    {badge && (
+                      <Badge className="absolute top-3 left-3 bg-primary text-primary-foreground">
+                        ⭐ {badge}
+                      </Badge>
+                    )}
+                    <Badge className="absolute top-3 right-3 bg-destructive text-destructive-foreground text-xs">
+                      Solo {remaining} rimaste
                     </Badge>
                   </div>
                   <div className="p-5">
@@ -54,7 +62,7 @@ export function RoomsPreview() {
                       <div>
                         <span className="text-2xl font-bold text-accent">€{room.price}</span>
                         <span className="text-sm text-muted-foreground">/mese</span>
-                        <p className="text-xs text-success font-medium">tutto incluso</p>
+                        <p className="text-xs text-success font-bold">tutto incluso — €0 extra, mai</p>
                       </div>
                       <span className="text-sm text-accent font-medium group-hover:underline">Dettagli →</span>
                     </div>
