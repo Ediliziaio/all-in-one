@@ -75,6 +75,34 @@ export interface Buono {
   nuovo?: boolean;
 }
 
+export interface Notification {
+  id: string;
+  titolo: string;
+  messaggio: string;
+  tipo: "prenotazione" | "supporto" | "buono" | "sistema";
+  letta: boolean;
+  created_at: string;
+}
+
+export interface Documento {
+  id: string;
+  nome: string;
+  tipo: "contratto" | "ricevuta" | "documento";
+  data: string;
+  dimensione: string;
+  url: string;
+}
+
+export interface Pagamento {
+  id: string;
+  mese: string;
+  importo: number;
+  stato: "pagato" | "in_scadenza" | "scaduto";
+  data_scadenza: string;
+  data_pagamento?: string;
+  metodo?: string;
+}
+
 // --- PROFILES ---
 export const mockProfiles: Profile[] = [
   {
@@ -369,6 +397,131 @@ export const mockBuoni: Buono[] = [
     logo_url: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=100&h=100&fit=crop",
     scadenza: "2026-06-30",
     attivo: true,
+  },
+];
+
+// --- NOTIFICATIONS ---
+export const mockNotifications: Notification[] = [
+  {
+    id: "n1",
+    titolo: "Nuova prenotazione",
+    messaggio: "Luca Verdi ha richiesto la Doppia 103",
+    tipo: "prenotazione",
+    letta: false,
+    created_at: "2025-06-10T10:30:00",
+  },
+  {
+    id: "n2",
+    titolo: "Ticket supporto",
+    messaggio: "Marco Rossi ha aperto un ticket per il WiFi",
+    tipo: "supporto",
+    letta: false,
+    created_at: "2025-06-09T16:00:00",
+  },
+  {
+    id: "n3",
+    titolo: "Nuovo buono disponibile",
+    messaggio: "Palestra FitPadova offre una settimana gratis!",
+    tipo: "buono",
+    letta: true,
+    created_at: "2025-06-08T09:00:00",
+  },
+  {
+    id: "n4",
+    titolo: "Pagamento in scadenza",
+    messaggio: "La rata di luglio scade tra 5 giorni",
+    tipo: "sistema",
+    letta: false,
+    created_at: "2025-06-07T08:00:00",
+  },
+];
+
+// --- DOCUMENTI ---
+export const mockDocumenti: Documento[] = [
+  {
+    id: "d1",
+    nome: "Contratto di locazione 2025-2026",
+    tipo: "contratto",
+    data: "2025-08-01",
+    dimensione: "2.4 MB",
+    url: "#",
+  },
+  {
+    id: "d2",
+    nome: "Ricevuta Settembre 2025",
+    tipo: "ricevuta",
+    data: "2025-09-01",
+    dimensione: "340 KB",
+    url: "#",
+  },
+  {
+    id: "d3",
+    nome: "Ricevuta Ottobre 2025",
+    tipo: "ricevuta",
+    data: "2025-10-01",
+    dimensione: "338 KB",
+    url: "#",
+  },
+  {
+    id: "d4",
+    nome: "Regolamento interno",
+    tipo: "documento",
+    data: "2025-08-01",
+    dimensione: "1.1 MB",
+    url: "#",
+  },
+  {
+    id: "d5",
+    nome: "Ricevuta Novembre 2025",
+    tipo: "ricevuta",
+    data: "2025-11-01",
+    dimensione: "342 KB",
+    url: "#",
+  },
+];
+
+// --- PAGAMENTI ---
+export const mockPagamenti: Pagamento[] = [
+  {
+    id: "pay1",
+    mese: "Settembre 2025",
+    importo: 480,
+    stato: "pagato",
+    data_scadenza: "2025-09-05",
+    data_pagamento: "2025-09-03",
+    metodo: "Bonifico bancario",
+  },
+  {
+    id: "pay2",
+    mese: "Ottobre 2025",
+    importo: 480,
+    stato: "pagato",
+    data_scadenza: "2025-10-05",
+    data_pagamento: "2025-10-04",
+    metodo: "Bonifico bancario",
+  },
+  {
+    id: "pay3",
+    mese: "Novembre 2025",
+    importo: 480,
+    stato: "pagato",
+    data_scadenza: "2025-11-05",
+    data_pagamento: "2025-11-02",
+    metodo: "Carta di credito",
+  },
+  {
+    id: "pay4",
+    mese: "Dicembre 2025",
+    importo: 480,
+    stato: "in_scadenza",
+    data_scadenza: "2025-12-05",
+  },
+  {
+    id: "pay5",
+    mese: "Gennaio 2026",
+    importo: 480,
+    stato: "scaduto",
+    data_scadenza: "2026-01-05",
   },
 ];
 
