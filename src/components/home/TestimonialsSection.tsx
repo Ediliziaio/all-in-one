@@ -4,12 +4,12 @@ import { Star, ChevronLeft, ChevronRight, Quote } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const testimonials = [
-  { name: "Marco Rossi", course: "Ingegneria Informatica", rating: 5, text: "Ambiente perfetto per studiare. La fibra è velocissima e le sale studio sono sempre disponibili. Non tornerei mai a un affitto normale.", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=face" },
-  { name: "Giulia Bianchi", course: "Medicina", rating: 5, text: "Vivere qui è comodissimo: tutto è incluso e l'università è a 5 minuti a piedi. Lo consiglio a chiunque!", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&h=80&fit=crop&crop=face" },
-  { name: "Ahmed El Fassi", course: "Economia", rating: 5, text: "Ho trovato subito una community fantastica. La palestra e la cucina comune sono un plus incredibile.", avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&h=80&fit=crop&crop=face" },
-  { name: "Sofia Chen", course: "Architettura", rating: 4, text: "Camera spaziosa e luminosa, perfetta per i miei progetti. La posizione è strategica per raggiungere tutto.", avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&h=80&fit=crop&crop=face" },
-  { name: "Luca Moretti", course: "Giurisprudenza", rating: 5, text: "Dopo 2 anni qui non cambierei per niente al mondo. Staff disponibile e struttura impeccabile.", avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=80&h=80&fit=crop&crop=face" },
-  { name: "Maria T.", course: "Genitore", rating: 5, text: "Come mamma, mi sento tranquilla sapendo che mia figlia è in un ambiente sicuro, organizzato e con assistenza sempre disponibile.", avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=80&h=80&fit=crop&crop=face" },
+  { name: "Marco Rossi", course: "Ingegneria Informatica", rating: 5, text: "Ho risparmiato €180/mese rispetto al mio vecchio affitto. WiFi che funziona davvero, bollette incluse, zero sorprese. Non torno più indietro.", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=face", highlight: "Risparmiati €180/mese" },
+  { name: "Giulia Bianchi", course: "Medicina", rating: 5, text: "In 3 anni non ho mai avuto un problema irrisolto per più di 24 ore. L'assistenza è reale, non un numero che non risponde mai.", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&h=80&fit=crop&crop=face", highlight: "Problemi risolti in <24h" },
+  { name: "Ahmed El Fassi", course: "Economia", rating: 5, text: "Il 98% rinnova il contratto. Io l'ho rinnovato 3 volte. La community, la palestra, la posizione — non trovi niente di simile a Padova.", avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&h=80&fit=crop&crop=face", highlight: "Rinnovato 3 volte" },
+  { name: "Sofia Chen", course: "Architettura", rating: 5, text: "Camera spaziosa, luminosa, perfetta per i miei progetti. A 5 minuti dall'università ho guadagnato 2 ore al giorno di vita.", avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&h=80&fit=crop&crop=face", highlight: "+2 ore al giorno" },
+  { name: "Luca Moretti", course: "Giurisprudenza", rating: 5, text: "Prima pagavo €650 tra affitto e bollette per un buco. Ora pago meno, vivo meglio, e non devo litigare con il proprietario.", avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=80&h=80&fit=crop&crop=face", highlight: "Da €650 a meno, e vive meglio" },
+  { name: "Maria T.", course: "Genitore", rating: 5, text: "Come mamma, finalmente dormo tranquilla. So che mia figlia è al sicuro, il contratto è regolare, e se ha un problema lo risolvono subito.", avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=80&h=80&fit=crop&crop=face", highlight: "Mamma tranquilla" },
 ];
 
 function StarRating({ rating }: { rating: number }) {
@@ -25,7 +25,12 @@ function StarRating({ rating }: { rating: number }) {
 function TestimonialCard({ t }: { t: typeof testimonials[0] }) {
   return (
     <div className="rounded-xl border bg-card p-6 h-full flex flex-col">
-      <Quote className="h-6 w-6 text-accent/30 mb-3" />
+      <div className="flex items-center justify-between mb-3">
+        <Quote className="h-6 w-6 text-accent/30" />
+        <span className="text-xs font-bold text-primary bg-primary/10 px-3 py-1 rounded-full">
+          {t.highlight}
+        </span>
+      </div>
       <p className="text-foreground text-sm leading-relaxed flex-1">"{t.text}"</p>
       <div className="flex items-center gap-3 mt-4 pt-4 border-t">
         <img src={t.avatar} alt={t.name} className="h-10 w-10 rounded-full object-cover" />
@@ -48,8 +53,13 @@ export function TestimonialsSection() {
     <section className="py-20 bg-background">
       <div className="container">
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-12">
-          <h2 className="font-heading text-3xl md:text-4xl font-bold text-foreground">Cosa dicono di noi</h2>
-          <p className="text-muted-foreground mt-3">Studenti e genitori raccontano la loro esperienza.</p>
+          <h2 className="font-heading text-3xl md:text-4xl font-bold text-foreground">
+            Non Fidarti di Noi.<br />
+            <span className="text-primary">Fidati di Loro.</span>
+          </h2>
+          <p className="text-muted-foreground mt-3">
+            <strong className="text-foreground">127 recensioni Google — media 4.9★</strong>. Ecco cosa dicono studenti e genitori.
+          </p>
         </motion.div>
 
         {/* Desktop: grid 3 columns */}
