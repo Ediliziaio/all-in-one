@@ -1,45 +1,68 @@
 
 
-# Restyling Colori e Stile Google
+# Completamento Piattaforma StudentatoPD — Piano Completo
 
-## Concetto
-Via il blu scuro e l'arancione. Il sito adotta la palette Google: sfondo bianco pulito, colori primari Google usati come accenti (Blu #4285F4 primario, Rosso #EA4335 per urgenza, Giallo #FBBC04 per highlight, Verde #34A853 per successo/disponibilità). Stile Material-like: ombre morbide, bordi arrotondati, tipografia pulita.
+## Stato attuale
+Ho analizzato tutti i file del progetto. La struttura è solida con 3 aree (pubblica, admin, studente), ma mancano diversi pezzi per renderlo funzionante al 100%.
 
-## Palette Google (HSL)
-- **Primary (Blu Google)**: `217 89% 61%` (#4285F4) — CTA, link, header
-- **Accent (Giallo Google)**: `43 96% 50%` (#FBBC04) — badge, highlight
-- **Success (Verde Google)**: `142 53% 43%` (#34A853) — disponibilità, conferme
-- **Destructive (Rosso Google)**: `7 81% 56%` (#EA4335) — errori, urgenza
-- **Background**: bianco puro `0 0% 100%`, foreground grigio scuro `220 9% 25%`
-- **Muted**: grigi chiarissimi Google-style `220 14% 96%`
+---
 
-## Modifiche
+## Cosa manca e cosa aggiungo
 
-### 1. CSS Variables (`src/index.css`)
-Riscrivere tutte le variabili `:root` e `.dark` con la palette Google. Background bianchissimo, primary = blu Google, accent = giallo Google.
+### 1. Pagina Admin Impostazioni (rotta morta)
+La sidebar admin ha "Impostazioni" ma la pagina non esiste. Creo `AdminImpostazioni.tsx` con: nome struttura, email, telefono, orari apertura, gestione notifiche email, pulsante salva.
 
-### 2. HeroSection (`src/components/home/HeroSection.tsx`)
-- Sfondo da blu scuro → sfondo bianco con gradient morbido grigio chiaro, oppure blu Google leggero
-- Testo scuro su sfondo chiaro (stile Google homepage)
-- Badge e stats con i 4 colori Google distribuiti
-- CTA primario blu Google, secondario outline
+### 2. Sistema Notifiche
+Nessuna notifica in tutto il sito. Creo `NotificationBell.tsx` — campanella con badge contatore e dropdown notifiche mock (nuova prenotazione, risposta ticket, nuovo buono). Lo integro negli header Admin e Studente.
 
-### 3. Navbar (`src/components/Navbar.tsx`)
-- Logo "SP" con i 4 colori Google (come la G di Google)
-- Underline attivo in blu Google
-- CTA "Richiedi info" in blu Google
+### 3. Header Dashboard consistente
+Admin e Studente non hanno un header top. Creo `DashboardHeader.tsx` con: titolo pagina, barra ricerca, campanella notifiche, avatar utente. Lo integro in entrambi i layout.
 
-### 4. Tutti i componenti con `bg-accent` / `text-accent`
-Cambiano automaticamente grazie alle CSS variables — giallo Google al posto dell'arancione. Alcuni punti dove l'arancione è hardcoded (classi `bg-accent`) verranno aggiornati di conseguenza.
+### 4. Form Prenotazione funzionante
+Il bottone "Richiedi Prenotazione" in CameraDettaglio non fa nulla. Aggiungo Dialog con form: nome, email, date, messaggio + toast conferma.
 
-### 5. WhatsAppButton, HowItWorksSection, ServicesSection, cards
-I colori accent/primary si aggiornano via variabili. Verifico e correggo eventuali colori hardcoded.
+### 5. Wizard Prenotazione Studente
+Creo `PrenotaCamera.tsx` — wizard a step: Scegli camera → Date → Dati → Riepilogo → Conferma. Rotta `/studente/prenota`.
 
-### 6. Memory update
-Aggiornare `mem://design/tokens` e `mem://index.md` con la nuova palette.
+### 6. Pagina Documenti Studente (mancante)
+Creo `Documenti.tsx` — contratto attivo, ricevute pagamento, documenti caricati. Lista mock con icone PDF e download simulato.
+
+### 7. Pagina Pagamenti Studente (mancante)
+Creo `Pagamenti.tsx` — storico completo con stato (Pagato/In scadenza/Scaduto), prossima scadenza evidenziata, totale speso.
+
+### 8. Azioni Admin funzionanti
+- **AdminPrenotazioni**: Conferma/Rifiuta aggiornano lo stato con useState locale
+- **AdminStudenti**: bottone "Vedi dettaglio" con Dialog info complete
+- **AdminCamere**: "Modifica" apre Dialog pre-compilato, "Foto" simula upload
+- **AdminSupporto**: risposta si aggiunge visivamente al ticket
+
+### 9. Dark Mode Toggle
+Aggiungo toggle dark/light nella Navbar pubblica e negli header dashboard. Il CSS ha già le variabili `.dark`.
+
+### 10. Mock Data aggiuntivi
+Aggiungo in `mockData.ts`: interfaccia + array `mockNotifications`, `mockDocumenti`, `mockPagamenti`.
+
+---
 
 ## File coinvolti
-- **Modifica**: `src/index.css` (variabili colore), `src/components/home/HeroSection.tsx` (sfondo/stile), `src/components/Navbar.tsx` (logo multicolore)
-- **Modifica**: `mem://design/tokens`, `mem://index.md`
-- Tutti gli altri componenti si aggiornano automaticamente via CSS variables
+
+**Nuovi (8 file)**:
+- `src/pages/admin/AdminImpostazioni.tsx`
+- `src/pages/studente/PrenotaCamera.tsx`
+- `src/pages/studente/Documenti.tsx`
+- `src/pages/studente/Pagamenti.tsx`
+- `src/components/NotificationBell.tsx`
+- `src/components/DashboardHeader.tsx`
+- `src/components/ThemeToggle.tsx`
+
+**Modificati (9 file)**:
+- `src/App.tsx` — nuove routes
+- `src/layouts/AdminLayout.tsx` — header con notifiche, ricerca, dark mode
+- `src/layouts/StudenteLayout.tsx` — menu + header aggiornati
+- `src/pages/CameraDettaglio.tsx` — form prenotazione
+- `src/pages/admin/AdminStudenti.tsx` — dialog dettaglio
+- `src/pages/admin/AdminPrenotazioni.tsx` — azioni con state
+- `src/pages/admin/AdminCamere.tsx` — modifica funzionante
+- `src/data/mockData.ts` — nuovi dati mock
+- `src/components/Navbar.tsx` — dark mode toggle
 
