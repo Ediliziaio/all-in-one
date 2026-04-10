@@ -14,6 +14,7 @@ const vantaggi = [
 ];
 
 const comparison = [
+  { feature: "Costo mensile medio", usText: "da €480 tutto incluso", tradText: "€350 + ~€150 bollette" },
   { feature: "Utenze incluse", us: true, trad: false },
   { feature: "WiFi Fibra 1Gbps", us: true, trad: false },
   { feature: "Manutenzione inclusa", us: true, trad: false },
@@ -25,9 +26,9 @@ const comparison = [
 ];
 
 const testimonials = [
-  { name: "Giulia R.", course: "Medicina, 3° anno", text: "Dopo un anno in affitto con bollette impazzite, qui ho finalmente la testa libera per studiare. Tutto incluso, zero stress." },
-  { name: "Marco T.", course: "Ingegneria, 2° anno", text: "Il rapporto qualità-prezzo è assurdo. WiFi veloce, camera pulita, palestra gratis. Provate a trovare tutto questo in un affitto." },
-  { name: "Sofia L.", course: "Psicologia, 1° anno", text: "Ero terrorizzata all'idea di trasferirmi da sola. Qui mi sono ambientata in una settimana, grazie agli eventi e alla community." },
+  { name: "Giulia R.", course: "Medicina, 3° anno", text: "Prima pagavo €350 di affitto più €130 di bollette, e dovevo rincorrere il proprietario per ogni problema. Qui con €480 ho tutto incluso e risparmio almeno €100 al mese." },
+  { name: "Marco T.", course: "Ingegneria, 2° anno", text: "Nel mio vecchio appartamento spendevo €40/mese solo di WiFi lento. Qui ho fibra 1Gbps, palestra e pulizia inclusi. Il confronto non regge." },
+  { name: "Sofia L.", course: "Psicologia, 1° anno", text: "Sono arrivata a Padova senza conoscere nessuno. Dopo una settimana di eventi e gruppi studio, avevo già un gruppo di amici. La community fa davvero la differenza." },
 ];
 
 const Vantaggi = () => (
@@ -89,11 +90,21 @@ const Vantaggi = () => (
               {comparison.map((row, i) => (
                 <div key={row.feature} className={`grid grid-cols-3 text-center text-sm p-4 ${i < comparison.length - 1 ? "border-b" : ""}`}>
                   <span className="text-left text-foreground">{row.feature}</span>
-                  <span>{row.us ? <Check className="h-5 w-5 text-success mx-auto" /> : <XIcon className="h-5 w-5 text-destructive mx-auto" />}</span>
-                  <span>{row.trad ? <Check className="h-5 w-5 text-success mx-auto" /> : <XIcon className="h-5 w-5 text-destructive mx-auto" />}</span>
+                  {"usText" in row ? (
+                    <>
+                      <span className="font-semibold text-accent">{row.usText}</span>
+                      <span className="text-muted-foreground">{row.tradText}</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>{row.us ? <Check className="h-5 w-5 text-success mx-auto" /> : <XIcon className="h-5 w-5 text-destructive mx-auto" />}</span>
+                      <span>{row.trad ? <Check className="h-5 w-5 text-success mx-auto" /> : <XIcon className="h-5 w-5 text-destructive mx-auto" />}</span>
+                    </>
+                  )}
                 </div>
               ))}
             </div>
+            <p className="text-xs text-muted-foreground text-center mt-4">Il confronto si basa su dati medi del mercato immobiliare studentesco a Padova.</p>
           </FadeIn>
         </div>
       </section>
@@ -125,10 +136,14 @@ const Vantaggi = () => (
         <section className="py-16 bg-muted/50">
           <div className="container text-center">
             <h2 className="font-heading text-2xl md:text-3xl font-bold text-foreground">Pronto? Il tuo posto ti aspetta</h2>
-            <p className="text-muted-foreground mt-2 max-w-md mx-auto">Esplora le camere disponibili e richiedi il tuo posto allo StudentatoPD.</p>
+            <p className="text-muted-foreground mt-2 max-w-md mx-auto">I posti per Settembre 2025 stanno finendo. Esplora le camere e richiedi il tuo.</p>
+            <div className="inline-flex items-center gap-2 mt-4 px-4 py-2 rounded-full bg-accent/10 text-accent text-sm font-medium">
+              <CalendarHeart className="h-4 w-4" />
+              Solo 12 posti ancora disponibili
+            </div>
             <div className="flex flex-wrap justify-center gap-3 mt-6">
               <Button size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90" asChild>
-                <Link to="/camere">Vedi le camere</Link>
+                <Link to="/camere">Scopri le camere</Link>
               </Button>
               <Button size="lg" variant="outline" asChild>
                 <Link to="/contatti">Scrivici</Link>
