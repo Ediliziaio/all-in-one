@@ -27,6 +27,7 @@ import AdminSupporto from "./pages/admin/AdminSupporto";
 import AdminBuoni from "./pages/admin/AdminBuoni";
 import AdminGuide from "./pages/admin/AdminGuide";
 import AdminImpostazioni from "./pages/admin/AdminImpostazioni";
+import AdminContratti from "./pages/admin/AdminContratti";
 
 // Studente
 import StudenteLayout from "./layouts/StudenteLayout";
@@ -69,6 +70,7 @@ const App = () => (
             <Route index element={<AdminDashboard />} />
             <Route path="camere" element={<AdminCamere />} />
             <Route path="richieste" element={<AdminPrenotazioni />} />
+            <Route path="contratti" element={<AdminContratti />} />
             <Route path="studenti" element={<AdminStudenti />} />
             <Route path="supporto" element={<AdminSupporto />} />
             <Route path="buoni" element={<AdminBuoni />} />
