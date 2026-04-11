@@ -1,45 +1,19 @@
 
 
-# Approccio bilanciato su Servizi e Vantaggi
+# Login Demo — Credenziali preimpostate
 
-Le due pagine sono già abbastanza sobrie nel tono. Le modifiche principali riguardano l'aggiunta di elementi push mirati (value stack, confronto economico, urgenza nella CTA) senza rendere aggressivo il tono generale.
+## Cosa aggiungo
 
----
+Sotto il form di login, inserisco una sezione "Account Demo" con due pulsanti rapidi che compilano automaticamente email e password:
 
-## Servizi.tsx — Modifiche
+1. **Studente**: `studente@demo.it` / `demo1234` → porta a `/studente`
+2. **Admin**: `admin@demo.it` / `demo1234` → porta a `/admin`
 
-### Sezioni informative (tono caldo, invariato)
-- Hero, Services Grid, "Per i genitori": restano come sono, tono professionale e accogliente.
+Cliccando su uno dei due, i campi si compilano automaticamente. L'utente deve solo premere "Accedi".
 
-### Sezione "Perché scegliere noi" → Value Stack sobrio
-- Aggiungere sotto i 3 punti un riepilogo valore simile alla homepage: "Tutto questo è incluso nel canone — da €480/mese. Nessun costo extra, mai."
-- Non barrato, non aggressivo. Solo il dato.
+Aggiungo anche la validazione: se email/password non corrispondono a nessun account demo, mostra un toast di errore.
 
-### CTA finale → Push moderato
-- Aggiungere un elemento di scarcity soft: "Posti limitati per Settembre 2025" sotto il titolo.
-- CTA primaria: "Scopri le camere" (resta).
-- Aggiungere badge "Posti limitati" sopra la CTA.
+## File modificati (1)
 
----
-
-## Vantaggi.tsx — Modifiche
-
-### Tabella comparativa → Elemento centrale con push
-- Aggiungere riga con valore economico: "Costo mensile medio" — "da €480 tutto incluso" vs "€350 + €150 bollette"
-- Aggiungere nota sotto la tabella: "Il confronto si basa su dati medi del mercato immobiliare studentesco a Padova."
-
-### Testimonials → Risultati specifici
-- Aggiornare i testi con outcome misurabili (come fatto nella homepage):
-  - Giulia: menzionare risparmio concreto
-  - Marco: menzionare confronto con affitto precedente
-  - Sofia: menzionare velocità di ambientamento
-
-### CTA finale → Push con urgenza
-- Aggiungere: "I posti per Settembre 2025 stanno finendo" + contatore soft delle disponibilità.
-
----
-
-## File modificati (2)
-- `src/pages/Servizi.tsx` — value stack nella sezione "Perché noi", CTA con scarcity
-- `src/pages/Vantaggi.tsx` — tabella comparativa arricchita, testimonial con risultati, CTA con urgenza
+- `src/pages/auth/LoginPage.tsx` — sezione "Account Demo" con 2 bottoni quick-fill + validazione credenziali mock
 
