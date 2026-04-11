@@ -6,7 +6,7 @@ import { mockNotifications } from "@/data/mockData";
 import { cn } from "@/lib/utils";
 
 const tipoIcon: Record<string, string> = {
-  prenotazione: "🏠",
+  richiesta: "🏠",
   supporto: "🎧",
   buono: "🎁",
   sistema: "⚙️",
