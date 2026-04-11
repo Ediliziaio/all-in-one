@@ -1,57 +1,31 @@
 
 
-# Da "Prenotazioni" a "Richieste di Affitto"
+# Pagina Admin Contratti
 
-## Il problema
-L'intero flusso usa il termine "prenotazione" come se fosse un hotel. In realtà si tratta di **affitti annuali**: lo studente fa una **richiesta di affitto** per una camera, l'admin la approva, e si firma un contratto.
+## Cosa aggiungo
 
-## Cosa cambia
+Una nuova pagina **"Contratti"** nell'area admin per gestire i contratti di affitto firmati dopo l'approvazione delle richieste.
 
-### Terminologia
-| Vecchio | Nuovo |
-|---------|-------|
-| Prenotazione | Richiesta di affitto |
-| Prenotazioni | Richieste |
-| Prenota una Camera | Richiedi una Camera |
-| Check-in / Check-out | Inizio contratto / Fine contratto |
-| Conferma prenotazione | Invia richiesta |
-| Prenotazione confermata | Richiesta approvata |
-| Prenotazione inviata | Richiesta inviata |
+## Dati mock
 
-### Flusso studente (PrenotaCamera.tsx)
-- Titolo: "Richiedi una Camera"
-- Step finale: "Richiesta inviata! Ti contatteremo per il contratto."
-- CTA: "Invia Richiesta" invece di "Conferma Prenotazione"
-- Date: "Inizio contratto" / "Fine contratto" (default sett 2025 → lug 2026)
+Nuovo tipo `Contratto` in `mockData.ts` con campi: id, richiesta_id, student_nome, camera_nome, data_inizio, data_fine, canone_mensile, stato (`attivo` | `in_scadenza` | `scaduto` | `disdetto`), data_firma, documento_url. Aggiungo 3-4 contratti mock collegati alle richieste approvate.
 
-### Admin (AdminPrenotazioni.tsx)
-- Titolo pagina: "Richieste di Affitto"
-- Tab: "In Attesa", "Approvate", "Rifiutate", "Concluse"
-- Dialog: "Dettaglio Richiesta"
-- Stati: pending → approvata (non "confermata")
+## Pagina AdminContratti.tsx
 
-### Sidebar e navigazione
-- AdminLayout: "Prenotazioni" → "Richieste"
-- StudenteLayout: link "Prenota" → "Richiedi Camera"
+- Header "Contratti di Affitto"
+- Tab: Attivi, In Scadenza, Scaduti, Disdetti
+- Tabella con: studente, camera, periodo, canone, stato (badge colorato), azioni
+- Dialog dettaglio contratto con tutti i campi + pulsante "Scarica Contratto" (mock)
+- Stile identico a AdminPrenotazioni (Card, Badge, PageTransition/FadeIn)
 
-### Mock data (mockData.ts)
-- Tipo `Prenotazione` → `RichiestaAffitto`
-- `mockPrenotazioni` → `mockRichieste`
-- Stato "confermata" → "approvata"
-- Campi `data_inizio`/`data_fine` restano (sono date contratto)
+## Navigazione
 
-### Dashboard e notifiche
-- AdminDashboard: "Prenotazioni in attesa" → "Richieste in attesa"
-- StudenteHome: card "Prenotazione" → "La tua richiesta"
-- NotificationBell: tipo "prenotazione" → "richiesta"
+- `AdminLayout.tsx`: nuova voce "Contratti" con icona `FileSignature` tra "Richieste" e "Studenti"
+- `App.tsx`: nuova route `/admin/contratti` → `AdminContratti`
 
-## File modificati (8)
-1. `src/data/mockData.ts` — rinomina tipo e array, stato "approvata"
-2. `src/pages/admin/AdminPrenotazioni.tsx` — tutta la terminologia
-3. `src/pages/studente/PrenotaCamera.tsx` — titoli, CTA, step labels
-4. `src/layouts/AdminLayout.tsx` — label sidebar
-5. `src/layouts/StudenteLayout.tsx` — label navigazione
-6. `src/pages/admin/AdminDashboard.tsx` — KPI e card
-7. `src/pages/studente/StudenteHome.tsx` — card richiesta
-8. `src/components/NotificationBell.tsx` — tipo notifica
+## File modificati (4)
+1. `src/data/mockData.ts` — tipo `Contratto` + `mockContratti`
+2. `src/pages/admin/AdminContratti.tsx` — nuova pagina
+3. `src/layouts/AdminLayout.tsx` — voce menu
+4. `src/App.tsx` — route
 
