@@ -229,6 +229,9 @@ export const mockRichieste: RichiestaAffitto[] = [
   },
 ];
 
+// Backward-compatible alias
+export const mockPrenotazioni = mockRichieste;
+
 // --- SUPPORT TICKETS ---
 export const mockTickets: SupportTicket[] = [
   {
