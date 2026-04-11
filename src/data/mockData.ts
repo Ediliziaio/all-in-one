@@ -531,5 +531,70 @@ export const mockPagamenti: Pagamento[] = [
   },
 ];
 
+// --- CONTRATTI ---
+export interface Contratto {
+  id: string;
+  richiesta_id: string;
+  student_nome: string;
+  camera_nome: string;
+  data_inizio: string;
+  data_fine: string;
+  canone_mensile: number;
+  stato: "attivo" | "in_scadenza" | "scaduto" | "disdetto";
+  data_firma: string;
+  documento_url: string;
+}
+
+export const mockContratti: Contratto[] = [
+  {
+    id: "c1",
+    richiesta_id: "pren1",
+    student_nome: "Marco Rossi",
+    camera_nome: "Singola Standard 101",
+    data_inizio: "2025-09-01",
+    data_fine: "2026-07-31",
+    canone_mensile: 480,
+    stato: "attivo",
+    data_firma: "2025-07-15",
+    documento_url: "#",
+  },
+  {
+    id: "c2",
+    richiesta_id: "pren2",
+    student_nome: "Sara Bianchi",
+    camera_nome: "Singola Standard 205",
+    data_inizio: "2025-09-01",
+    data_fine: "2026-07-31",
+    canone_mensile: 480,
+    stato: "attivo",
+    data_firma: "2025-07-20",
+    documento_url: "#",
+  },
+  {
+    id: "c3",
+    richiesta_id: "pren0",
+    student_nome: "Andrea Neri",
+    camera_nome: "Doppia 201",
+    data_inizio: "2024-09-01",
+    data_fine: "2025-07-31",
+    canone_mensile: 380,
+    stato: "in_scadenza",
+    data_firma: "2024-07-10",
+    documento_url: "#",
+  },
+  {
+    id: "c4",
+    richiesta_id: "pren00",
+    student_nome: "Elena Conti",
+    camera_nome: "Singola Plus 302",
+    data_inizio: "2023-09-01",
+    data_fine: "2024-07-31",
+    canone_mensile: 520,
+    stato: "scaduto",
+    data_firma: "2023-07-05",
+    documento_url: "#",
+  },
+];
+
 // Current mock user (simulates logged-in student)
 export const currentUser = mockProfiles[0];
