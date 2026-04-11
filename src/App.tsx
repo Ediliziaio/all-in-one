@@ -68,7 +68,7 @@ const App = () => (
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<AdminDashboard />} />
             <Route path="camere" element={<AdminCamere />} />
-            <Route path="prenotazioni" element={<AdminPrenotazioni />} />
+            <Route path="richieste" element={<AdminPrenotazioni />} />
             <Route path="studenti" element={<AdminStudenti />} />
             <Route path="supporto" element={<AdminSupporto />} />
             <Route path="buoni" element={<AdminBuoni />} />
