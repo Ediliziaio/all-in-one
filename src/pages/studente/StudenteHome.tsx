@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { BedDouble, CalendarCheck, Headphones, Gift, ArrowRight } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { currentUser, mockPrenotazioni, mockTickets, mockPosts, mockBuoni } from "@/data/mockData";
+import { currentUser, mockRichieste, mockTickets, mockPosts, mockBuoni } from "@/data/mockData";
 import { getRoomById } from "@/data/rooms";
 import { PageTransition, FadeIn, StaggerContainer, StaggerItem, HoverCard } from "@/components/motion/MotionWrappers";
 
@@ -10,7 +10,7 @@ export default function StudenteHome() {
   const hour = new Date().getHours();
   const greeting = hour < 12 ? "Buongiorno" : hour < 18 ? "Buon pomeriggio" : "Buonasera";
   const myRoom = currentUser.camera_id ? getRoomById(currentUser.camera_id) : null;
-  const myBooking = mockPrenotazioni.find((p) => p.student_id === currentUser.id);
+  const myBooking = mockRichieste.find((p) => p.student_id === currentUser.id);
   const myTickets = mockTickets.filter((t) => t.student_id === currentUser.id && t.stato !== "risolto");
   const latestBuono = mockBuoni[0];
 
@@ -49,11 +49,11 @@ export default function StudenteHome() {
                 <CardContent className="p-4 space-y-2">
                   <div className="flex items-center gap-2">
                     <CalendarCheck className="h-4 w-4 text-accent" />
-                    <span className="font-heading font-semibold">Prenotazione</span>
+                    <span className="font-heading font-semibold">La tua richiesta</span>
                   </div>
                   <p className="text-sm">{myBooking.camera_nome}</p>
                   <p className="text-xs text-muted-foreground">{myBooking.data_inizio} → {myBooking.data_fine}</p>
-                  <Badge className={myBooking.stato === "confermata" ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"}>
+                  <Badge className={myBooking.stato === "approvata" ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"}>
                     {myBooking.stato}
                   </Badge>
                 </CardContent>

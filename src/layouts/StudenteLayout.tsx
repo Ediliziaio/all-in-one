@@ -8,7 +8,7 @@ import { DashboardHeader } from "@/components/DashboardHeader";
 const menuItems = [
   { label: "Home", href: "/studente", icon: Home },
   { label: "La Mia Camera", href: "/studente/camera", icon: BedDouble },
-  { label: "Prenota", href: "/studente/prenota", icon: CalendarPlus },
+  { label: "Richiedi Camera", href: "/studente/prenota", icon: CalendarPlus },
   { label: "Community", href: "/studente/community", icon: Users },
   { label: "Guide", href: "/studente/guide", icon: BookOpen },
   { label: "Buoni", href: "/studente/buoni", icon: Gift },

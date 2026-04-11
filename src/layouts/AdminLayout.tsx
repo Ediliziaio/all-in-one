@@ -6,7 +6,7 @@ import { DashboardHeader } from "@/components/DashboardHeader";
 const menuItems = [
   { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
   { label: "Camere", href: "/admin/camere", icon: BedDouble },
-  { label: "Prenotazioni", href: "/admin/prenotazioni", icon: CalendarCheck },
+  { label: "Richieste", href: "/admin/richieste", icon: CalendarCheck },
   { label: "Studenti", href: "/admin/studenti", icon: Users },
   { label: "Supporto", href: "/admin/supporto", icon: Headphones },
   { label: "Buoni", href: "/admin/buoni", icon: Gift },

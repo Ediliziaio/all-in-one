@@ -16,7 +16,7 @@ export interface Profile {
   camera_id?: string;
 }
 
-export interface Prenotazione {
+export interface RichiestaAffitto {
   id: string;
   camera_id: string;
   camera_nome: string;
@@ -24,10 +24,13 @@ export interface Prenotazione {
   student_nome: string;
   data_inizio: string;
   data_fine: string;
-  stato: "pending" | "confermata" | "rifiutata" | "conclusa";
+  stato: "pending" | "approvata" | "rifiutata" | "conclusa";
   note?: string;
   created_at: string;
 }
+
+// Backward-compatible alias
+export type Prenotazione = RichiestaAffitto;
 
 export interface SupportTicket {
   id: string;
@@ -79,7 +82,7 @@ export interface Notification {
   id: string;
   titolo: string;
   messaggio: string;
-  tipo: "prenotazione" | "supporto" | "buono" | "sistema";
+  tipo: "richiesta" | "supporto" | "buono" | "sistema";
   letta: boolean;
   created_at: string;
 }
@@ -177,8 +180,8 @@ export const mockProfiles: Profile[] = [
   },
 ];
 
-// --- PRENOTAZIONI ---
-export const mockPrenotazioni: Prenotazione[] = [
+// --- RICHIESTE DI AFFITTO ---
+export const mockRichieste: RichiestaAffitto[] = [
   {
     id: "pren1",
     camera_id: "singola-101",
@@ -187,7 +190,7 @@ export const mockPrenotazioni: Prenotazione[] = [
     student_nome: "Marco Rossi",
     data_inizio: "2025-09-01",
     data_fine: "2026-07-31",
-    stato: "confermata",
+    stato: "approvata",
     created_at: "2025-05-15",
   },
   {
@@ -198,7 +201,7 @@ export const mockPrenotazioni: Prenotazione[] = [
     student_nome: "Sara Bianchi",
     data_inizio: "2025-09-01",
     data_fine: "2026-07-31",
-    stato: "confermata",
+    stato: "approvata",
     created_at: "2025-05-20",
   },
   {
@@ -225,6 +228,9 @@ export const mockPrenotazioni: Prenotazione[] = [
     created_at: "2025-06-10",
   },
 ];
+
+// Backward-compatible alias
+export const mockPrenotazioni = mockRichieste;
 
 // --- SUPPORT TICKETS ---
 export const mockTickets: SupportTicket[] = [
@@ -404,9 +410,9 @@ export const mockBuoni: Buono[] = [
 export const mockNotifications: Notification[] = [
   {
     id: "n1",
-    titolo: "Nuova prenotazione",
+    titolo: "Nuova richiesta di affitto",
     messaggio: "Luca Verdi ha richiesto la Doppia 103",
-    tipo: "prenotazione",
+    tipo: "richiesta",
     letta: false,
     created_at: "2025-06-10T10:30:00",
   },

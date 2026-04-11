@@ -38,14 +38,14 @@ export default function PrenotaCamera() {
 
   const handleConfirm = () => {
     setStep(4);
-    toast.success("Prenotazione inviata con successo!");
+    toast.success("Richiesta inviata con successo!");
   };
 
   return (
     <PageTransition className="p-6 space-y-6">
       <FadeIn>
-        <h1 className="font-heading text-2xl font-bold">Prenota una Camera</h1>
-        <p className="text-sm text-muted-foreground">Segui i passaggi per richiedere una camera</p>
+        <h1 className="font-heading text-2xl font-bold">Richiedi una Camera</h1>
+        <p className="text-sm text-muted-foreground">Segui i passaggi per inviare la tua richiesta di affitto</p>
       </FadeIn>
 
       {/* Stepper */}
@@ -97,11 +97,11 @@ export default function PrenotaCamera() {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Data inizio</Label>
+                  <Label>Inizio contratto</Label>
                   <Input type="date" value={dataInizio} onChange={(e) => setDataInizio(e.target.value)} />
                 </div>
                 <div className="space-y-2">
-                  <Label>Data fine</Label>
+                  <Label>Fine contratto</Label>
                   <Input type="date" value={dataFine} onChange={(e) => setDataFine(e.target.value)} />
                 </div>
               </div>
@@ -148,7 +148,7 @@ export default function PrenotaCamera() {
         {/* Step 3: Riepilogo */}
         {step === 3 && room && (
           <Card>
-            <CardHeader><CardTitle>Riepilogo prenotazione</CardTitle></CardHeader>
+            <CardHeader><CardTitle>Riepilogo richiesta</CardTitle></CardHeader>
             <CardContent className="space-y-4">
               <div className="flex gap-4">
                 <img src={room.images[0]} alt={room.name} className="w-24 h-24 rounded-lg object-cover" />
@@ -160,8 +160,8 @@ export default function PrenotaCamera() {
               </div>
               <Separator />
               <div className="grid grid-cols-2 gap-3 text-sm">
-                <div><span className="text-muted-foreground">Check-in:</span> <span className="font-medium">{dataInizio}</span></div>
-                <div><span className="text-muted-foreground">Check-out:</span> <span className="font-medium">{dataFine}</span></div>
+                <div><span className="text-muted-foreground">Inizio contratto:</span> <span className="font-medium">{dataInizio}</span></div>
+                <div><span className="text-muted-foreground">Fine contratto:</span> <span className="font-medium">{dataFine}</span></div>
                 <div><span className="text-muted-foreground">Studente:</span> <span className="font-medium">{currentUser.nome} {currentUser.cognome}</span></div>
                 <div><span className="text-muted-foreground">Email:</span> <span className="font-medium">{currentUser.email}</span></div>
               </div>
@@ -182,9 +182,9 @@ export default function PrenotaCamera() {
               <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
                 <PartyPopper className="h-8 w-8 text-primary" />
               </div>
-              <h2 className="font-heading text-xl font-bold">Prenotazione inviata!</h2>
+              <h2 className="font-heading text-xl font-bold">Richiesta inviata!</h2>
               <p className="text-muted-foreground max-w-md mx-auto">
-                La tua richiesta è stata inviata con successo. Riceverai una conferma via email entro 24 ore lavorative.
+                La tua richiesta di affitto è stata inviata con successo. Ti contatteremo per il contratto entro 24 ore lavorative.
               </p>
             </CardContent>
           </Card>
@@ -203,7 +203,7 @@ export default function PrenotaCamera() {
             </Button>
           ) : (
             <Button onClick={handleConfirm}>
-              Conferma Prenotazione <Check className="h-4 w-4 ml-1" />
+              Invia Richiesta <Check className="h-4 w-4 ml-1" />
             </Button>
           )}
         </div>

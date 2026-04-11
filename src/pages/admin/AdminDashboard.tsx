@@ -3,13 +3,13 @@ import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { mockPrenotazioni, mockTickets, mockProfiles } from "@/data/mockData";
+import { mockRichieste, mockTickets, mockProfiles } from "@/data/mockData";
 import { rooms } from "@/data/rooms";
 import { PageTransition, FadeIn, StaggerContainer, StaggerItem, HoverCard, CountUp } from "@/components/motion/MotionWrappers";
 
 const kpis = [
   { label: "Camere disponibili", value: `${rooms.filter(r => r.available).length}/${rooms.length}`, icon: BedDouble, color: "text-accent" },
-  { label: "Prenotazioni in attesa", value: mockPrenotazioni.filter(p => p.stato === "pending").length.toString(), icon: CalendarCheck, color: "text-yellow-500" },
+  { label: "Richieste in attesa", value: mockRichieste.filter(p => p.stato === "pending").length.toString(), icon: CalendarCheck, color: "text-yellow-500" },
   { label: "Ticket aperti", value: mockTickets.filter(t => t.stato !== "risolto").length.toString(), icon: Headphones, color: "text-red-500" },
   { label: "Studenti attivi", value: mockProfiles.filter(p => p.role === "student").length.toString(), icon: Users, color: "text-green-500" },
 ];
@@ -97,18 +97,18 @@ export default function AdminDashboard() {
           <FadeIn delay={0.1}>
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle className="text-base">Ultime prenotazioni</CardTitle>
-                <Button variant="ghost" size="sm" asChild><Link to="/admin/prenotazioni">Vedi tutte <ArrowUpRight className="h-3 w-3 ml-1" /></Link></Button>
+                <CardTitle className="text-base">Ultime richieste</CardTitle>
+                <Button variant="ghost" size="sm" asChild><Link to="/admin/richieste">Vedi tutte <ArrowUpRight className="h-3 w-3 ml-1" /></Link></Button>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {mockPrenotazioni.slice(0, 4).map((p) => (
+                  {mockRichieste.slice(0, 4).map((p) => (
                     <div key={p.id} className="flex items-center justify-between text-sm">
                       <div>
                         <p className="font-medium">{p.student_nome}</p>
                         <p className="text-xs text-muted-foreground">{p.camera_nome}</p>
                       </div>
-                      <Badge variant={p.stato === "pending" ? "secondary" : "default"} className={p.stato === "confermata" ? "bg-green-100 text-green-700" : ""}>
+                      <Badge variant={p.stato === "pending" ? "secondary" : "default"} className={p.stato === "approvata" ? "bg-green-100 text-green-700" : ""}>
                         {p.stato}
                       </Badge>
                     </div>
