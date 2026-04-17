@@ -32,6 +32,14 @@ export interface RichiestaAffitto {
 // Backward-compatible alias
 export type Prenotazione = RichiestaAffitto;
 
+export interface TicketMessage {
+  id: string;
+  author: "studente" | "admin";
+  authorName: string;
+  text: string;
+  createdAt: string;
+}
+
 export interface SupportTicket {
   id: string;
   student_id: string;
@@ -43,6 +51,13 @@ export interface SupportTicket {
   stato: "aperto" | "in_corso" | "risolto";
   risposta_admin?: string;
   created_at: string;
+  messages: TicketMessage[];
+  assignedTo?: string;
+  unreadForAdmin?: boolean;
+  unreadForStudent?: boolean;
+  rating?: number;
+  closedAt?: string;
+  updatedAt?: string;
 }
 
 export interface CommunityPost {
