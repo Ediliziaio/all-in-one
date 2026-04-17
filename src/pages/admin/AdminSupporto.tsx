@@ -194,6 +194,25 @@ export default function AdminSupporto() {
     toast.success(`Priorità cambiata in ${priorita}`);
   };
 
+  const handleDragEnd = (e: DragEndEvent) => {
+    setDraggingId(null);
+    const ticketId = e.active.id as string;
+    const newStato = e.over?.id as SupportTicket["stato"] | undefined;
+    if (!newStato) return;
+    const ticket = tickets.find((t) => t.id === ticketId);
+    if (!ticket || ticket.stato === newStato) return;
+    setTickets((prev) =>
+      prev.map((t) =>
+        t.id === ticketId
+          ? { ...t, stato: newStato, closedAt: newStato === "risolto" ? new Date().toISOString() : t.closedAt, updatedAt: new Date().toISOString() }
+          : t,
+      ),
+    );
+    toast.success(`Ticket spostato in ${statoLabel[newStato]}`);
+  };
+
+  const draggingTicket = draggingId ? tickets.find((t) => t.id === draggingId) || null : null;
+
   const studentProfile = selected ? mockProfiles.find((p) => p.id === selected.student_id) : null;
 
   const detailPanel = selected && (
