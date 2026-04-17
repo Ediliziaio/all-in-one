@@ -168,8 +168,8 @@ export default function AdminBuoni() {
             <p className="text-2xl font-bold mt-1 text-success">{kpi.attivi}</p>
           </CardContent></Card>
           <Card><CardContent className="p-4">
-            <div className="flex items-center justify-between"><p className="text-xs text-muted-foreground">In scadenza (&lt;30gg)</p><AlertCircle className="h-4 w-4 text-warning" /></div>
-            <p className="text-2xl font-bold mt-1 text-warning">{kpi.inScad}</p>
+            <div className="flex items-center justify-between"><p className="text-xs text-muted-foreground">In scadenza (&lt;30gg)</p><AlertCircle className="h-4 w-4 text-orange-700" /></div>
+            <p className="text-2xl font-bold mt-1 text-orange-700">{kpi.inScad}</p>
           </CardContent></Card>
           <Card><CardContent className="p-4">
             <div className="flex items-center justify-between"><p className="text-xs text-muted-foreground">Categorie</p><Tag className="h-4 w-4 text-primary" /></div>
@@ -266,7 +266,7 @@ export default function AdminBuoni() {
                         <span className="flex items-center gap-1">
                           <Calendar className="h-3 w-3" />
                           {scaduto ? `Scaduto il ${b.scadenza}` :
-                           inScad ? <span className="text-warning font-medium">Scade in {giorni}gg</span> :
+                           inScad ? <span className="text-orange-700 font-medium">Scade in {giorni}gg</span> :
                            `Scade ${b.scadenza}`}
                         </span>
                         <span>Usato {usiCount(b.id)}×</span>

@@ -19,7 +19,7 @@ import { downloadCSV, daysUntil, formatEUR, todayStamp } from "@/lib/csv";
 
 const statoBadge: Record<string, string> = {
   attivo: "bg-success/15 text-success border-success/20",
-  in_scadenza: "bg-warning/15 text-warning border-warning/20",
+  in_scadenza: "bg-orange-100 text-orange-700 border-orange-200",
   scaduto: "bg-destructive/15 text-destructive border-destructive/20",
   disdetto: "bg-muted text-muted-foreground border-border",
 };
@@ -115,7 +115,7 @@ export default function AdminContratti() {
           <td className="py-3 px-4">
             <p className="text-sm">{c.data_inizio} → {c.data_fine}</p>
             {showCountdown && giorni > 0 && giorni < 60 && (
-              <Badge className="mt-1 bg-warning/15 text-warning border-warning/20 text-[10px]">
+              <Badge className="mt-1 bg-orange-100 text-orange-700 border-orange-200 text-[10px]">
                 Scade in {giorni}gg
               </Badge>
             )}
@@ -191,9 +191,9 @@ export default function AdminContratti() {
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <p className="text-xs text-muted-foreground">In Scadenza (&lt;60gg)</p>
-                  <AlertCircle className="h-4 w-4 text-warning" />
+                  <AlertCircle className="h-4 w-4 text-orange-700" />
                 </div>
-                <p className="text-2xl font-bold mt-1 text-warning">{kpi.inScadenza}</p>
+                <p className="text-2xl font-bold mt-1 text-orange-700">{kpi.inScadenza}</p>
               </CardContent>
             </Card>
             <Card>
@@ -328,7 +328,7 @@ export default function AdminContratti() {
                         </div>
                         <div>
                           <p className="text-xs text-muted-foreground">Residuo</p>
-                          <p className="font-bold text-lg text-warning">{formatEUR(detail.residuo)}</p>
+                          <p className="font-bold text-lg text-orange-700">{formatEUR(detail.residuo)}</p>
                         </div>
                       </div>
                     </div>
@@ -346,7 +346,7 @@ export default function AdminContratti() {
                           <div key={p.id} className="flex items-center justify-between p-3 rounded-lg border bg-card">
                             <div className="flex items-center gap-3">
                               {p.stato === "pagato" ? <CheckCircle2 className="h-5 w-5 text-success" /> :
-                               p.stato === "in_scadenza" ? <Clock className="h-5 w-5 text-warning" /> :
+                               p.stato === "in_scadenza" ? <Clock className="h-5 w-5 text-orange-700" /> :
                                <AlertCircle className="h-5 w-5 text-destructive" />}
                               <div>
                                 <p className="font-medium text-sm">{p.mese}</p>
@@ -379,7 +379,7 @@ export default function AdminContratti() {
                       {[
                         { label: "Contratto firmato", date: selected.data_firma, icon: CheckCircle2, color: "text-success" },
                         { label: "Contratto attivo", date: selected.data_inizio, icon: Clock, color: "text-primary" },
-                        { label: "Scadenza prevista", date: selected.data_fine, icon: AlertCircle, color: "text-warning" },
+                        { label: "Scadenza prevista", date: selected.data_fine, icon: AlertCircle, color: "text-orange-700" },
                       ].map((e, i) => (
                         <div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-muted/30">
                           <e.icon className={`h-4 w-4 mt-0.5 ${e.color}`} />
