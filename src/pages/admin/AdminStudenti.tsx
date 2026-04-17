@@ -897,7 +897,7 @@ function buildTimeline(data: Enriched): TimelineEvent[] {
     const label = p.stato === "pagato" ? "Pagato" : p.stato === "scaduto" ? "Scaduto" : "In scadenza";
     events.push({
       id: `pay-${p.id}`,
-      date: p.scadenza || p.mese,
+      date: p.data_scadenza || p.mese,
       type: "payment",
       title: `Pagamento ${p.mese}`,
       description: `€${p.importo}`,
