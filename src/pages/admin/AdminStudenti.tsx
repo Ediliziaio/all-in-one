@@ -206,6 +206,16 @@ export default function AdminStudenti() {
                 <ListIcon className="h-4 w-4" />
               </Button>
             </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => exportStudentsCSV(filtered)}
+              className="gap-1.5"
+              title="Esporta CSV"
+            >
+              <Download className="h-4 w-4" />
+              <span className="hidden sm:inline">Esporta CSV</span>
+            </Button>
           </div>
           <Tabs value={filter} onValueChange={(v) => setFilter(v as FilterMode)}>
             <TabsList>
