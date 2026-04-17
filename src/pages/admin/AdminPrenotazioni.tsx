@@ -357,9 +357,10 @@ export default function AdminPrenotazioni() {
               </SheetContent>
             </Sheet>
 
-            <ToggleGroup type="single" value={view} onValueChange={(v) => v && setView(v as "pipeline" | "list")} className="border rounded-md">
+            <ToggleGroup type="single" value={view} onValueChange={(v) => v && setView(v as "pipeline" | "list" | "calendar")} className="border rounded-md">
               <ToggleGroupItem value="pipeline" size="sm" aria-label="Pipeline"><LayoutGrid className="h-4 w-4"/></ToggleGroupItem>
               <ToggleGroupItem value="list" size="sm" aria-label="Lista"><ListIcon className="h-4 w-4"/></ToggleGroupItem>
+              <ToggleGroupItem value="calendar" size="sm" aria-label="Calendario"><CalendarIcon className="h-4 w-4"/></ToggleGroupItem>
             </ToggleGroup>
           </div>
         </Card>
