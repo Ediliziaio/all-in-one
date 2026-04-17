@@ -86,6 +86,15 @@ export interface TicketMessage {
   createdAt: string;
 }
 
+export interface TicketActivity {
+  id: string;
+  tipo: "creazione" | "cambio_stato" | "assegnazione" | "cambio_priorita" | "chiusura";
+  testo: string;
+  autore: string;
+  createdAt: string;
+  meta?: { from?: string; to?: string };
+}
+
 export interface SupportTicket {
   id: string;
   student_id: string;
@@ -98,6 +107,7 @@ export interface SupportTicket {
   risposta_admin?: string;
   created_at: string;
   messages: TicketMessage[];
+  activity?: TicketActivity[];
   assignedTo?: string;
   unreadForAdmin?: boolean;
   unreadForStudent?: boolean;
