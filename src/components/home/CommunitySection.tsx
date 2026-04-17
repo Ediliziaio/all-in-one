@@ -38,7 +38,7 @@ const galleryImages = [
 
 export function CommunitySection() {
   return (
-    <section className="py-20 bg-muted/40 relative overflow-hidden">
+    <section className="py-12 md:py-20 bg-muted/40 relative overflow-hidden">
       {/* Decorative blob */}
       <div className="pointer-events-none absolute -top-32 -right-32 h-96 w-96 rounded-full bg-accent/10 blur-3xl" />
       <div className="pointer-events-none absolute -bottom-32 -left-32 h-96 w-96 rounded-full bg-primary/10 blur-3xl" />

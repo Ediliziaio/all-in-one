@@ -51,7 +51,7 @@ export function UrgencySection() {
   const fillPct = (takenSpots / totalSpots) * 100;
 
   return (
-    <section className="relative py-20 text-background overflow-hidden">
+    <section className="relative py-12 md:py-20 text-background overflow-hidden">
       <img
         src={padovaBg}
         alt=""

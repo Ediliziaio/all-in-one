@@ -66,11 +66,11 @@ export default function Contatti() {
       <Navbar />
 
       {/* Hero */}
-      <section className="py-16 md:py-20 bg-gradient-to-b from-primary/5 to-background">
+      <section className="py-12 md:py-20 bg-gradient-to-b from-primary/5 to-background">
         <div className="container">
           <motion.div initial="hidden" animate="visible" variants={fade} transition={{ duration: 0.6 }} className="text-center max-w-2xl mx-auto">
-            <h1 className="font-heading text-4xl md:text-5xl font-bold text-foreground">Contattaci</h1>
-            <p className="text-muted-foreground mt-4 text-lg">Scrivici — rispondiamo davvero entro 24 ore (sì, anche su WhatsApp).</p>
+            <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl font-bold text-foreground">Contattaci</h1>
+            <p className="text-muted-foreground mt-4 text-base md:text-lg">Scrivici — rispondiamo davvero entro 24 ore (sì, anche su WhatsApp).</p>
           </motion.div>
         </div>
       </section>
