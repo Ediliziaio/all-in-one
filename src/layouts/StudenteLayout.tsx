@@ -1,11 +1,13 @@
+import { useState } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
-import { Home, BedDouble, Users, BookOpen, Gift, Headphones, UserCircle, FileText, CreditCard, CalendarPlus, LogOut } from "lucide-react";
+import { Home, BedDouble, Users, BookOpen, Gift, Headphones, UserCircle, FileText, CreditCard, CalendarPlus, LogOut, MoreHorizontal } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { currentUser } from "@/data/mockData";
 import { cn } from "@/lib/utils";
 import { DashboardHeader } from "@/components/DashboardHeader";
 
-const menuItems = [
+const sidebarItems = [
   { label: "Home", href: "/studente", icon: Home },
   { label: "La Mia Camera", href: "/studente/camera", icon: BedDouble },
   { label: "Richiedi Camera", href: "/studente/prenota", icon: CalendarPlus },
@@ -18,8 +20,25 @@ const menuItems = [
   { label: "Profilo", href: "/studente/profilo", icon: UserCircle },
 ];
 
+const bottomNavItems = [
+  { label: "Home", href: "/studente", icon: Home },
+  { label: "Camera", href: "/studente/camera", icon: BedDouble },
+  { label: "Community", href: "/studente/community", icon: Users },
+  { label: "Profilo", href: "/studente/profilo", icon: UserCircle },
+];
+
+const moreMenuItems = [
+  { label: "Richiedi Camera", href: "/studente/prenota", icon: CalendarPlus },
+  { label: "Pagamenti", href: "/studente/pagamenti", icon: CreditCard },
+  { label: "Documenti", href: "/studente/documenti", icon: FileText },
+  { label: "Supporto", href: "/studente/supporto", icon: Headphones },
+  { label: "Buoni", href: "/studente/buoni", icon: Gift },
+  { label: "Guide", href: "/studente/guide", icon: BookOpen },
+];
+
 export default function StudenteLayout() {
   const location = useLocation();
+  const [moreOpen, setMoreOpen] = useState(false);
 
   return (
     <div className="flex min-h-screen bg-muted/30">
@@ -31,14 +50,14 @@ export default function StudenteLayout() {
               <AvatarImage src={currentUser.avatar} />
               <AvatarFallback>{currentUser.nome[0]}</AvatarFallback>
             </Avatar>
-            <div>
-              <p className="font-heading font-semibold text-sm">{currentUser.nome} {currentUser.cognome}</p>
-              <p className="text-xs text-muted-foreground">{currentUser.corso}</p>
+            <div className="min-w-0">
+              <p className="font-heading font-semibold text-sm truncate">{currentUser.nome} {currentUser.cognome}</p>
+              <p className="text-xs text-muted-foreground truncate">{currentUser.corso}</p>
             </div>
           </div>
         </div>
-        <nav className="flex-1 p-3 space-y-1">
-          {menuItems.map((item) => {
+        <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
+          {sidebarItems.map((item) => {
             const active = location.pathname === item.href || (item.href !== "/studente" && location.pathname.startsWith(item.href));
             return (
               <Link
@@ -63,25 +82,58 @@ export default function StudenteLayout() {
       </aside>
 
       {/* Mobile bottom nav */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-card border-t flex justify-around py-2">
-        {menuItems.slice(0, 5).map((item) => {
-          const active = location.pathname === item.href;
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-card border-t flex justify-around py-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+        {bottomNavItems.map((item) => {
+          const active = location.pathname === item.href || (item.href !== "/studente" && location.pathname.startsWith(item.href));
           return (
-            <Link key={item.href} to={item.href} className={cn("flex flex-col items-center gap-1 px-2 py-1 text-xs", active ? "text-primary" : "text-muted-foreground")}>
+            <Link key={item.href} to={item.href} className={cn("flex flex-col items-center gap-1 px-2 py-1 text-[11px] min-w-0 flex-1", active ? "text-primary" : "text-muted-foreground")}>
               <item.icon className="h-5 w-5" />
-              <span>{item.label}</span>
+              <span className="truncate">{item.label}</span>
             </Link>
           );
         })}
+        <Sheet open={moreOpen} onOpenChange={setMoreOpen}>
+          <SheetTrigger asChild>
+            <button className="flex flex-col items-center gap-1 px-2 py-1 text-[11px] text-muted-foreground flex-1">
+              <MoreHorizontal className="h-5 w-5" />
+              <span>Altro</span>
+            </button>
+          </SheetTrigger>
+          <SheetContent side="bottom" className="rounded-t-2xl max-h-[80vh]">
+            <SheetHeader className="text-left">
+              <SheetTitle>Menu</SheetTitle>
+            </SheetHeader>
+            <div className="grid grid-cols-3 gap-3 py-4">
+              {moreMenuItems.map((item) => (
+                <Link
+                  key={item.href}
+                  to={item.href}
+                  onClick={() => setMoreOpen(false)}
+                  className="flex flex-col items-center gap-2 p-3 rounded-xl bg-muted/50 hover:bg-muted text-center"
+                >
+                  <item.icon className="h-5 w-5 text-primary" />
+                  <span className="text-xs font-medium">{item.label}</span>
+                </Link>
+              ))}
+            </div>
+            <Link
+              to="/"
+              onClick={() => setMoreOpen(false)}
+              className="flex items-center justify-center gap-2 w-full p-3 rounded-xl border text-sm font-medium text-muted-foreground hover:bg-muted"
+            >
+              <LogOut className="h-4 w-4" /> Esci
+            </Link>
+          </SheetContent>
+        </Sheet>
       </div>
 
-      <div className="flex-1 flex flex-col overflow-auto">
+      <div className="flex-1 flex flex-col overflow-auto min-w-0">
         <DashboardHeader
           userName={`${currentUser.nome} ${currentUser.cognome}`}
           userAvatar={currentUser.avatar}
           userInitials={`${currentUser.nome[0]}${currentUser.cognome[0]}`}
         />
-        <main className="flex-1 pb-20 md:pb-0">
+        <main className="flex-1 pb-24 md:pb-0">
           <Outlet />
         </main>
       </div>

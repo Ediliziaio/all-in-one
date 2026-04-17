@@ -8,14 +8,13 @@ import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { rooms, getRoomTypeLabel } from "@/data/rooms";
 import { currentUser } from "@/data/mockData";
-import { Check, ChevronRight, ChevronLeft, BedDouble, Calendar, User, ClipboardList, PartyPopper } from "lucide-react";
+import { Check, ChevronRight, ChevronLeft, BedDouble, Calendar, ClipboardList, PartyPopper } from "lucide-react";
 import { toast } from "sonner";
 import { PageTransition, FadeIn } from "@/components/motion/MotionWrappers";
 
 const steps = [
   { label: "Camera", icon: BedDouble },
   { label: "Date", icon: Calendar },
-  { label: "Dati", icon: User },
   { label: "Riepilogo", icon: ClipboardList },
   { label: "Conferma", icon: PartyPopper },
 ];
@@ -37,27 +36,27 @@ export default function PrenotaCamera() {
   };
 
   const handleConfirm = () => {
-    setStep(4);
+    setStep(3);
     toast.success("Richiesta inviata con successo!");
   };
 
   return (
-    <PageTransition className="p-6 space-y-6">
+    <PageTransition className="p-4 md:p-6 space-y-5 md:space-y-6">
       <FadeIn>
-        <h1 className="font-heading text-2xl font-bold">Richiedi una Camera</h1>
+        <h1 className="font-heading text-xl md:text-2xl font-bold">Richiedi una Camera</h1>
         <p className="text-sm text-muted-foreground">Segui i passaggi per inviare la tua richiesta di affitto</p>
       </FadeIn>
 
       {/* Stepper */}
       <FadeIn delay={0.1}>
-        <div className="flex items-center gap-2 overflow-x-auto pb-2">
+        <div className="flex items-center gap-1.5 md:gap-2 overflow-x-auto pb-2 -mx-1 px-1">
           {steps.map((s, i) => (
-            <div key={i} className="flex items-center gap-2">
-              <div className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+            <div key={i} className="flex items-center gap-1.5 md:gap-2 shrink-0">
+              <div className={`flex items-center gap-2 px-2.5 md:px-3 py-2 rounded-lg text-xs md:text-sm font-medium transition-colors ${
                 i === step ? "bg-primary text-primary-foreground" : i < step ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"
               }`}>
                 {i < step ? <Check className="h-4 w-4" /> : <s.icon className="h-4 w-4" />}
-                <span className="hidden sm:inline">{s.label}</span>
+                <span className={i === step ? "inline" : "hidden sm:inline"}>{s.label}</span>
               </div>
               {i < steps.length - 1 && <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />}
             </div>
@@ -68,7 +67,7 @@ export default function PrenotaCamera() {
       <FadeIn delay={0.2}>
         {/* Step 0: Scegli camera */}
         {step === 0 && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
             {available.map((r) => (
               <Card
                 key={r.id}
@@ -76,13 +75,13 @@ export default function PrenotaCamera() {
                 onClick={() => setSelectedRoom(r.id)}
               >
                 <img src={r.images[0]} alt={r.name} className="w-full h-36 object-cover rounded-t-lg" />
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-heading font-semibold">{r.name}</p>
-                      <p className="text-xs text-muted-foreground">{getRoomTypeLabel(r.type)} · {r.sqm}mq</p>
+                <CardContent className="p-3 md:p-4">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="font-heading font-semibold text-sm truncate">{r.name}</p>
+                      <p className="text-xs text-muted-foreground truncate">{getRoomTypeLabel(r.type)} · {r.sqm}mq</p>
                     </div>
-                    <Badge variant="outline" className="text-primary border-primary">{r.price}€/mese</Badge>
+                    <Badge variant="outline" className="text-primary border-primary shrink-0 text-xs">{r.price}€/mese</Badge>
                   </div>
                 </CardContent>
               </Card>
@@ -93,9 +92,9 @@ export default function PrenotaCamera() {
         {/* Step 1: Date */}
         {step === 1 && (
           <Card>
-            <CardHeader><CardTitle>Seleziona le date</CardTitle></CardHeader>
+            <CardHeader><CardTitle className="text-base md:text-lg">Seleziona le date</CardTitle></CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Inizio contratto</Label>
                   <Input type="date" value={dataInizio} onChange={(e) => setDataInizio(e.target.value)} />
@@ -104,6 +103,10 @@ export default function PrenotaCamera() {
                   <Label>Fine contratto</Label>
                   <Input type="date" value={dataFine} onChange={(e) => setDataFine(e.target.value)} />
                 </div>
+              </div>
+              <div className="space-y-2">
+                <Label>Note aggiuntive (opzionale)</Label>
+                <Textarea placeholder="Preferenze, richieste speciali..." value={note} onChange={(e) => setNote(e.target.value)} rows={3} />
               </div>
               {room && (
                 <p className="text-sm text-muted-foreground">
@@ -114,44 +117,13 @@ export default function PrenotaCamera() {
           </Card>
         )}
 
-        {/* Step 2: Dati personali */}
-        {step === 2 && (
+        {/* Step 2: Riepilogo (con dati personali integrati) */}
+        {step === 2 && room && (
           <Card>
-            <CardHeader><CardTitle>I tuoi dati</CardTitle></CardHeader>
+            <CardHeader><CardTitle className="text-base md:text-lg">Riepilogo richiesta</CardTitle></CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Nome</Label>
-                  <Input defaultValue={currentUser.nome} readOnly className="bg-muted/50" />
-                </div>
-                <div className="space-y-2">
-                  <Label>Cognome</Label>
-                  <Input defaultValue={currentUser.cognome} readOnly className="bg-muted/50" />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label>Email</Label>
-                <Input defaultValue={currentUser.email} readOnly className="bg-muted/50" />
-              </div>
-              <div className="space-y-2">
-                <Label>Corso di studi</Label>
-                <Input defaultValue={currentUser.corso} readOnly className="bg-muted/50" />
-              </div>
-              <div className="space-y-2">
-                <Label>Note aggiuntive</Label>
-                <Textarea placeholder="Preferenze, richieste speciali..." value={note} onChange={(e) => setNote(e.target.value)} />
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Step 3: Riepilogo */}
-        {step === 3 && room && (
-          <Card>
-            <CardHeader><CardTitle>Riepilogo richiesta</CardTitle></CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex gap-4">
-                <img src={room.images[0]} alt={room.name} className="w-24 h-24 rounded-lg object-cover" />
+              <div className="flex flex-col sm:flex-row gap-4">
+                <img src={room.images[0]} alt={room.name} className="w-full sm:w-24 h-32 sm:h-24 rounded-lg object-cover" />
                 <div>
                   <p className="font-heading font-semibold">{room.name}</p>
                   <p className="text-sm text-muted-foreground">{getRoomTypeLabel(room.type)} · {room.sqm}mq · Piano {room.floor}</p>
@@ -159,11 +131,12 @@ export default function PrenotaCamera() {
                 </div>
               </div>
               <Separator />
-              <div className="grid grid-cols-2 gap-3 text-sm">
-                <div><span className="text-muted-foreground">Inizio contratto:</span> <span className="font-medium">{dataInizio}</span></div>
-                <div><span className="text-muted-foreground">Fine contratto:</span> <span className="font-medium">{dataFine}</span></div>
-                <div><span className="text-muted-foreground">Studente:</span> <span className="font-medium">{currentUser.nome} {currentUser.cognome}</span></div>
-                <div><span className="text-muted-foreground">Email:</span> <span className="font-medium">{currentUser.email}</span></div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                <div><span className="text-muted-foreground">Inizio:</span> <span className="font-medium">{dataInizio}</span></div>
+                <div><span className="text-muted-foreground">Fine:</span> <span className="font-medium">{dataFine}</span></div>
+                <div className="sm:col-span-2"><span className="text-muted-foreground">Studente:</span> <span className="font-medium">{currentUser.nome} {currentUser.cognome}</span></div>
+                <div className="sm:col-span-2 truncate"><span className="text-muted-foreground">Email:</span> <span className="font-medium">{currentUser.email}</span></div>
+                <div className="sm:col-span-2"><span className="text-muted-foreground">Corso:</span> <span className="font-medium">{currentUser.corso}</span></div>
               </div>
               {note && (
                 <>
@@ -175,16 +148,16 @@ export default function PrenotaCamera() {
           </Card>
         )}
 
-        {/* Step 4: Conferma */}
-        {step === 4 && (
+        {/* Step 3: Conferma */}
+        {step === 3 && (
           <Card className="text-center py-12">
             <CardContent className="space-y-4">
               <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
                 <PartyPopper className="h-8 w-8 text-primary" />
               </div>
               <h2 className="font-heading text-xl font-bold">Richiesta inviata!</h2>
-              <p className="text-muted-foreground max-w-md mx-auto">
-                La tua richiesta di affitto è stata inviata con successo. Ti contatteremo per il contratto entro 24 ore lavorative.
+              <p className="text-muted-foreground max-w-md mx-auto px-4">
+                La tua richiesta di affitto è stata inviata. Ti contatteremo per il contratto entro 24 ore lavorative.
               </p>
             </CardContent>
           </Card>
@@ -192,17 +165,22 @@ export default function PrenotaCamera() {
       </FadeIn>
 
       {/* Navigation buttons */}
-      {step < 4 && (
-        <div className="flex justify-between">
-          <Button variant="outline" onClick={() => setStep(Math.max(0, step - 1))} disabled={step === 0}>
+      {step < 3 && (
+        <div className="flex gap-2 sm:gap-3">
+          <Button
+            variant="outline"
+            onClick={() => setStep(Math.max(0, step - 1))}
+            disabled={step === 0}
+            className="flex-1 sm:flex-none"
+          >
             <ChevronLeft className="h-4 w-4 mr-1" /> Indietro
           </Button>
-          {step < 3 ? (
-            <Button onClick={() => setStep(step + 1)} disabled={!canNext()}>
+          {step < 2 ? (
+            <Button onClick={() => setStep(step + 1)} disabled={!canNext()} className="flex-1 sm:flex-none">
               Avanti <ChevronRight className="h-4 w-4 ml-1" />
             </Button>
           ) : (
-            <Button onClick={handleConfirm}>
+            <Button onClick={handleConfirm} className="flex-1 sm:flex-none">
               Invia Richiesta <Check className="h-4 w-4 ml-1" />
             </Button>
           )}
