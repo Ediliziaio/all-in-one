@@ -11,12 +11,24 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuLabel, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
-import { Search, Send, MessageSquare, Inbox, Clock, CheckCircle2, Timer, MoreVertical, Zap, X } from "lucide-react";
+import { Search, Send, MessageSquare, Inbox, Clock, CheckCircle2, Timer, MoreVertical, Zap, X, List, Kanban } from "lucide-react";
 import { mockTickets as initialTickets, mockProfiles, type SupportTicket, type TicketMessage } from "@/data/mockData";
 import { toast } from "sonner";
 import { PageTransition, FadeIn } from "@/components/motion/MotionWrappers";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
+import {
+  DndContext,
+  DragEndEvent,
+  DragOverlay,
+  DragStartEvent,
+  PointerSensor,
+  TouchSensor,
+  useDraggable,
+  useDroppable,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
 
 const prioritaColors: Record<string, string> = {
   urgente: "bg-red-100 text-red-700 border-red-200",
@@ -35,14 +47,23 @@ const prioritaBar: Record<string, string> = {
 const statoColors: Record<string, string> = {
   aperto: "bg-blue-100 text-blue-700 border-blue-200",
   in_corso: "bg-yellow-100 text-yellow-700 border-yellow-200",
+  attesa_studente: "bg-violet-100 text-violet-700 border-violet-200",
   risolto: "bg-green-100 text-green-700 border-green-200",
 };
 
 const statoLabel: Record<string, string> = {
   aperto: "Aperto",
   in_corso: "In corso",
+  attesa_studente: "Attesa studente",
   risolto: "Risolto",
 };
+
+const pipelineStages: { key: SupportTicket["stato"]; label: string; dot: string; bg: string }[] = [
+  { key: "aperto", label: "Nuovo", dot: "bg-blue-500", bg: "bg-blue-50/60" },
+  { key: "in_corso", label: "In lavorazione", dot: "bg-yellow-500", bg: "bg-yellow-50/60" },
+  { key: "attesa_studente", label: "Attesa studente", dot: "bg-violet-500", bg: "bg-violet-50/60" },
+  { key: "risolto", label: "Risolto", dot: "bg-green-500", bg: "bg-green-50/60" },
+];
 
 const quickReplies = [
   "Ciao, abbiamo ricevuto la tua segnalazione e la stiamo verificando. Ti aggiorniamo a breve.",
