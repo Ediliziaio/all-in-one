@@ -842,3 +842,157 @@ function TicketStatoBadge({ stato }: { stato: string }) {
   };
   return <Badge className={`text-[10px] ${map[stato] || ""}`}>{stato.replace("_", " ")}</Badge>;
 }
+
+/* --------------------------- Timeline --------------------------- */
+type TimelineEvent = {
+  id: string;
+  date: string;
+  type: "payment" | "ticket" | "room" | "crm" | "profile";
+  title: string;
+  description?: string;
+  badge?: { label: string; tone: "success" | "warning" | "danger" | "muted" | "info" };
+};
+
+function buildTimeline(data: Enriched): TimelineEvent[] {
+  const events: TimelineEvent[] = [];
+  const { profile: s, richiesta, tickets, room, payments } = data;
+
+  // Profile created (fallback)
+  const profileDate = (s as { created_at?: string }).created_at || richiesta?.created_at;
+  if (profileDate) {
+    events.push({
+      id: `profile-${s.id}`,
+      date: profileDate,
+      type: "profile",
+      title: "Profilo creato",
+      description: `${s.nome} ${s.cognome} si è registrato sulla piattaforma`,
+    });
+  }
+
+  // CRM richiesta
+  if (richiesta) {
+    events.push({
+      id: `crm-${richiesta.id}`,
+      date: richiesta.created_at,
+      type: "crm",
+      title: "Richiesta inviata",
+      description: `Fonte: ${richiesta.fonte || "—"}`,
+    });
+    if (richiesta.stato === "approvata" && room) {
+      events.push({
+        id: `room-${richiesta.id}`,
+        date: richiesta.data_inizio || richiesta.created_at,
+        type: "room",
+        title: `Assegnata camera ${room.name}`,
+        description: `Piano ${room.floor} · Contratto ${formatDate(richiesta.data_inizio)} → ${formatDate(richiesta.data_fine)}`,
+        badge: { label: "Attivo", tone: "success" },
+      });
+    }
+  }
+
+  // Pagamenti
+  payments.forEach((p) => {
+    const tone =
+      p.stato === "pagato" ? "success" : p.stato === "scaduto" ? "danger" : "warning";
+    const label = p.stato === "pagato" ? "Pagato" : p.stato === "scaduto" ? "Scaduto" : "In scadenza";
+    events.push({
+      id: `pay-${p.id}`,
+      date: p.scadenza || p.mese,
+      type: "payment",
+      title: `Pagamento ${p.mese}`,
+      description: `€${p.importo}`,
+      badge: { label, tone },
+    });
+  });
+
+  // Ticket
+  tickets.forEach((t) => {
+    events.push({
+      id: `tk-${t.id}`,
+      date: t.created_at,
+      type: "ticket",
+      title: `Ticket: ${t.titolo}`,
+      description: t.descrizione,
+      badge: { label: t.categoria, tone: "info" },
+    });
+  });
+
+  return events.sort((a, b) => (b.date || "").localeCompare(a.date || ""));
+}
+
+const TYPE_META: Record<
+  TimelineEvent["type"],
+  { icon: typeof Users; color: string; bg: string }
+> = {
+  payment: { icon: CreditCard, color: "text-blue-700", bg: "bg-blue-100" },
+  ticket: { icon: Headphones, color: "text-orange-700", bg: "bg-orange-100" },
+  room: { icon: BedDouble, color: "text-purple-700", bg: "bg-purple-100" },
+  crm: { icon: Sparkles, color: "text-green-700", bg: "bg-green-100" },
+  profile: { icon: UserPlus, color: "text-muted-foreground", bg: "bg-muted" },
+};
+
+function StudentTimeline({ data }: { data: Enriched }) {
+  const events = useMemo(() => buildTimeline(data), [data]);
+
+  if (events.length === 0) {
+    return (
+      <Card className="p-8 text-center">
+        <Activity className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+        <p className="text-sm text-muted-foreground">Nessuna attività registrata</p>
+      </Card>
+    );
+  }
+
+  return (
+    <div className="relative pl-6 space-y-3">
+      <div className="absolute left-[11px] top-2 bottom-2 w-px bg-border" />
+      {events.map((ev) => {
+        const meta = TYPE_META[ev.type];
+        const Icon = meta.icon;
+        return (
+          <div key={ev.id} className="relative">
+            <div
+              className={`absolute -left-6 top-2 h-6 w-6 rounded-full flex items-center justify-center ring-4 ring-background ${meta.bg}`}
+            >
+              <Icon className={`h-3 w-3 ${meta.color}`} />
+            </div>
+            <Card className="p-3 bg-muted/30 border-muted">
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0 flex-1">
+                  <p className="font-medium text-sm">{ev.title}</p>
+                  {ev.description && (
+                    <p className="text-xs text-muted-foreground mt-0.5">{ev.description}</p>
+                  )}
+                </div>
+                {ev.badge && <TimelineBadge {...ev.badge} />}
+              </div>
+              <div className="flex items-center gap-2 mt-2 text-[11px] text-muted-foreground">
+                <Calendar className="h-3 w-3" />
+                <span>{formatDateTime(ev.date)}</span>
+                <span>·</span>
+                <span>{relTime(ev.date)}</span>
+              </div>
+            </Card>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function TimelineBadge({
+  label,
+  tone,
+}: {
+  label: string;
+  tone: "success" | "warning" | "danger" | "muted" | "info";
+}) {
+  const map = {
+    success: "bg-green-100 text-green-700 hover:bg-green-100",
+    warning: "bg-orange-100 text-orange-700 hover:bg-orange-100",
+    danger: "bg-red-100 text-red-700 hover:bg-red-100",
+    info: "bg-blue-100 text-blue-700 hover:bg-blue-100",
+    muted: "bg-muted text-muted-foreground hover:bg-muted",
+  };
+  return <Badge className={`text-[10px] shrink-0 ${map[tone]}`}>{label}</Badge>;
+}
