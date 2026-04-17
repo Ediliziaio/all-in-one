@@ -365,16 +365,19 @@ export default function AdminSupporto() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input placeholder="Cerca ticket o studente..." className="pl-9 h-9" value={search} onChange={(e) => setSearch(e.target.value)} />
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-              <Select value={fStato} onValueChange={setFStato}>
-                <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="Stato" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Tutti gli stati</SelectItem>
-                  <SelectItem value="aperto">Aperto</SelectItem>
-                  <SelectItem value="in_corso">In corso</SelectItem>
-                  <SelectItem value="risolto">Risolto</SelectItem>
-                </SelectContent>
-              </Select>
+            <div className={cn("grid gap-2", view === "pipeline" ? "grid-cols-2 sm:grid-cols-3" : "grid-cols-2 sm:grid-cols-4")}>
+              {view === "lista" && (
+                <Select value={fStato} onValueChange={setFStato}>
+                  <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="Stato" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Tutti gli stati</SelectItem>
+                    <SelectItem value="aperto">Aperto</SelectItem>
+                    <SelectItem value="in_corso">In corso</SelectItem>
+                    <SelectItem value="attesa_studente">Attesa studente</SelectItem>
+                    <SelectItem value="risolto">Risolto</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
               <Select value={fPrio} onValueChange={setFPrio}>
                 <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="Priorità" /></SelectTrigger>
                 <SelectContent>
@@ -404,9 +407,73 @@ export default function AdminSupporto() {
                 </SelectContent>
               </Select>
             </div>
+            <div className="flex items-center gap-1 rounded-md border bg-background p-0.5 lg:ml-auto">
+              <Button
+                variant={view === "lista" ? "default" : "ghost"}
+                size="sm"
+                className="h-8 px-2 text-xs"
+                onClick={() => setView("lista")}
+              >
+                <List className="h-3.5 w-3.5 mr-1" /> Lista
+              </Button>
+              <Button
+                variant={view === "pipeline" ? "default" : "ghost"}
+                size="sm"
+                className="h-8 px-2 text-xs"
+                onClick={() => setView("pipeline")}
+              >
+                <Kanban className="h-3.5 w-3.5 mr-1" /> Pipeline
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </FadeIn>
+
+      {view === "pipeline" ? (
+        <FadeIn delay={0.1}>
+          <DndContext
+            sensors={sensors}
+            onDragStart={(e: DragStartEvent) => setDraggingId(e.active.id as string)}
+            onDragCancel={() => setDraggingId(null)}
+            onDragEnd={handleDragEnd}
+          >
+            <div className="flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory">
+              {pipelineStages.map((stage) => {
+                const items = filtered.filter((t) => t.stato === stage.key);
+                return (
+                  <PipelineColumn key={stage.key} stage={stage} count={items.length}>
+                    {items.length === 0 ? (
+                      <div className="text-center text-xs text-muted-foreground py-8 border border-dashed rounded-md">
+                        Nessun ticket
+                      </div>
+                    ) : (
+                      items.map((t) => (
+                        <DraggableTicketCard
+                          key={t.id}
+                          ticket={t}
+                          profile={mockProfiles.find((p) => p.id === t.student_id)}
+                          onClick={() => setSelectedId(t.id)}
+                          isDragging={draggingId === t.id}
+                        />
+                      ))
+                    )}
+                  </PipelineColumn>
+                );
+              })}
+            </div>
+            <DragOverlay dropAnimation={null}>
+              {draggingTicket && (
+                <div className="rotate-2 opacity-95">
+                  <TicketCardContent
+                    ticket={draggingTicket}
+                    profile={mockProfiles.find((p) => p.id === draggingTicket.student_id)}
+                  />
+                </div>
+              )}
+            </DragOverlay>
+          </DndContext>
+        </FadeIn>
+      ) : (
 
       {/* List + detail */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
