@@ -547,8 +547,7 @@ export default function AdminSupporto() {
           </div>
         )}
       </div>
-
-      {/* Detail mobile dialog */}
+      )}
       {isMobile && (
         <Dialog open={!!selected} onOpenChange={(o) => !o && setSelectedId(null)}>
           <DialogContent className="max-w-none w-screen h-[100dvh] p-0 gap-0 rounded-none sm:rounded-none">
