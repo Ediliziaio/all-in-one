@@ -232,46 +232,6 @@ const CameraDettaglio = () => {
                   </TabsContent>
                 </Tabs>
 
-                <Separator className="mb-6" />
-
-                <h2 className="font-heading text-xl font-semibold text-foreground mb-4">La posizione</h2>
-                <div className="rounded-2xl overflow-hidden border bg-card mb-8">
-                  <div className="relative h-48 bg-muted">
-                    <img
-                      src="https://images.unsplash.com/photo-1524813686514-a57563d77965?w=1200&h=400&fit=crop"
-                      alt="Mappa posizione studentato"
-                      className="w-full h-full object-cover opacity-90"
-                      loading="lazy"
-                    />
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="bg-background/95 backdrop-blur-sm rounded-full p-3 shadow-lg">
-                        <MapPin className="h-6 w-6 text-primary" />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="p-5 space-y-3">
-                    <div>
-                      <p className="font-semibold text-foreground">Via Napoleone, Padova</p>
-                      <p className="text-sm text-muted-foreground">Quartiere universitario · 35100</p>
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                      {[
-                        { icon: GraduationCap, label: "Università", time: "5 min a piedi" },
-                        { icon: ShoppingBag, label: "Supermercato", time: "3 min" },
-                        { icon: Coffee, label: "Bar & Ristoranti", time: "2 min" },
-                      ].map((p) => (
-                        <div key={p.label} className="flex items-center gap-2 p-2 rounded-lg bg-muted/40">
-                          <p.icon className="h-4 w-4 text-primary shrink-0" />
-                          <div className="min-w-0">
-                            <p className="text-xs font-medium text-foreground truncate">{p.label}</p>
-                            <p className="text-[11px] text-muted-foreground">{p.time}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
                 {similar.length > 0 && (
                   <>
                     <Separator className="mb-6" />
