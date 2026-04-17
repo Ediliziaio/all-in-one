@@ -16,17 +16,12 @@ import {
   Phone, Mail, MessageCircle, Search, Filter, Plus, LayoutGrid, List as ListIcon,
   TrendingUp, Users, Euro, CalendarDays, MapPin, GraduationCap, User as UserIcon,
   StickyNote, PhoneCall, Send, CalendarCheck2, ArrowRight, X, Globe, Instagram,
-  MessageSquare, Building2, CalendarIcon, Flame, CalendarRange, ChevronLeft, ChevronRight,
-  Clock, FileSignature, AlertCircle, GripVertical
+  MessageSquare, Building2, CalendarIcon, Flame, ChevronLeft, ChevronRight,
 } from "lucide-react";
 import { mockRichieste, mockOperatori, type RichiestaAffitto, type LeadStato, type LeadFonte, type LeadPriorita, type Activity } from "@/data/mockData";
 import { toast } from "sonner";
 import { PageTransition, FadeIn } from "@/components/motion/MotionWrappers";
-import {
-  format, formatDistanceToNow, differenceInDays, startOfMonth, endOfMonth,
-  startOfWeek, endOfWeek, eachDayOfInterval, isSameMonth, isSameDay,
-  addMonths, subMonths, isToday, parseISO, isValid
-} from "date-fns";
+import { format, formatDistanceToNow } from "date-fns";
 import { it } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import {
