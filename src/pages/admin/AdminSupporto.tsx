@@ -288,6 +288,16 @@ export default function AdminSupporto() {
               <DropdownMenuItem onClick={() => handleChangePrio("alta")}>Alta</DropdownMenuItem>
               <DropdownMenuItem onClick={() => handleChangePrio("normale")}>Normale</DropdownMenuItem>
               <DropdownMenuItem onClick={() => handleChangePrio("bassa")}>Bassa</DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuLabel>Assegna a</DropdownMenuLabel>
+              {mockOperatori.map((op) => (
+                <DropdownMenuItem key={op} onClick={() => handleAssign(selected.id, op)}>
+                  {op === CURRENT_OPERATOR ? `${op} (io)` : op}
+                </DropdownMenuItem>
+              ))}
+              <DropdownMenuItem onClick={() => handleAssign(selected.id, undefined)} className="text-muted-foreground">
+                Rimuovi assegnazione
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
           {isMobile && (
@@ -296,13 +306,52 @@ export default function AdminSupporto() {
             </Button>
           )}
         </div>
-        <div className="flex flex-wrap gap-1.5">
+        <div className="flex flex-wrap items-center gap-1.5">
           <Badge variant="outline" className={cn("text-xs", statoColors[selected.stato])}>{statoLabel[selected.stato]}</Badge>
           <Badge variant="outline" className={cn("text-xs capitalize", prioritaColors[selected.priorita])}>Priorità {selected.priorita}</Badge>
           <Badge variant="outline" className="text-xs capitalize">{selected.categoria}</Badge>
+          {(() => {
+            const sla = getSLA(selected);
+            return (
+              <Badge variant="outline" className={cn("text-xs gap-1", slaBadgeColors[sla.color])}>
+                <Clock className="h-3 w-3" /> {sla.label}
+              </Badge>
+            );
+          })()}
           {selected.rating && (
             <Badge variant="outline" className="text-xs bg-yellow-50 text-yellow-700 border-yellow-200">★ {selected.rating}/5</Badge>
           )}
+        </div>
+        <div className="flex items-center gap-2 text-xs">
+          <span className="text-muted-foreground">Assegnato a:</span>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="h-7 px-2 gap-1.5 text-xs font-normal">
+                {selected.assignedTo ? (
+                  <>
+                    <Avatar className="h-4 w-4">
+                      <AvatarFallback className="text-[8px]">{selected.assignedTo[0]}</AvatarFallback>
+                    </Avatar>
+                    <span>{selected.assignedTo}</span>
+                  </>
+                ) : (
+                  <span className="text-muted-foreground">Non assegnato</span>
+                )}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start">
+              {mockOperatori.map((op) => (
+                <DropdownMenuItem key={op} onClick={() => handleAssign(selected.id, op)}>
+                  <Avatar className="h-5 w-5 mr-2"><AvatarFallback className="text-[9px]">{op[0]}</AvatarFallback></Avatar>
+                  {op === CURRENT_OPERATOR ? `${op} (io)` : op}
+                </DropdownMenuItem>
+              ))}
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => handleAssign(selected.id, undefined)} className="text-muted-foreground">
+                Rimuovi assegnazione
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 
