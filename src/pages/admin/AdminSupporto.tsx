@@ -569,6 +569,7 @@ export default function AdminSupporto() {
                           profile={mockProfiles.find((p) => p.id === t.student_id)}
                           onClick={() => setSelectedId(t.id)}
                           isDragging={draggingId === t.id}
+                          onAssign={handleAssign}
                         />
                       ))
                     )}
@@ -601,16 +602,21 @@ export default function AdminSupporto() {
             filtered.map((t) => {
               const last = t.messages[t.messages.length - 1];
               const profile = mockProfiles.find((p) => p.id === t.student_id);
+              const sla = getSLA(t);
               return (
                 <motion.div key={t.id} whileHover={{ scale: 1.005 }} whileTap={{ scale: 0.995 }}>
                   <Card
                     className={cn(
-                      "cursor-pointer transition-all overflow-hidden",
+                      "cursor-pointer transition-all overflow-hidden relative",
                       selectedId === t.id && !isMobile ? "ring-2 ring-primary" : "hover:bg-muted/30",
-                      t.unreadForAdmin && "border-primary/40"
+                      t.unreadForAdmin && "border-primary/40",
+                      sla.urgent && "border-red-400 ring-1 ring-red-300/60 animate-pulse"
                     )}
                     onClick={() => setSelectedId(t.id)}
                   >
+                    {sla.urgent && (
+                      <AlertTriangle className="absolute top-2 right-2 h-3.5 w-3.5 text-red-600" />
+                    )}
                     <div className="flex">
                       <div className={cn("w-1 shrink-0", prioritaBar[t.priorita])} />
                       <CardContent className="p-3 flex-1 min-w-0">
@@ -633,7 +639,41 @@ export default function AdminSupporto() {
                             <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
                               <Badge variant="outline" className={cn("text-[10px] px-1.5 py-0", statoColors[t.stato])}>{statoLabel[t.stato]}</Badge>
                               <Badge variant="outline" className={cn("text-[10px] px-1.5 py-0 capitalize", prioritaColors[t.priorita])}>{t.priorita}</Badge>
+                              <Badge variant="outline" className={cn("text-[10px] px-1.5 py-0 gap-0.5", slaBadgeColors[sla.color])}>
+                                <Clock className="h-2.5 w-2.5" /> {sla.label}
+                              </Badge>
                               <span className="text-[10px] text-muted-foreground ml-auto">{relTime(t.updatedAt || t.created_at)}</span>
+                            </div>
+                            <div className="flex items-center gap-1.5 mt-1.5">
+                              <div onPointerDown={(e) => e.stopPropagation()} onClick={(e) => e.stopPropagation()}>
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" size="sm" className="h-6 px-1.5 gap-1 text-[10px] font-normal">
+                                      {t.assignedTo ? (
+                                        <>
+                                          <Avatar className="h-4 w-4"><AvatarFallback className="text-[8px]">{t.assignedTo[0]}</AvatarFallback></Avatar>
+                                          <span className="truncate max-w-[100px]">{t.assignedTo}</span>
+                                        </>
+                                      ) : (
+                                        <span className="text-muted-foreground">+ Assegna</span>
+                                      )}
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="start">
+                                    <DropdownMenuLabel>Assegna a</DropdownMenuLabel>
+                                    {mockOperatori.map((op) => (
+                                      <DropdownMenuItem key={op} onClick={() => handleAssign(t.id, op)}>
+                                        <Avatar className="h-5 w-5 mr-2"><AvatarFallback className="text-[9px]">{op[0]}</AvatarFallback></Avatar>
+                                        {op === CURRENT_OPERATOR ? `${op} (io)` : op}
+                                      </DropdownMenuItem>
+                                    ))}
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem onClick={() => handleAssign(t.id, undefined)} className="text-muted-foreground">
+                                      Rimuovi
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              </div>
                             </div>
                           </div>
                         </div>
