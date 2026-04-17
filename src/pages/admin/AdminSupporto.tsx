@@ -196,6 +196,18 @@ export default function AdminSupporto() {
     setTickets((prev) => prev.map((t) => (t.id === selectedId ? { ...t, unreadForAdmin: false } : t)));
   }, [selectedId]);
 
+  const addActivity = (ticketId: string, activity: Omit<TicketActivity, "id" | "createdAt"> & { createdAt?: string }) => {
+    const entry: TicketActivity = {
+      id: `a${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      createdAt: activity.createdAt || new Date().toISOString(),
+      tipo: activity.tipo,
+      testo: activity.testo,
+      autore: activity.autore,
+      meta: activity.meta,
+    };
+    setTickets((prev) => prev.map((t) => (t.id === ticketId ? { ...t, activity: [...(t.activity || []), entry] } : t)));
+  };
+
   const handleSend = () => {
     if (!selected || !reply.trim()) return;
     const now = new Date().toISOString();
@@ -219,6 +231,8 @@ export default function AdminSupporto() {
 
   const handleChangeStato = (stato: SupportTicket["stato"]) => {
     if (!selected) return;
+    const from = selected.stato;
+    if (from === stato) return;
     setTickets((prev) =>
       prev.map((t) =>
         t.id === selected.id
@@ -226,17 +240,40 @@ export default function AdminSupporto() {
           : t
       )
     );
+    addActivity(selected.id, {
+      tipo: stato === "risolto" ? "chiusura" : "cambio_stato",
+      testo: stato === "risolto" ? "Ticket chiuso come Risolto" : `Stato cambiato in ${statoLabel[stato]}`,
+      autore: CURRENT_OPERATOR,
+      meta: { from, to: stato },
+    });
     toast.success(`Stato cambiato in ${statoLabel[stato]}`);
   };
 
   const handleChangePrio = (priorita: SupportTicket["priorita"]) => {
     if (!selected) return;
+    const from = selected.priorita;
+    if (from === priorita) return;
     setTickets((prev) => prev.map((t) => (t.id === selected.id ? { ...t, priorita } : t)));
+    addActivity(selected.id, {
+      tipo: "cambio_priorita",
+      testo: `Priorità cambiata in ${priorita.charAt(0).toUpperCase() + priorita.slice(1)}`,
+      autore: CURRENT_OPERATOR,
+      meta: { from, to: priorita },
+    });
     toast.success(`Priorità cambiata in ${priorita}`);
   };
 
   const handleAssign = (ticketId: string, operator: string | undefined) => {
+    const ticket = tickets.find((t) => t.id === ticketId);
+    const from = ticket?.assignedTo;
+    if (from === operator) return;
     setTickets((prev) => prev.map((t) => (t.id === ticketId ? { ...t, assignedTo: operator } : t)));
+    addActivity(ticketId, {
+      tipo: "assegnazione",
+      testo: operator ? `Assegnato a ${operator}` : "Assegnazione rimossa",
+      autore: CURRENT_OPERATOR,
+      meta: { from, to: operator },
+    });
     toast.success(operator ? `Assegnato a ${operator}` : "Assegnazione rimossa");
   };
 
