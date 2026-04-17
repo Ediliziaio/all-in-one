@@ -69,6 +69,90 @@ const formatDate = (iso?: string) => {
   });
 };
 
+const formatDateTime = (iso: string) =>
+  new Date(iso).toLocaleString("it-IT", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
+const relTime = (iso: string) => {
+  const diff = Date.now() - new Date(iso).getTime();
+  const m = Math.round(diff / 60000);
+  if (m < 1) return "ora";
+  if (m < 60) return `${m} min fa`;
+  const h = Math.round(m / 60);
+  if (h < 24) return `${h} h fa`;
+  const d = Math.round(h / 24);
+  if (d < 30) return `${d} g fa`;
+  const mo = Math.round(d / 30);
+  if (mo < 12) return `${mo} mesi fa`;
+  return `${Math.round(mo / 12)} anni fa`;
+};
+
+const csvEscape = (v: unknown) => {
+  const s = v == null ? "" : String(v);
+  if (/[",\n;]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
+  return s;
+};
+
+function exportStudentsCSV(
+  rows: {
+    profile: Profile;
+    room?: { name: string; floor: number };
+    richiesta?: { telefono?: string };
+    payments: { stato: string }[];
+    overdue: boolean;
+  }[],
+) {
+  const header = [
+    "Nome",
+    "Cognome",
+    "Email",
+    "Corso",
+    "Anno",
+    "Camera",
+    "Piano",
+    "Telefono",
+    "Stato pagamento",
+  ];
+  const body = rows.map((r) => {
+    const stato =
+      r.payments.length === 0
+        ? "Nessun pagamento"
+        : r.overdue
+          ? "In ritardo"
+          : "Regolare";
+    return [
+      r.profile.nome,
+      r.profile.cognome,
+      r.profile.email,
+      r.profile.corso,
+      `${r.profile.anno}`,
+      r.room?.name || "",
+      r.room ? `${r.room.floor}` : "",
+      r.richiesta?.telefono || "",
+      stato,
+    ]
+      .map(csvEscape)
+      .join(",");
+  });
+  const csv = "\uFEFF" + [header.join(","), ...body].join("\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  const today = new Date().toISOString().slice(0, 10);
+  a.href = url;
+  a.download = `studenti-${today}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast.success(`Esportati ${rows.length} studenti`);
+}
+
 export default function AdminStudenti() {
   const students = useMemo(() => mockProfiles.filter((p) => p.role === "student"), []);
 
