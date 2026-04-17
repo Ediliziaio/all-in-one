@@ -1,80 +1,52 @@
 
 
-L'utente è sulla pagina `/admin/richieste` (AdminPrenotazioni.tsx) e vuole trasformarla in un mini-CRM con pipeline tipo Kanban, dettagli contatto completi, e gestione del lead/richiesta come un vero processo di vendita.
+L'utente vuole una vista pipeline (kanban) anche nella gestione Supporto admin, simile a quella appena creata per le richieste affitto.
 
-Stato attuale: tabella semplice con tabs per stato (pending/approvata/conclusa/rifiutata), dialog dettaglio minimale. Manca pipeline visuale, dati contatto (telefono, provenienza, note interne), storico attività, attribuzione operatore, follow-up.
+Stati ticket attuali: `aperto` | `in_corso` | `risolto`. Per una pipeline utile aggiungo step intermedio così diventano 4 colonne sensate: **Nuovo (aperto) → In lavorazione (in_corso) → In attesa risposta studente → Risolto**.
 
-# CRM Richieste di Affitto
+Riuso pattern già adottato in AdminPrenotazioni: `@dnd-kit/core` (già installato), toggle vista in toolbar, stessa estetica delle colonne.
 
-## Diagnosi
-La pagina attuale è una lista a tabs: utile ma piatta. Manca tutto il processo che c'è dietro una richiesta: contatto, qualifica, visita, proposta, contratto. Niente note interne, niente storico interazioni, niente operatore assegnato, niente fonte del lead.
+# Pipeline Supporto Admin
 
-## Modello dati esteso (`mockData.ts`)
+## Cambiamenti
 
-Estendo `RichiestaAffitto` con campi CRM:
-- **Contatto**: `telefono`, `email`, `eta`, `corso_universita`, `citta_provenienza`
-- **Lead**: `fonte` ('sito' | 'instagram' | 'passaparola' | 'google' | 'fiera' | 'altro'), `budget_max`, `data_visita?`
-- **Pipeline**: nuovo enum stato → `nuovo` | `contattato` | `visita_programmata` | `proposta_inviata` | `contratto_firmato` | `perso`
-- **Gestione**: `operatore_assegnato?`, `priorita` ('bassa'|'media'|'alta'), `prossimo_followup?`, `motivo_perdita?`
-- **Storico**: `attivita: Activity[]` con `{ id, tipo: 'nota'|'chiamata'|'email'|'visita'|'cambio_stato', testo, autore, createdAt }`
+### 1. Modello dati (`src/data/mockData.ts`)
+- Aggiungo nuovo stato `attesa_studente` al tipo `SupportTicket.stato` → `"aperto" | "in_corso" | "attesa_studente" | "risolto"`
+- Aggiorno qualche ticket mock per popolare la nuova colonna
 
-Mantengo i vecchi stati come compat e mappo. Aggiungo `mockOperatori` (3-4 nomi staff).
+### 2. Pagina admin (`src/pages/admin/AdminSupporto.tsx`)
 
-## UI nuova pagina (`AdminPrenotazioni.tsx` → diventa CRM)
+**Toggle vista in toolbar**: bottoni `Lista` ↔ `Pipeline` (icona kanban) accanto al sort.
 
-### 1. Header con KPI
-4 mini-card: **Lead totali / Nuovi questa settimana / Tasso conversione / Valore pipeline (€)**
+**Vista Pipeline** (nuovo componente `TicketPipelineView` interno al file):
+- 4 colonne kanban scrollabili orizzontalmente: `Nuovo` · `In lavorazione` · `Attesa studente` · `Risolto`
+- Header colonna con: nome stato, conteggio ticket, pallino colorato
+- Card ticket compatta: barra priorità sx, avatar+nome studente, titolo (1 riga), badge categoria, ultima attività relativa, pallino non letto
+- Drag & drop con `@dnd-kit/core` (`DndContext`, `useDraggable`, `useDroppable`) — riuso pattern di `AdminPrenotazioni`
+- Click sulla card → apre lo stesso pannello dettaglio chat già esistente (su mobile `Dialog` full-screen, su desktop pannello laterale che sostituisce la lista)
 
-### 2. Toolbar
-- Search per nome/email/telefono
-- Filtri: fonte, operatore assegnato, priorità, range data
-- Toggle vista: **Pipeline (Kanban)** ↔ **Lista**
-- Bottone "+ Nuovo lead" (dialog manuale)
+**Filtro stato**: nascosto in vista pipeline (le colonne sono già lo stato), gli altri filtri (priorità, categoria, search) restano attivi.
 
-### 3. Vista Pipeline (default)
-6 colonne kanban scrollabili orizzontalmente:
-`Nuovo → Contattato → Visita programmata → Proposta inviata → Contratto firmato → Perso`
+**Mobile**: scroll orizzontale snap, 1 colonna alla volta. Tap card → dialog full-screen.
 
-Ogni card lead mostra: nome+avatar, camera richiesta, badge priorità (barra colorata sx), giorni in pipeline, operatore assegnato (avatar piccolo), icona fonte.
+**Aggiornamento stato**: drop su colonna chiama `handleChangeStato(nuovoStato)` esistente, mostra toast.
 
-Drag & drop per spostare tra colonne (uso `@dnd-kit/core` se presente, altrimenti bottoni "Sposta a →" nel menu della card per evitare nuove dipendenze).
-
-### 4. Vista Lista
-Tabella con colonne: Nome, Contatto, Camera, Stato, Operatore, Priorità, Ultima attività, Azioni.
-
-### 5. Dialog dettaglio lead (full-screen su mobile)
-Layout 2 colonne (stack su mobile):
-
-**Colonna sinistra - Info contatto**:
-- Avatar + nome grande, badge stato pipeline
-- Pulsanti rapidi: chiama, email, WhatsApp
-- Dati: età, corso, città provenienza, budget, fonte
-- Camera richiesta + date contratto
-- Operatore assegnato (dropdown cambio)
-- Priorità (dropdown)
-- Prossimo follow-up (date picker)
-
-**Colonna destra - Timeline attività + composer**:
-- Tabs: "Tutte / Note / Chiamate / Email / Cambi stato"
-- Timeline cronologica con icone per tipo
-- Composer in fondo: textarea + tipo attività (toggle: nota/chiamata/email/visita) + bottone Aggiungi
-- Bottoni in fondo: "Sposta a [stato successivo]", "Marca come Perso" (apre sub-dialog per motivo)
-
-### 6. Mobile
-- KPI: 2x2 grid
-- Kanban: scroll orizzontale con snap, 1 colonna visibile a tempo
-- Toolbar: filtri in Sheet
-- Dialog dettaglio: full-screen
+### 3. UI/UX
+- Colori colonne coerenti con `statoColors` esistente:
+  - Nuovo → blu
+  - In lavorazione → giallo
+  - Attesa studente → viola/indaco (nuovo)
+  - Risolto → verde
+- Aggiungo `attesa_studente` a `statoColors` e `statoLabel`
+- Drag overlay (ghost card) come in CRM per feedback visivo
 
 ## File modificati (2)
-
-1. **`src/data/mockData.ts`** — estendi tipo `RichiestaAffitto` (campi contatto, lead, pipeline, attività), aggiungi `Activity`, `mockOperatori`, popola 6-8 lead di esempio distribuiti nelle nuove colonne pipeline
-2. **`src/pages/admin/AdminPrenotazioni.tsx`** — riscrittura: KPI, toolbar, vista Pipeline kanban + vista Lista, dialog CRM completo con timeline, gestione assegnazione/priorità/follow-up
+1. `src/data/mockData.ts` — aggiungi stato `attesa_studente`, aggiorna 1-2 ticket mock
+2. `src/pages/admin/AdminSupporto.tsx` — aggiungi toggle vista, componente `TicketPipelineView` con kanban dnd-kit, mappa nuovo stato in label/colori, gestione drop
 
 ## Tecnica
-- Nessuna nuova dipendenza: drag&drop con HTML5 nativo (`draggable`, `onDragStart`, `onDrop`) per evitare di installare libs
-- Riuso shadcn: `Card`, `Tabs`, `Dialog`, `Sheet`, `Select`, `DropdownMenu`, `Popover`+`Calendar`, `Badge`, `Avatar`, `Textarea`, `ToggleGroup`
-- `date-fns` (già nel progetto) per "3 giorni fa", giorni in pipeline
-- State locale con `useState`, persistenza in `localStorage` per non perdere modifiche al refresh
-- Responsive mobile-first
+- Nessuna nuova dipendenza (`@dnd-kit/core` già nel progetto dopo CRM richieste)
+- Riuso `prioritaBar`, `prioritaColors`, `statoColors`, `relTime`, `detailPanel` esistenti
+- State `view: "lista" | "pipeline"` con default `lista`
+- Persistenza scelta vista in `localStorage` (`admin_supporto_view`)
 
