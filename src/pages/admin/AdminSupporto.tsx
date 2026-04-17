@@ -573,3 +573,95 @@ function StatCard({ icon, label, value, tone }: { icon: React.ReactNode; label: 
     </Card>
   );
 }
+
+type PipelineStage = { key: SupportTicket["stato"]; label: string; dot: string; bg: string };
+
+function PipelineColumn({ stage, count, children }: { stage: PipelineStage; count: number; children: React.ReactNode }) {
+  const { setNodeRef, isOver } = useDroppable({ id: stage.key });
+  return (
+    <div
+      ref={setNodeRef}
+      className={cn(
+        "shrink-0 w-[280px] sm:w-[300px] snap-start rounded-lg border flex flex-col max-h-[calc(100vh-16rem)]",
+        stage.bg,
+        isOver && "ring-2 ring-primary ring-offset-2",
+      )}
+    >
+      <div className="flex items-center justify-between px-3 py-2 border-b bg-background/60 rounded-t-lg sticky top-0 z-10">
+        <div className="flex items-center gap-2">
+          <span className={cn("h-2 w-2 rounded-full", stage.dot)} />
+          <span className="text-xs font-semibold">{stage.label}</span>
+        </div>
+        <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-5">{count}</Badge>
+      </div>
+      <div className="flex-1 overflow-y-auto p-2 space-y-2">{children}</div>
+    </div>
+  );
+}
+
+function DraggableTicketCard({
+  ticket,
+  profile,
+  onClick,
+  isDragging,
+}: {
+  ticket: SupportTicket;
+  profile?: { avatar?: string };
+  onClick: () => void;
+  isDragging: boolean;
+}) {
+  const { attributes, listeners, setNodeRef } = useDraggable({ id: ticket.id });
+  return (
+    <div
+      ref={setNodeRef}
+      {...attributes}
+      {...listeners}
+      onClick={onClick}
+      className={cn("touch-none", isDragging && "opacity-30")}
+    >
+      <TicketCardContent ticket={ticket} profile={profile} />
+    </div>
+  );
+}
+
+function TicketCardContent({
+  ticket,
+  profile,
+}: {
+  ticket: SupportTicket;
+  profile?: { avatar?: string };
+}) {
+  const last = ticket.messages[ticket.messages.length - 1];
+  return (
+    <Card className={cn("cursor-pointer hover:shadow-md transition-shadow overflow-hidden", ticket.unreadForAdmin && "border-primary/40")}>
+      <div className="flex">
+        <div className={cn("w-1 shrink-0", prioritaBar[ticket.priorita])} />
+        <CardContent className="p-2.5 flex-1 min-w-0">
+          <div className="flex items-start gap-2">
+            <Avatar className="h-7 w-7 shrink-0">
+              {profile?.avatar && <AvatarImage src={profile.avatar} alt={ticket.student_nome} />}
+              <AvatarFallback className="text-[10px]">{ticket.student_nome[0]}</AvatarFallback>
+            </Avatar>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-start justify-between gap-1">
+                <p className={cn("text-xs truncate", ticket.unreadForAdmin ? "font-semibold" : "font-medium")}>{ticket.titolo}</p>
+                {ticket.unreadForAdmin && <span className="mt-1 h-1.5 w-1.5 rounded-full bg-primary shrink-0" />}
+              </div>
+              <p className="text-[10px] text-muted-foreground truncate">{ticket.student_nome}</p>
+              {last && (
+                <p className="text-[10px] text-muted-foreground line-clamp-1 mt-0.5">
+                  <span className="font-medium">{last.author === "admin" ? "Tu" : "Studente"}:</span> {last.text}
+                </p>
+              )}
+              <div className="flex items-center gap-1 mt-1.5 flex-wrap">
+                <Badge variant="outline" className={cn("text-[9px] px-1 py-0 capitalize h-4", prioritaColors[ticket.priorita])}>{ticket.priorita}</Badge>
+                <Badge variant="outline" className="text-[9px] px-1 py-0 capitalize h-4">{ticket.categoria}</Badge>
+                <span className="text-[9px] text-muted-foreground ml-auto">{relTime(ticket.updatedAt || ticket.created_at)}</span>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </div>
+    </Card>
+  );
+}
