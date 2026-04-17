@@ -49,7 +49,12 @@ import {
   CheckCircle2,
   Clock,
   XCircle,
+  Download,
+  Sparkles,
+  UserPlus,
+  Activity,
 } from "lucide-react";
+import { toast } from "sonner";
 
 type ViewMode = "grid" | "list";
 type FilterMode = "all" | "assigned" | "unassigned";
@@ -63,6 +68,90 @@ const formatDate = (iso?: string) => {
     year: "2-digit",
   });
 };
+
+const formatDateTime = (iso: string) =>
+  new Date(iso).toLocaleString("it-IT", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
+const relTime = (iso: string) => {
+  const diff = Date.now() - new Date(iso).getTime();
+  const m = Math.round(diff / 60000);
+  if (m < 1) return "ora";
+  if (m < 60) return `${m} min fa`;
+  const h = Math.round(m / 60);
+  if (h < 24) return `${h} h fa`;
+  const d = Math.round(h / 24);
+  if (d < 30) return `${d} g fa`;
+  const mo = Math.round(d / 30);
+  if (mo < 12) return `${mo} mesi fa`;
+  return `${Math.round(mo / 12)} anni fa`;
+};
+
+const csvEscape = (v: unknown) => {
+  const s = v == null ? "" : String(v);
+  if (/[",\n;]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
+  return s;
+};
+
+function exportStudentsCSV(
+  rows: {
+    profile: Profile;
+    room?: { name: string; floor: number };
+    richiesta?: { telefono?: string };
+    payments: { stato: string }[];
+    overdue: boolean;
+  }[],
+) {
+  const header = [
+    "Nome",
+    "Cognome",
+    "Email",
+    "Corso",
+    "Anno",
+    "Camera",
+    "Piano",
+    "Telefono",
+    "Stato pagamento",
+  ];
+  const body = rows.map((r) => {
+    const stato =
+      r.payments.length === 0
+        ? "Nessun pagamento"
+        : r.overdue
+          ? "In ritardo"
+          : "Regolare";
+    return [
+      r.profile.nome,
+      r.profile.cognome,
+      r.profile.email,
+      r.profile.corso,
+      `${r.profile.anno}`,
+      r.room?.name || "",
+      r.room ? `${r.room.floor}` : "",
+      r.richiesta?.telefono || "",
+      stato,
+    ]
+      .map(csvEscape)
+      .join(",");
+  });
+  const csv = "\uFEFF" + [header.join(","), ...body].join("\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  const today = new Date().toISOString().slice(0, 10);
+  a.href = url;
+  a.download = `studenti-${today}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast.success(`Esportati ${rows.length} studenti`);
+}
 
 export default function AdminStudenti() {
   const students = useMemo(() => mockProfiles.filter((p) => p.role === "student"), []);
@@ -201,6 +290,16 @@ export default function AdminStudenti() {
                 <ListIcon className="h-4 w-4" />
               </Button>
             </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => exportStudentsCSV(filtered)}
+              className="gap-1.5"
+              title="Esporta CSV"
+            >
+              <Download className="h-4 w-4" />
+              <span className="hidden sm:inline">Esporta CSV</span>
+            </Button>
           </div>
           <Tabs value={filter} onValueChange={(v) => setFilter(v as FilterMode)}>
             <TabsList>
@@ -501,7 +600,7 @@ function StudentDetail({ data }: { data: Enriched }) {
 
       {/* Tabs */}
       <Tabs defaultValue="anagrafica" className="flex-1 min-h-0 flex flex-col mt-4">
-        <TabsList className="grid grid-cols-4 w-full">
+        <TabsList className="grid grid-cols-5 w-full">
           <TabsTrigger value="anagrafica">Anagrafica</TabsTrigger>
           <TabsTrigger value="camera">Camera</TabsTrigger>
           <TabsTrigger value="pagamenti">
@@ -510,6 +609,7 @@ function StudentDetail({ data }: { data: Enriched }) {
           <TabsTrigger value="ticket">
             Ticket{tickets.length > 0 && ` (${tickets.length})`}
           </TabsTrigger>
+          <TabsTrigger value="timeline">Timeline</TabsTrigger>
         </TabsList>
 
         <ScrollArea className="flex-1 mt-3 pr-3">
@@ -682,6 +782,11 @@ function StudentDetail({ data }: { data: Enriched }) {
               </Card>
             )}
           </TabsContent>
+
+          {/* Timeline */}
+          <TabsContent value="timeline" className="mt-0">
+            <StudentTimeline data={data} />
+          </TabsContent>
         </ScrollArea>
       </Tabs>
     </div>
@@ -736,4 +841,158 @@ function TicketStatoBadge({ stato }: { stato: string }) {
     risolto: "bg-green-100 text-green-700 hover:bg-green-100",
   };
   return <Badge className={`text-[10px] ${map[stato] || ""}`}>{stato.replace("_", " ")}</Badge>;
+}
+
+/* --------------------------- Timeline --------------------------- */
+type TimelineEvent = {
+  id: string;
+  date: string;
+  type: "payment" | "ticket" | "room" | "crm" | "profile";
+  title: string;
+  description?: string;
+  badge?: { label: string; tone: "success" | "warning" | "danger" | "muted" | "info" };
+};
+
+function buildTimeline(data: Enriched): TimelineEvent[] {
+  const events: TimelineEvent[] = [];
+  const { profile: s, richiesta, tickets, room, payments } = data;
+
+  // Profile created (fallback)
+  const profileDate = (s as { created_at?: string }).created_at || richiesta?.created_at;
+  if (profileDate) {
+    events.push({
+      id: `profile-${s.id}`,
+      date: profileDate,
+      type: "profile",
+      title: "Profilo creato",
+      description: `${s.nome} ${s.cognome} si è registrato sulla piattaforma`,
+    });
+  }
+
+  // CRM richiesta
+  if (richiesta) {
+    events.push({
+      id: `crm-${richiesta.id}`,
+      date: richiesta.created_at,
+      type: "crm",
+      title: "Richiesta inviata",
+      description: `Fonte: ${richiesta.fonte || "—"}`,
+    });
+    if (richiesta.stato === "approvata" && room) {
+      events.push({
+        id: `room-${richiesta.id}`,
+        date: richiesta.data_inizio || richiesta.created_at,
+        type: "room",
+        title: `Assegnata camera ${room.name}`,
+        description: `Piano ${room.floor} · Contratto ${formatDate(richiesta.data_inizio)} → ${formatDate(richiesta.data_fine)}`,
+        badge: { label: "Attivo", tone: "success" },
+      });
+    }
+  }
+
+  // Pagamenti
+  payments.forEach((p) => {
+    const tone =
+      p.stato === "pagato" ? "success" : p.stato === "scaduto" ? "danger" : "warning";
+    const label = p.stato === "pagato" ? "Pagato" : p.stato === "scaduto" ? "Scaduto" : "In scadenza";
+    events.push({
+      id: `pay-${p.id}`,
+      date: p.data_scadenza || p.mese,
+      type: "payment",
+      title: `Pagamento ${p.mese}`,
+      description: `€${p.importo}`,
+      badge: { label, tone },
+    });
+  });
+
+  // Ticket
+  tickets.forEach((t) => {
+    events.push({
+      id: `tk-${t.id}`,
+      date: t.created_at,
+      type: "ticket",
+      title: `Ticket: ${t.titolo}`,
+      description: t.descrizione,
+      badge: { label: t.categoria, tone: "info" },
+    });
+  });
+
+  return events.sort((a, b) => (b.date || "").localeCompare(a.date || ""));
+}
+
+const TYPE_META: Record<
+  TimelineEvent["type"],
+  { icon: typeof Users; color: string; bg: string }
+> = {
+  payment: { icon: CreditCard, color: "text-blue-700", bg: "bg-blue-100" },
+  ticket: { icon: Headphones, color: "text-orange-700", bg: "bg-orange-100" },
+  room: { icon: BedDouble, color: "text-purple-700", bg: "bg-purple-100" },
+  crm: { icon: Sparkles, color: "text-green-700", bg: "bg-green-100" },
+  profile: { icon: UserPlus, color: "text-muted-foreground", bg: "bg-muted" },
+};
+
+function StudentTimeline({ data }: { data: Enriched }) {
+  const events = useMemo(() => buildTimeline(data), [data]);
+
+  if (events.length === 0) {
+    return (
+      <Card className="p-8 text-center">
+        <Activity className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+        <p className="text-sm text-muted-foreground">Nessuna attività registrata</p>
+      </Card>
+    );
+  }
+
+  return (
+    <div className="relative pl-6 space-y-3">
+      <div className="absolute left-[11px] top-2 bottom-2 w-px bg-border" />
+      {events.map((ev) => {
+        const meta = TYPE_META[ev.type];
+        const Icon = meta.icon;
+        return (
+          <div key={ev.id} className="relative">
+            <div
+              className={`absolute -left-6 top-2 h-6 w-6 rounded-full flex items-center justify-center ring-4 ring-background ${meta.bg}`}
+            >
+              <Icon className={`h-3 w-3 ${meta.color}`} />
+            </div>
+            <Card className="p-3 bg-muted/30 border-muted">
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0 flex-1">
+                  <p className="font-medium text-sm">{ev.title}</p>
+                  {ev.description && (
+                    <p className="text-xs text-muted-foreground mt-0.5">{ev.description}</p>
+                  )}
+                </div>
+                {ev.badge && <TimelineBadge {...ev.badge} />}
+              </div>
+              <div className="flex items-center gap-2 mt-2 text-[11px] text-muted-foreground">
+                <Calendar className="h-3 w-3" />
+                <span>{formatDateTime(ev.date)}</span>
+                <span>·</span>
+                <span>{relTime(ev.date)}</span>
+              </div>
+            </Card>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function TimelineBadge({
+  label,
+  tone,
+}: {
+  label: string;
+  tone: "success" | "warning" | "danger" | "muted" | "info";
+}) {
+  const map = {
+    success: "bg-green-100 text-green-700 hover:bg-green-100",
+    warning: "bg-orange-100 text-orange-700 hover:bg-orange-100",
+    danger: "bg-red-100 text-red-700 hover:bg-red-100",
+    info: "bg-blue-100 text-blue-700 hover:bg-blue-100",
+    muted: "bg-muted text-muted-foreground hover:bg-muted",
+  };
+  return <Badge className={`text-[10px] shrink-0 ${map[tone]}`}>{label}</Badge>;
 }
