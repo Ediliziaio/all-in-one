@@ -611,13 +611,29 @@ function DraggableTicketCard({
   isDragging: boolean;
 }) {
   const { attributes, listeners, setNodeRef } = useDraggable({ id: ticket.id });
+  const downPos = useRef<{ x: number; y: number } | null>(null);
+
+  const handlePointerDown = (e: React.PointerEvent) => {
+    downPos.current = { x: e.clientX, y: e.clientY };
+  };
+  const handlePointerUp = (e: React.PointerEvent) => {
+    if (!downPos.current) return;
+    const dx = Math.abs(e.clientX - downPos.current.x);
+    const dy = Math.abs(e.clientY - downPos.current.y);
+    downPos.current = null;
+    if (dx < 5 && dy < 5 && !isDragging) {
+      onClick();
+    }
+  };
+
   return (
     <div
       ref={setNodeRef}
       {...attributes}
       {...listeners}
-      onClick={onClick}
-      className={cn("touch-none", isDragging && "opacity-30")}
+      onPointerDown={handlePointerDown}
+      onPointerUp={handlePointerUp}
+      className={cn("touch-none cursor-pointer", isDragging && "opacity-30")}
     >
       <TicketCardContent ticket={ticket} profile={profile} />
     </div>
