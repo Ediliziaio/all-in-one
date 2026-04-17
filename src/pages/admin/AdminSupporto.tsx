@@ -501,23 +501,44 @@ export default function AdminSupporto() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="flex items-center gap-1 rounded-md border bg-background p-0.5 lg:ml-auto">
+            <div className="flex flex-wrap items-center gap-2 lg:ml-auto">
               <Button
-                variant={view === "lista" ? "default" : "ghost"}
+                variant={onlyMine ? "default" : "outline"}
                 size="sm"
-                className="h-8 px-2 text-xs"
-                onClick={() => setView("lista")}
+                className="h-8 px-2.5 text-xs gap-1.5"
+                onClick={() => setOnlyMine((v) => !v)}
+                title={`Mostra solo ticket assegnati a ${CURRENT_OPERATOR}`}
               >
-                <List className="h-3.5 w-3.5 mr-1" /> Lista
+                <UserCheck className="h-3.5 w-3.5" /> I miei
               </Button>
-              <Button
-                variant={view === "pipeline" ? "default" : "ghost"}
-                size="sm"
-                className="h-8 px-2 text-xs"
-                onClick={() => setView("pipeline")}
-              >
-                <Kanban className="h-3.5 w-3.5 mr-1" /> Pipeline
-              </Button>
+              {stats.urgenti > 0 && (
+                <Button
+                  variant={onlyUrgent ? "destructive" : "outline"}
+                  size="sm"
+                  className={cn("h-8 px-2.5 text-xs gap-1.5", !onlyUrgent && "text-red-600 border-red-200 hover:bg-red-50")}
+                  onClick={() => setOnlyUrgent((v) => !v)}
+                >
+                  <AlertTriangle className="h-3.5 w-3.5" /> Urgenti {stats.urgenti}
+                </Button>
+              )}
+              <div className="flex items-center gap-1 rounded-md border bg-background p-0.5">
+                <Button
+                  variant={view === "lista" ? "default" : "ghost"}
+                  size="sm"
+                  className="h-7 px-2 text-xs"
+                  onClick={() => setView("lista")}
+                >
+                  <List className="h-3.5 w-3.5 mr-1" /> Lista
+                </Button>
+                <Button
+                  variant={view === "pipeline" ? "default" : "ghost"}
+                  size="sm"
+                  className="h-7 px-2 text-xs"
+                  onClick={() => setView("pipeline")}
+                >
+                  <Kanban className="h-3.5 w-3.5 mr-1" /> Pipeline
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>
