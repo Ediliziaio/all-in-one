@@ -12,10 +12,24 @@ import { Textarea } from "@/components/ui/textarea";
 import { getRoomById, getRoomTypeLabel, rooms } from "@/data/rooms";
 import { PageTransition, FadeIn, HoverCard as MotionHoverCard } from "@/components/motion/MotionWrappers";
 import { toast } from "sonner";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
   ArrowLeft, ArrowRight, Check, Calendar, Ruler, Layers, X,
-  Wifi, Bath, Wind, ChevronLeft, Clock, Grid2x2, Images
+  Wifi, Bath, Wind, ChevronLeft, Clock, Grid2x2, Images, Quote,
+  Sun, BedDouble, Sparkles, MapPin, GraduationCap, ShoppingBag, Coffee,
+  Zap, Droplets, Shield, Cigarette, PawPrint, Users, Moon
 } from "lucide-react";
+
+const featureIcon = (f: string) => {
+  const k = f.toLowerCase();
+  if (k.includes("wifi")) return Wifi;
+  if (k.includes("bagno")) return Bath;
+  if (k.includes("aria") || k.includes("clima")) return Wind;
+  if (k.includes("scrivania") || k.includes("studio")) return BedDouble;
+  if (k.includes("tv")) return Sparkles;
+  if (k.includes("balcone") || k.includes("vista")) return Sun;
+  return Check;
+};
 
 const CameraDettaglio = () => {
   const { id } = useParams<{ id: string }>();
