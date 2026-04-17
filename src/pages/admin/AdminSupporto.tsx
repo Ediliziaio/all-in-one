@@ -306,6 +306,29 @@ export default function AdminSupporto() {
   const draggingTicket = draggingId ? tickets.find((t) => t.id === draggingId) || null : null;
 
   const studentProfile = selected ? mockProfiles.find((p) => p.id === selected.student_id) : null;
+  const studentContract = selected
+    ? mockRichieste.find((r) => r.student_id === selected.student_id && r.stato === "approvata")
+    : null;
+  const studentPhone = studentContract?.telefono
+    || (selected ? mockRichieste.find((r) => r.student_id === selected.student_id)?.telefono : undefined);
+
+  const fmtDate = (iso?: string) => {
+    if (!iso) return "—";
+    try {
+      return new Date(iso).toLocaleDateString("it-IT", { day: "2-digit", month: "2-digit", year: "2-digit" });
+    } catch {
+      return iso;
+    }
+  };
+
+  const cameraLabel = (() => {
+    if (!studentProfile?.camera_id) return "—";
+    const parts = studentProfile.camera_id.split("-");
+    const num = parts[parts.length - 1];
+    const tipo = parts.slice(0, -1).join(" ");
+    const cap = tipo.charAt(0).toUpperCase() + tipo.slice(1);
+    return studentProfile.piano ? `${cap} ${num} · Piano ${studentProfile.piano}` : `${cap} ${num}`;
+  })();
 
   const detailPanel = selected && (
     <div className="flex flex-col h-full">
