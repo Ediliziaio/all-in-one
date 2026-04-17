@@ -145,6 +145,40 @@ export default function AdminBuoni() {
   // Mock counter — usi from hashing id
   const usiCount = (id: string) => (id.charCodeAt(id.length - 1) * 7) % 200 + 12;
 
+  const topUsi = useMemo(() => {
+    return buoni
+      .map(b => ({ name: b.nome_esercizio.length > 18 ? b.nome_esercizio.slice(0, 18) + "…" : b.nome_esercizio, usi: usiCount(b.id) }))
+      .sort((a, b) => b.usi - a.usi)
+      .slice(0, 5);
+  }, [buoni]);
+
+  const allVisibleSelected = filtered.length > 0 && filtered.every(b => selected.has(b.id));
+  const toggleSelect = (id: string) => {
+    setSelected(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+  const toggleSelectAll = () => {
+    if (allVisibleSelected) setSelected(new Set());
+    else setSelected(new Set(filtered.map(b => b.id)));
+  };
+  const clearSelection = () => setSelected(new Set());
+
+  const bulkDeactivate = () => {
+    setBuoni(prev => prev.map(b => selected.has(b.id) ? { ...b, attivo: false } : b));
+    toast({ title: `Disattivati ${selected.size} buoni` });
+    clearSelection();
+  };
+  const bulkDelete = () => {
+    const n = selected.size;
+    setBuoni(prev => prev.filter(b => !selected.has(b.id)));
+    toast({ title: `Eliminati ${n} buoni` });
+    clearSelection();
+    setConfirmDelete(false);
+  };
+
   return (
     <PageTransition className="p-4 sm:p-6 space-y-6">
       <FadeIn>
