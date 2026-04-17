@@ -16,6 +16,25 @@ export interface Profile {
   camera_id?: string;
 }
 
+export type LeadStato =
+  | "nuovo"
+  | "contattato"
+  | "visita_programmata"
+  | "proposta_inviata"
+  | "contratto_firmato"
+  | "perso";
+
+export type LeadFonte = "sito" | "instagram" | "passaparola" | "google" | "fiera" | "altro";
+export type LeadPriorita = "bassa" | "media" | "alta";
+
+export interface Activity {
+  id: string;
+  tipo: "nota" | "chiamata" | "email" | "visita" | "cambio_stato";
+  testo: string;
+  autore: string;
+  createdAt: string;
+}
+
 export interface RichiestaAffitto {
   id: string;
   camera_id: string;
@@ -24,10 +43,37 @@ export interface RichiestaAffitto {
   student_nome: string;
   data_inizio: string;
   data_fine: string;
+  // Legacy stato (kept for compat with other pages)
   stato: "pending" | "approvata" | "rifiutata" | "conclusa";
+  // CRM pipeline stato
+  pipeline_stato: LeadStato;
   note?: string;
   created_at: string;
+  // Contatto
+  telefono: string;
+  email: string;
+  eta?: number;
+  corso_universita?: string;
+  citta_provenienza?: string;
+  // Lead
+  fonte: LeadFonte;
+  budget_max?: number;
+  data_visita?: string;
+  // Gestione
+  operatore_assegnato?: string;
+  priorita: LeadPriorita;
+  prossimo_followup?: string;
+  motivo_perdita?: string;
+  // Storico
+  attivita: Activity[];
 }
+
+export const mockOperatori: string[] = [
+  "Giulia Marchetti",
+  "Federico Bianchi",
+  "Sara Lombardi",
+  "Matteo Rinaldi",
+];
 
 // Backward-compatible alias
 export type Prenotazione = RichiestaAffitto;
