@@ -1,87 +1,67 @@
 
 
-# Migliora 4 aree admin: Contratti, Camere, Buoni, Guide
+# Editor markdown + Grafici KPI + Bulk actions
 
-Oggi le 4 pagine sono basiche (lista + dialog semplice). Le porto a livello pro come ho fatto per Studenti.
+## 1. Editor markdown reale (`/admin/guide`)
 
----
+Sostituisco la `Textarea` del dialog con un mini-editor custom (no nuove dipendenze):
 
-## 1. `/admin/contratti` — Da tabella piatta a gestione contratti completa
+**Toolbar** sopra la textarea con bottoni:
+- **B** Bold (`**testo**`)
+- **I** Italic (`*testo*`)
+- **H2** Heading (`## `)
+- **• List** Lista puntata (`- `)
+- **1. List** Lista numerata (`1. `)
+- **🔗 Link** (`[testo](url)`) — prompt per URL
+- **`<>`** Inline code
+- **"** Quote (`> `)
 
-**Header KPI** (4 card): totale contratti, attivi, in scadenza (<60gg), incasso mensile ricorrente totale (€).
+Ogni bottone wrappa la selezione corrente nella textarea (uso `selectionStart/End` + `setRangeText`). Shortcut tastiera: Ctrl+B, Ctrl+I, Ctrl+K (link).
 
-**Toolbar**: ricerca per studente/camera, filtri tabs (esistenti) + filtro periodo (anno corrente / scaduti), ordinamento (data fine, canone, recenti), bottone **"Esporta CSV"**.
+**Preview a destra**: parser markdown leggero (~40 righe regex) che rende: `**bold**`, `*italic*`, `## H2`, `### H3`, liste `-`/`1.`, `[link](url)`, ``code``, `> quote`, paragrafi. Output via `dangerouslySetInnerHTML` con escape HTML iniziale per sicurezza. Stile prose-like con classi Tailwind.
 
-**Tabella migliorata**: avatar studente + nome, camera con piano, periodo con **giorni rimanenti** ("scade tra 45gg" badge giallo se <60), canone con totale residuo, stato, azioni (occhio + scarica PDF inline).
+## 2. Grafici KPI (4 pagine)
 
-**Popup dettaglio arricchito** (Dialog 2 colonne, tabs):
-- **Tab Riepilogo**: dati attuali + box "Riepilogo finanziario" (totale contratto, già incassato, residuo)
-- **Tab Pagamenti**: timeline pagamenti collegati (da `mockPagamenti`), badge stato
-- **Tab Documento**: anteprima placeholder + bottone scarica
-- **Tab Storico**: eventi (firma, modifiche, rinnovi)
-- Header con bottoni rapidi: "Vedi studente" → `/admin/studenti`, "Vedi camera" → `/admin/camere`, "Rinnova" (toast)
+Uso `ChartContainer` + `recharts` (già nel progetto). Tutti i dati derivano deterministicamente dai mock esistenti (no nuove dipendenze, no modifiche a `mockData.ts`).
 
-**Empty state** + microinterazioni hover.
+- **`/admin/contratti`** — Card "Trend MRR (6 mesi)" sotto la riga KPI: `AreaChart` con MRR mese per mese (calcolato simulando crescita: ultimo mese = MRR attuale, mesi precedenti scalati al 80%–95% via seed).
+- **`/admin/camere`** — Card "Occupazione storica (6 mesi)": `LineChart` % occupazione mese per mese (scala leggermente l'attuale `kpi.tasso`).
+- **`/admin/buoni`** — Card "Top 5 buoni più utilizzati": `BarChart` orizzontale con top 5 by `usiCount(id)` decrescente.
+- **`/admin/guide`** — Card "Top 5 guide più lette": `BarChart` orizzontale con top 5 by `letture(id)` decrescente.
 
----
+Ogni grafico vive in un `Card` separato sotto la griglia KPI, height ~200px, responsive.
 
-## 2. `/admin/camere` — Già evoluto, aggiungo livello strategico
+## 3. Bulk actions
 
-**Header KPI** (4 card): totale camere, disponibili, occupate, **tasso occupazione %** + canone medio.
+### `/admin/buoni` & `/admin/guide`
+- `Checkbox` in alto a sinistra di ogni card/riga
+- Stato `selected: Set<string>` per pagina
+- Quando `selected.size > 0`, **barra azioni sticky** sopra la lista:
+  - "X selezionati" + bottone "Deseleziona tutti"
+  - **Disattiva selezionati** (set `attivo/attiva = false`)
+  - **Elimina selezionati** (con `AlertDialog` di conferma)
+- Checkbox "Seleziona tutti i visibili" nella toolbar
 
-**Toolbar**: ricerca per nome, **filtro tipo** (singola/plus/doppia), **filtro disponibilità** (tutte/disponibili/occupate), **filtro piano**, ordinamento (prezzo, piano, foto count).
+### `/admin/contratti`
+- `Checkbox` come prima colonna nella tabella
+- Quando selezionati > 0, barra azioni:
+  - **Invia promemoria scadenza** → toast `Promemoria inviato a N studenti`
+  - "Deseleziona tutti"
 
-**Card camera arricchita**: aggiungo overlay con badge "Studente assegnato" (deriva da `mockProfiles.camera_id`) cliccabile → apre profilo studente; warning rosso se 0 foto o descrizione mancante; mini-stat foto.
+## 4. Test E2E — note
 
-**Bottone "Esporta CSV"** lista camere (nome, tipo, prezzo, piano, mq, disponibilità, occupante).
-
-**Vista lista**: aggiungo colonna "Occupante" e "Servizi" count.
-
-**Empty state** ricerca senza risultati.
-
----
-
-## 3. `/admin/buoni` — Da griglia statica a gestione partner
-
-**Header KPI** (4 card): totale buoni, attivi, in scadenza (<30gg), categorie totali.
-
-**Toolbar**: ricerca esercizio, **filtro categoria** (Cibo/Sport/Libri/Divertimento/Servizi) tabs, filtro stato (attivi/disattivi/scaduti), ordinamento (recenti, scadenza, A-Z).
-
-**Card buono migliorata**: badge "Scade tra Xgg" giallo se <30, badge "SCADUTO" rosso, contatore mock "utilizzato N volte", bottone modifica (matita) accanto a switch.
-
-**Popup dettaglio + modifica** (oltre a "Aggiungi"): click sulla card apre dialog modifica con tutti i campi prefilled, anteprima preview live della card a destra.
-
-**Bottone "Esporta CSV"** + microinterazioni.
-
----
-
-## 4. `/admin/guide` — Da lista piatta a CMS guide
-
-**Header KPI** (4 card): totale guide, attive, disattive, categorie coperte.
-
-**Toolbar**: ricerca titolo/contenuto, **filtro categoria** tabs (Burocrazia/Università/Vita in Città/Risparmio/Trasporti), ordinamento (A-Z, recenti, categoria), toggle **vista lista vs griglia card**.
-
-**Card/riga guida migliorata**: badge categoria colorato per categoria, contatore mock "letta N volte", icona modifica + elimina (oltre allo switch attiva/disattiva esistente).
-
-**Popup modifica** (oltre a "Nuova"): click sulla riga apre dialog edit con campi prefilled + **preview markdown-like** del contenuto a destra (split view), contatore caratteri.
-
-**Bottone "Esporta CSV"** lista guide + empty state.
-
----
+Dopo l'implementazione richiamerò la pagina via browser per smoke-test rapido, ma le verifiche manuali (esporta CSV scaricato, dialog 4 tab Contratti, preview live) restano a carico utente — i tool browser non possono ispezionare file scaricati né fare interazioni profonde affidabili in dialog complessi.
 
 ## File modificati (4)
-- `src/pages/admin/AdminContratti.tsx` — refactor completo
-- `src/pages/admin/AdminCamere.tsx` — aggiunte KPI/filtri/CSV/occupante (mantengo dialog esistente)
-- `src/pages/admin/AdminBuoni.tsx` — refactor
-- `src/pages/admin/AdminGuide.tsx` — refactor
-
-**Nessuna modifica a `mockData.ts`** — tutto deriva dai mock esistenti (`mockContratti`, `mockBuoni`, `mockGuide`, `mockPagamenti`, `mockProfiles`, `rooms`).
+- `src/pages/admin/AdminGuide.tsx` — editor MD + toolbar + parser preview + bulk + grafico top letture
+- `src/pages/admin/AdminBuoni.tsx` — bulk + grafico top usi
+- `src/pages/admin/AdminContratti.tsx` — bulk reminder + grafico MRR trend
+- `src/pages/admin/AdminCamere.tsx` — grafico occupazione storica
 
 ## Tecnica
-- Riuso `Card`, `Tabs`, `Dialog`, `Badge`, `Input`, `Switch`, `Button`, `Avatar` (shadcn)
-- Icone lucide: Search, Download, TrendingUp, Calendar, Home, BedDouble, Tag, Gift, BookOpen, AlertCircle, Pencil, Trash2, Eye, FileText, Users
-- Funzione `exportCSV` riusata (BOM Excel)
-- Helpers: `daysUntil(date)`, `formatEUR()`, calcolo occupazione/incasso memoizzati
-- Cross-link verso `/admin/studenti`, `/admin/camere`, `/admin/contratti`
-- Nessuna nuova dipendenza, nessuna route nuova
+- **No nuove dipendenze**: editor MD in ~80 righe, parser MD ~40 righe regex
+- Riuso `ChartContainer` (`@/components/ui/chart`), `Checkbox`, `AlertDialog`, icone lucide (`Bold`, `Italic`, `Heading2`, `List`, `ListOrdered`, `Link2`, `Code`, `Quote`, `BellRing`, `Trash2`, `EyeOff`)
+- `useRef<HTMLTextAreaElement>` per manipolare selezione
+- Helper `parseMarkdown(s: string): string` puro testabile, escape HTML prima di applicare regex
+- Stato selezione locale (`Set<string>`) per ogni pagina, reset su filter change
 
