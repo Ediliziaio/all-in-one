@@ -2,10 +2,11 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowRight, Star, Users, MapPin, CheckCircle, Clock, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { CountUp, KenBurns, GradientMesh } from "@/components/motion/MotionWrappers";
 
 const containerVariants = {
   hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.2 } },
+  visible: { opacity: 1, transition: { staggerChildren: 0.18 } },
 };
 
 const itemVariants = {
@@ -13,21 +14,17 @@ const itemVariants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
 };
 
-const imageVariants = {
-  hidden: { opacity: 0, scale: 0.8 },
-  visible: { opacity: 1, scale: 1, transition: { duration: 0.5, ease: "easeOut" as const } },
-};
-
 const floatingVariants = {
   animate: {
-    y: [0, -8, 0],
-    transition: { duration: 3, repeat: Infinity, ease: "easeInOut" as const },
+    y: [0, -10, 0],
+    transition: { duration: 4, repeat: Infinity, ease: "easeInOut" as const },
   },
 };
 
 export function HeroSection() {
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-muted via-background to-muted">
+      <GradientMesh />
       <div className="container relative py-16 md:py-24">
         <motion.div
           variants={containerVariants}
@@ -39,6 +36,10 @@ export function HeroSection() {
           <div className="space-y-6">
             <motion.div variants={itemVariants} className="flex flex-wrap gap-2">
               <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary">
+                <span className="relative flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
+                </span>
                 <Info className="h-3.5 w-3.5" /> Posti limitati per Settembre 2025
               </span>
             </motion.div>
@@ -55,7 +56,7 @@ export function HeroSection() {
               variants={itemVariants}
               className="max-w-lg text-lg text-muted-foreground"
             >
-              Camera privata con tutto incluso — WiFi, palestra, bollette — 
+              Camera privata con tutto incluso — WiFi, palestra, bollette —
               <strong className="text-foreground"> a partire da €480/mese</strong>. A pochi minuti dall'università.
             </motion.p>
 
@@ -74,19 +75,33 @@ export function HeroSection() {
               variants={itemVariants}
               className="flex flex-wrap gap-8 pt-6 border-t border-border"
             >
-              {[
-                { icon: <Star className="h-5 w-5 text-[hsl(var(--google-yellow))]" />, value: "4.9★", label: "127 recensioni Google" },
-                { icon: <Users className="h-5 w-5 text-[hsl(var(--google-blue))]" />, value: "98%", label: "rinnova il contratto" },
-                { icon: <MapPin className="h-5 w-5 text-[hsl(var(--google-red))]" />, value: "€0", label: "costi nascosti" },
-              ].map((stat) => (
-                <div key={stat.label} className="flex items-center gap-2">
-                  {stat.icon}
-                  <div>
-                    <p className="text-2xl font-bold text-foreground">{stat.value}</p>
-                    <p className="text-xs text-muted-foreground">{stat.label}</p>
-                  </div>
+              <div className="flex items-center gap-2">
+                <Star className="h-5 w-5 text-[hsl(var(--google-yellow))]" />
+                <div>
+                  <p className="text-2xl font-bold text-foreground">
+                    <CountUp to={4.9} decimals={1} suffix="★" />
+                  </p>
+                  <p className="text-xs text-muted-foreground">127 recensioni Google</p>
                 </div>
-              ))}
+              </div>
+              <div className="flex items-center gap-2">
+                <Users className="h-5 w-5 text-[hsl(var(--google-blue))]" />
+                <div>
+                  <p className="text-2xl font-bold text-foreground">
+                    <CountUp to={98} suffix="%" />
+                  </p>
+                  <p className="text-xs text-muted-foreground">rinnova il contratto</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <MapPin className="h-5 w-5 text-[hsl(var(--google-red))]" />
+                <div>
+                  <p className="text-2xl font-bold text-foreground">
+                    <CountUp to={0} prefix="€" />
+                  </p>
+                  <p className="text-xs text-muted-foreground">costi nascosti</p>
+                </div>
+              </div>
             </motion.div>
 
             {/* Trust badges */}
@@ -108,13 +123,13 @@ export function HeroSection() {
             <div className="absolute -right-4 -top-4 h-72 w-72 rounded-full bg-primary/10 blur-3xl" />
             <div className="absolute -bottom-4 -left-4 h-48 w-48 rounded-full bg-[hsl(var(--google-green))]/10 blur-2xl" />
 
-            <motion.div variants={imageVariants} className="relative z-10 overflow-hidden rounded-2xl shadow-2xl">
-              <img
+            <div className="relative z-10 overflow-hidden rounded-2xl shadow-2xl">
+              <KenBurns
                 src="https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=800&h=500&fit=crop"
                 alt="Camera studentato moderna"
                 className="h-64 w-full object-cover"
               />
-            </motion.div>
+            </div>
 
             <motion.div
               variants={floatingVariants}

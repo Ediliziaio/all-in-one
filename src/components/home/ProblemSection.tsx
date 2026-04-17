@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Lightbulb, Thermometer, PhoneOff, Users, WifiOff, FileWarning } from "lucide-react";
+import { Lightbulb, Thermometer, PhoneOff, Users, WifiOff, FileWarning, ArrowDown } from "lucide-react";
 
 const problems = [
   { icon: Thermometer, text: "Bollette che raddoppiano d'inverno — e nessuno ti avvisa" },
@@ -27,7 +27,7 @@ export function ProblemSection() {
             <span className="text-destructive">può essere complicato.</span>
           </h2>
           <p className="text-muted-foreground mt-4 max-w-2xl mx-auto text-lg">
-            Ogni anno tanti studenti si ritrovano a fare i conti con situazioni che rendono 
+            Ogni anno tanti studenti si ritrovano a fare i conti con situazioni che rendono
             la vita universitaria più difficile del necessario.
           </p>
         </motion.div>
@@ -40,25 +40,38 @@ export function ProblemSection() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1, duration: 0.4 }}
-              className="flex items-center gap-4 rounded-xl border border-destructive/20 bg-card p-5"
+              whileHover={{ x: 4 }}
+              className="group flex items-center gap-4 rounded-xl border border-destructive/20 bg-card p-5 transition-shadow hover:shadow-md hover:border-destructive/40"
             >
-              <div className="h-10 w-10 rounded-full bg-destructive/10 flex items-center justify-center shrink-0">
+              <motion.div
+                className="h-10 w-10 rounded-full bg-destructive/10 flex items-center justify-center shrink-0"
+                whileHover={{ rotate: [0, -8, 8, -8, 0], transition: { duration: 0.4 } }}
+              >
                 <p.icon className="h-5 w-5 text-destructive" />
-              </div>
+              </motion.div>
               <p className="text-foreground font-medium">{p.text}</p>
             </motion.div>
           ))}
         </div>
 
-        <motion.p
+        <motion.div
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ delay: 0.6 }}
-          className="text-center mt-10 text-xl font-bold text-foreground"
+          transition={{ delay: 0.5 }}
+          className="flex flex-col items-center mt-10"
         >
-          Noi abbiamo eliminato <span className="text-primary">ognuno</span> di questi problemi.
-        </motion.p>
+          <motion.div
+            animate={{ y: [0, 8, 0] }}
+            transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
+            className="mb-4 h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center"
+          >
+            <ArrowDown className="h-5 w-5 text-primary" />
+          </motion.div>
+          <p className="text-center text-xl md:text-2xl font-bold text-foreground">
+            Noi abbiamo eliminato <span className="text-primary">ognuno</span> di questi problemi.
+          </p>
+        </motion.div>
       </div>
     </section>
   );
