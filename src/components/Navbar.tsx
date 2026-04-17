@@ -6,6 +6,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import logoNapoleone from "@/assets/logo-napoleone.png";
 
 const navLinks = [
   { label: "Camere", href: "/camere" },
@@ -23,21 +24,11 @@ export function Navbar() {
     <header className="sticky top-0 z-50 glass">
       <div className="container flex h-16 items-center justify-between">
         <Link to="/" className="flex items-center gap-2">
-          <div className="h-8 w-8 rounded-lg bg-muted flex items-center justify-center">
-            <span className="font-heading font-bold text-sm">
-              <span className="text-[hsl(var(--google-blue))]">S</span>
-              <span className="text-[hsl(var(--google-red))]">P</span>
-            </span>
-          </div>
-          <span className="font-heading font-bold text-xl text-foreground">
-            <span className="text-[hsl(var(--google-blue))]">S</span>
-            <span className="text-[hsl(var(--google-red))]">t</span>
-            <span className="text-[hsl(var(--google-yellow))]">u</span>
-            <span className="text-[hsl(var(--google-blue))]">d</span>
-            <span className="text-[hsl(var(--google-green))]">e</span>
-            <span className="text-[hsl(var(--google-red))]">n</span>
-            <span className="text-foreground">tatoPD</span>
-          </span>
+          <img
+            src={logoNapoleone}
+            alt="Studentato Napoleone Padova"
+            className="h-10 w-auto"
+          />
         </Link>
 
         {/* Desktop */}
