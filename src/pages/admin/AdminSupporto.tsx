@@ -10,9 +10,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuLabel, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
-import { Search, Send, Inbox, Clock, CheckCircle2, Timer, MoreVertical, Zap, X, List, Kanban, AlertTriangle, UserCheck } from "lucide-react";
-import { mockTickets as initialTickets, mockProfiles, mockOperatori, type SupportTicket, type TicketMessage } from "@/data/mockData";
+import { Search, Send, Inbox, Clock, CheckCircle2, Timer, MoreVertical, Zap, X, List, Kanban, AlertTriangle, UserCheck, Plus, ArrowRight, Flag, Lock, MessageCircle } from "lucide-react";
+import { mockTickets as initialTickets, mockProfiles, mockOperatori, type SupportTicket, type TicketMessage, type TicketActivity } from "@/data/mockData";
 import { toast } from "sonner";
 import { PageTransition, FadeIn } from "@/components/motion/MotionWrappers";
 import { cn } from "@/lib/utils";
@@ -195,6 +196,18 @@ export default function AdminSupporto() {
     setTickets((prev) => prev.map((t) => (t.id === selectedId ? { ...t, unreadForAdmin: false } : t)));
   }, [selectedId]);
 
+  const addActivity = (ticketId: string, activity: Omit<TicketActivity, "id" | "createdAt"> & { createdAt?: string }) => {
+    const entry: TicketActivity = {
+      id: `a${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      createdAt: activity.createdAt || new Date().toISOString(),
+      tipo: activity.tipo,
+      testo: activity.testo,
+      autore: activity.autore,
+      meta: activity.meta,
+    };
+    setTickets((prev) => prev.map((t) => (t.id === ticketId ? { ...t, activity: [...(t.activity || []), entry] } : t)));
+  };
+
   const handleSend = () => {
     if (!selected || !reply.trim()) return;
     const now = new Date().toISOString();
@@ -218,6 +231,8 @@ export default function AdminSupporto() {
 
   const handleChangeStato = (stato: SupportTicket["stato"]) => {
     if (!selected) return;
+    const from = selected.stato;
+    if (from === stato) return;
     setTickets((prev) =>
       prev.map((t) =>
         t.id === selected.id
@@ -225,17 +240,40 @@ export default function AdminSupporto() {
           : t
       )
     );
+    addActivity(selected.id, {
+      tipo: stato === "risolto" ? "chiusura" : "cambio_stato",
+      testo: stato === "risolto" ? "Ticket chiuso come Risolto" : `Stato cambiato in ${statoLabel[stato]}`,
+      autore: CURRENT_OPERATOR,
+      meta: { from, to: stato },
+    });
     toast.success(`Stato cambiato in ${statoLabel[stato]}`);
   };
 
   const handleChangePrio = (priorita: SupportTicket["priorita"]) => {
     if (!selected) return;
+    const from = selected.priorita;
+    if (from === priorita) return;
     setTickets((prev) => prev.map((t) => (t.id === selected.id ? { ...t, priorita } : t)));
+    addActivity(selected.id, {
+      tipo: "cambio_priorita",
+      testo: `Priorità cambiata in ${priorita.charAt(0).toUpperCase() + priorita.slice(1)}`,
+      autore: CURRENT_OPERATOR,
+      meta: { from, to: priorita },
+    });
     toast.success(`Priorità cambiata in ${priorita}`);
   };
 
   const handleAssign = (ticketId: string, operator: string | undefined) => {
+    const ticket = tickets.find((t) => t.id === ticketId);
+    const from = ticket?.assignedTo;
+    if (from === operator) return;
     setTickets((prev) => prev.map((t) => (t.id === ticketId ? { ...t, assignedTo: operator } : t)));
+    addActivity(ticketId, {
+      tipo: "assegnazione",
+      testo: operator ? `Assegnato a ${operator}` : "Assegnazione rimossa",
+      autore: CURRENT_OPERATOR,
+      meta: { from, to: operator },
+    });
     toast.success(operator ? `Assegnato a ${operator}` : "Assegnazione rimossa");
   };
 
@@ -246,6 +284,7 @@ export default function AdminSupporto() {
     if (!newStato) return;
     const ticket = tickets.find((t) => t.id === ticketId);
     if (!ticket || ticket.stato === newStato) return;
+    const from = ticket.stato;
     setTickets((prev) =>
       prev.map((t) =>
         t.id === ticketId
@@ -253,6 +292,12 @@ export default function AdminSupporto() {
           : t,
       ),
     );
+    addActivity(ticketId, {
+      tipo: newStato === "risolto" ? "chiusura" : "cambio_stato",
+      testo: newStato === "risolto" ? "Ticket chiuso come Risolto" : `Stato cambiato in ${statoLabel[newStato]}`,
+      autore: CURRENT_OPERATOR,
+      meta: { from, to: newStato },
+    });
     toast.success(`Ticket spostato in ${statoLabel[newStato]}`);
   };
 
@@ -355,42 +400,57 @@ export default function AdminSupporto() {
         </div>
       </div>
 
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-muted/20">
-        <AnimatePresence initial={false}>
-          {selected.messages.map((m) => {
-            const mine = m.author === "admin";
-            return (
-              <motion.div
-                key={m.id}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                className={cn("flex gap-2", mine ? "justify-end" : "justify-start")}
-              >
-                {!mine && (
-                  <Avatar className="h-7 w-7 shrink-0">
-                    {studentProfile?.avatar && <AvatarImage src={studentProfile.avatar} alt={m.authorName} />}
-                    <AvatarFallback className="text-[10px]">{m.authorName[0]}</AvatarFallback>
-                  </Avatar>
-                )}
-                <div className={cn("max-w-[80%] rounded-2xl px-3 py-2 text-sm",
-                  mine ? "bg-primary text-primary-foreground rounded-br-sm" : "bg-background border rounded-bl-sm")}>
-                  <p className="whitespace-pre-wrap break-words">{m.text}</p>
-                  <p className={cn("text-[10px] mt-1", mine ? "text-primary-foreground/70" : "text-muted-foreground")}>
-                    {m.authorName} · {relTime(m.createdAt)}
-                  </p>
-                </div>
-                {mine && (
-                  <Avatar className="h-7 w-7 shrink-0">
-                    <AvatarFallback className="text-[10px] bg-green-100 text-green-700">S</AvatarFallback>
-                  </Avatar>
-                )}
-              </motion.div>
-            );
-          })}
-        </AnimatePresence>
-        <div ref={messagesEndRef} />
-      </div>
+      {/* Tabs: Conversazione / Cronologia */}
+      <Tabs defaultValue="chat" className="flex-1 flex flex-col min-h-0">
+        <TabsList className="mx-4 mt-3 self-start">
+          <TabsTrigger value="chat" className="text-xs gap-1.5"><MessageCircle className="h-3.5 w-3.5" /> Conversazione</TabsTrigger>
+          <TabsTrigger value="timeline" className="text-xs gap-1.5"><Clock className="h-3.5 w-3.5" /> Cronologia</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="chat" className="flex-1 min-h-0 mt-2 data-[state=inactive]:hidden">
+          <div className="h-full overflow-y-auto p-4 space-y-3 bg-muted/20">
+            <AnimatePresence initial={false}>
+              {selected.messages.map((m) => {
+                const mine = m.author === "admin";
+                return (
+                  <motion.div
+                    key={m.id}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className={cn("flex gap-2", mine ? "justify-end" : "justify-start")}
+                  >
+                    {!mine && (
+                      <Avatar className="h-7 w-7 shrink-0">
+                        {studentProfile?.avatar && <AvatarImage src={studentProfile.avatar} alt={m.authorName} />}
+                        <AvatarFallback className="text-[10px]">{m.authorName[0]}</AvatarFallback>
+                      </Avatar>
+                    )}
+                    <div className={cn("max-w-[80%] rounded-2xl px-3 py-2 text-sm",
+                      mine ? "bg-primary text-primary-foreground rounded-br-sm" : "bg-background border rounded-bl-sm")}>
+                      <p className="whitespace-pre-wrap break-words">{m.text}</p>
+                      <p className={cn("text-[10px] mt-1", mine ? "text-primary-foreground/70" : "text-muted-foreground")}>
+                        {m.authorName} · {relTime(m.createdAt)}
+                      </p>
+                    </div>
+                    {mine && (
+                      <Avatar className="h-7 w-7 shrink-0">
+                        <AvatarFallback className="text-[10px] bg-green-100 text-green-700">S</AvatarFallback>
+                      </Avatar>
+                    )}
+                  </motion.div>
+                );
+              })}
+            </AnimatePresence>
+            <div ref={messagesEndRef} />
+          </div>
+        </TabsContent>
+
+        <TabsContent value="timeline" className="flex-1 min-h-0 mt-2 data-[state=inactive]:hidden">
+          <div className="h-full overflow-y-auto p-4 bg-muted/20">
+            <TicketTimeline ticket={selected} />
+          </div>
+        </TabsContent>
+      </Tabs>
 
       {/* Composer */}
       <div className="border-t p-3 shrink-0 bg-background space-y-2">
@@ -879,3 +939,100 @@ function TicketCardContent({
     </Card>
   );
 }
+
+type TimelineItem = {
+  id: string;
+  kind: "creazione" | "cambio_stato" | "assegnazione" | "cambio_priorita" | "chiusura" | "risposta_admin" | "risposta_studente";
+  testo: string;
+  autore: string;
+  createdAt: string;
+};
+
+function buildTimeline(ticket: SupportTicket): TimelineItem[] {
+  const items: TimelineItem[] = [];
+
+  items.push({
+    id: `create-${ticket.id}`,
+    kind: "creazione",
+    testo: "Ticket creato",
+    autore: ticket.student_nome,
+    createdAt: ticket.created_at,
+  });
+
+  (ticket.activity || []).forEach((a) => {
+    items.push({
+      id: a.id,
+      kind: a.tipo,
+      testo: a.testo,
+      autore: a.autore,
+      createdAt: a.createdAt,
+    });
+  });
+
+  ticket.messages.forEach((m, idx) => {
+    if (idx === 0 && m.author === "studente" && m.createdAt === ticket.created_at) return;
+    items.push({
+      id: `msg-${m.id}`,
+      kind: m.author === "admin" ? "risposta_admin" : "risposta_studente",
+      testo: m.text.length > 120 ? m.text.slice(0, 120) + "…" : m.text,
+      autore: m.authorName,
+      createdAt: m.createdAt,
+    });
+  });
+
+  if (ticket.closedAt && !items.some((i) => i.kind === "chiusura")) {
+    items.push({
+      id: `close-${ticket.id}`,
+      kind: "chiusura",
+      testo: "Ticket chiuso come Risolto",
+      autore: ticket.assignedTo || "Sistema",
+      createdAt: ticket.closedAt,
+    });
+  }
+
+  return items.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+}
+
+const timelineMeta: Record<TimelineItem["kind"], { Icon: React.ComponentType<{ className?: string }>; bg: string; text: string }> = {
+  creazione: { Icon: Plus, bg: "bg-green-100", text: "text-green-700" },
+  cambio_stato: { Icon: ArrowRight, bg: "bg-blue-100", text: "text-blue-700" },
+  assegnazione: { Icon: UserCheck, bg: "bg-violet-100", text: "text-violet-700" },
+  cambio_priorita: { Icon: Flag, bg: "bg-orange-100", text: "text-orange-700" },
+  risposta_admin: { Icon: MessageCircle, bg: "bg-primary/10", text: "text-primary" },
+  risposta_studente: { Icon: MessageCircle, bg: "bg-muted", text: "text-foreground" },
+  chiusura: { Icon: Lock, bg: "bg-muted", text: "text-muted-foreground" },
+};
+
+function TicketTimeline({ ticket }: { ticket: SupportTicket }) {
+  const items = useMemo(() => buildTimeline(ticket), [ticket]);
+
+  if (items.length === 0) {
+    return <p className="text-sm text-muted-foreground text-center py-8">Nessuna attività ancora.</p>;
+  }
+
+  return (
+    <div className="relative pl-2">
+      <div className="absolute left-[18px] top-2 bottom-2 w-px bg-border" />
+      <ul className="space-y-3">
+        {items.map((item) => {
+          const meta = timelineMeta[item.kind];
+          const Icon = meta.Icon;
+          return (
+            <li key={item.id} className="relative flex gap-3 items-start">
+              <div className={cn("relative z-10 h-9 w-9 rounded-full flex items-center justify-center shrink-0 border-2 border-background", meta.bg)}>
+                <Icon className={cn("h-4 w-4", meta.text)} />
+              </div>
+              <div className="flex-1 min-w-0 rounded-lg border bg-background/80 px-3 py-2">
+                <p className="text-sm text-foreground break-words">{item.testo}</p>
+                <p className="text-[11px] text-muted-foreground mt-0.5">
+                  {item.autore} · {relTime(item.createdAt)}
+                </p>
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+}
+
