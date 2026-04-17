@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Star, ChevronLeft, ChevronRight, Quote } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -12,17 +12,24 @@ const testimonials = [
   { name: "Maria T.", course: "Genitore", rating: 5, text: "Come mamma, finalmente dormo tranquilla. So che mia figlia è al sicuro, il contratto è regolare, e se ha un problema lo risolvono subito.", avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=80&h=80&fit=crop&crop=face" },
 ];
 
-function StarRating({ rating }: { rating: number }) {
+function StarRating({ rating, animate = false }: { rating: number; animate?: boolean }) {
   return (
     <div className="flex gap-1">
       {Array.from({ length: 5 }).map((_, i) => (
-        <Star key={i} className={`h-4 w-4 ${i < rating ? "text-accent fill-accent" : "text-muted"}`} />
+        <motion.div
+          key={i}
+          initial={animate ? { opacity: 0, scale: 0 } : undefined}
+          animate={animate ? { opacity: 1, scale: 1 } : undefined}
+          transition={animate ? { delay: 0.2 + i * 0.08, type: "spring", stiffness: 300 } : undefined}
+        >
+          <Star className={`h-4 w-4 ${i < rating ? "text-accent fill-accent" : "text-muted"}`} />
+        </motion.div>
       ))}
     </div>
   );
 }
 
-function TestimonialCard({ t }: { t: typeof testimonials[0] }) {
+function TestimonialCard({ t, animateStars = false }: { t: typeof testimonials[0]; animateStars?: boolean }) {
   return (
     <div className="rounded-xl border bg-card p-6 h-full flex flex-col">
       <div className="mb-3">
@@ -36,7 +43,7 @@ function TestimonialCard({ t }: { t: typeof testimonials[0] }) {
           <p className="text-xs text-muted-foreground">{t.course}</p>
         </div>
         <div className="ml-auto">
-          <StarRating rating={t.rating} />
+          <StarRating rating={t.rating} animate={animateStars} />
         </div>
       </div>
     </div>
@@ -45,6 +52,20 @@ function TestimonialCard({ t }: { t: typeof testimonials[0] }) {
 
 export function TestimonialsSection() {
   const [idx, setIdx] = useState(0);
+  const [paused, setPaused] = useState(false);
+
+  // Auto-rotate desktop trio every 5s
+  useEffect(() => {
+    if (paused) return;
+    const id = setInterval(() => setIdx((i) => (i + 1) % testimonials.length), 5000);
+    return () => clearInterval(id);
+  }, [paused]);
+
+  const visible = [
+    testimonials[idx % testimonials.length],
+    testimonials[(idx + 1) % testimonials.length],
+    testimonials[(idx + 2) % testimonials.length],
+  ];
 
   return (
     <section className="py-20 bg-background">
@@ -59,19 +80,25 @@ export function TestimonialsSection() {
           </p>
         </motion.div>
 
-        {/* Desktop: grid 3 columns */}
-        <div className="hidden md:grid grid-cols-3 gap-6">
-          {testimonials.slice(0, 6).map((t, i) => (
-            <motion.div
-              key={t.name}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
-            >
-              <TestimonialCard t={t} />
-            </motion.div>
-          ))}
+        {/* Desktop: rotating trio */}
+        <div
+          className="hidden md:grid grid-cols-3 gap-6"
+          onMouseEnter={() => setPaused(true)}
+          onMouseLeave={() => setPaused(false)}
+        >
+          <AnimatePresence mode="popLayout">
+            {visible.map((t, i) => (
+              <motion.div
+                key={`${t.name}-${idx}-${i}`}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.5, delay: i * 0.08 }}
+              >
+                <TestimonialCard t={t} animateStars />
+              </motion.div>
+            ))}
+          </AnimatePresence>
         </div>
 
         {/* Mobile: carousel */}
@@ -84,7 +111,7 @@ export function TestimonialsSection() {
               exit={{ opacity: 0, x: -30 }}
               transition={{ duration: 0.3 }}
             >
-              <TestimonialCard t={testimonials[idx]} />
+              <TestimonialCard t={testimonials[idx]} animateStars />
             </motion.div>
           </AnimatePresence>
 
@@ -92,7 +119,7 @@ export function TestimonialsSection() {
             <Button variant="outline" size="icon" onClick={() => setIdx((idx - 1 + testimonials.length) % testimonials.length)}>
               <ChevronLeft className="h-4 w-4" />
             </Button>
-            <span className="flex items-center text-sm text-muted-foreground">{idx + 1}/{testimonials.length}</span>
+            <span className="flex items-center text-sm text-muted-foreground">{(idx % testimonials.length) + 1}/{testimonials.length}</span>
             <Button variant="outline" size="icon" onClick={() => setIdx((idx + 1) % testimonials.length)}>
               <ChevronRight className="h-4 w-4" />
             </Button>

@@ -12,7 +12,7 @@ const services = [
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
-  visible: (i: number) => ({ opacity: 1, y: 0, transition: { delay: i * 0.1, duration: 0.5 } }),
+  visible: (i: number) => ({ opacity: 1, y: 0, transition: { delay: i * 0.08, duration: 0.5 } }),
 };
 
 export function ServicesSection() {
@@ -43,20 +43,26 @@ export function ServicesSection() {
               whileInView="visible"
               viewport={{ once: true }}
               variants={fadeUp}
-              className="rounded-xl border bg-card p-6 hover:shadow-lg transition-shadow group"
+              whileHover={{ y: -6 }}
+              transition={{ type: "spring", stiffness: 300, damping: 20 }}
+              className="relative rounded-xl border bg-card p-6 hover:shadow-xl hover:border-accent/40 transition-[box-shadow,border-color] group overflow-hidden"
             >
-              <div className="mb-4">
-                <div className="h-12 w-12 rounded-lg bg-accent/10 flex items-center justify-center group-hover:bg-accent/20 transition-colors">
+              <div className="absolute inset-0 bg-gradient-to-br from-accent/0 via-accent/0 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="relative mb-4">
+                <motion.div
+                  whileHover={{ rotate: [0, -10, 10, 0] }}
+                  transition={{ duration: 0.5 }}
+                  className="h-12 w-12 rounded-lg bg-accent/10 flex items-center justify-center group-hover:bg-accent/20 transition-colors"
+                >
                   <s.icon className="h-6 w-6 text-accent" />
-                </div>
+                </motion.div>
               </div>
-              <h3 className="font-heading font-semibold text-lg text-card-foreground">{s.title}</h3>
-              <p className="text-sm text-muted-foreground mt-1">{s.desc}</p>
+              <h3 className="relative font-heading font-semibold text-lg text-card-foreground">{s.title}</h3>
+              <p className="relative text-sm text-muted-foreground mt-1">{s.desc}</p>
             </motion.div>
           ))}
         </div>
 
-        {/* Value summary */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
