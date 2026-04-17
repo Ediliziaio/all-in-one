@@ -369,77 +369,43 @@ export default function AdminPrenotazioni() {
       {/* Pipeline view */}
       {view === "pipeline" && (
         <FadeIn delay={0.15}>
-          <div className="overflow-x-auto -mx-4 md:mx-0 px-4 md:px-0 snap-x snap-mandatory md:snap-none">
-            <div className="flex gap-3 md:gap-4 min-w-min pb-2">
-              {STAGES.map(stage => {
-                const items = filtered.filter(l => l.pipeline_stato === stage.id);
-                const stageValue = items.reduce((s, l) => s + (l.budget_max || 0), 0);
-                return (
-                  <div
-                    key={stage.id}
-                    className="w-[280px] md:w-[300px] flex-shrink-0 snap-start"
-                    onDragOver={(e) => e.preventDefault()}
-                    onDrop={() => { if (draggedId) moveStato(draggedId, stage.id); setDraggedId(null); }}
-                  >
-                    <div className="flex items-center justify-between mb-2 px-1">
-                      <div className="flex items-center gap-2">
-                        <div className={cn("h-2 w-2 rounded-full", stage.color)} />
-                        <h3 className="font-semibold text-sm">{stage.label}</h3>
-                        <Badge variant="secondary" className="text-xs h-5">{items.length}</Badge>
-                      </div>
-                      <span className="text-[10px] text-muted-foreground">€{stageValue}/m</span>
-                    </div>
-                    <div className="bg-muted/40 rounded-lg p-2 min-h-[200px] space-y-2">
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+            <div className="overflow-x-auto -mx-4 md:mx-0 px-4 md:px-0 snap-x snap-mandatory md:snap-none">
+              <div className="flex gap-3 md:gap-4 min-w-min pb-2">
+                {STAGES.map(stage => {
+                  const items = filtered.filter(l => l.pipeline_stato === stage.id);
+                  const stageValue = items.reduce((s, l) => s + (l.budget_max || 0), 0);
+                  return (
+                    <PipelineColumn key={stage.id} stage={stage} count={items.length} stageValue={stageValue} isDragging={!!draggedId}>
                       {items.length === 0 && (
-                        <div className="text-xs text-muted-foreground text-center py-8">Nessun lead</div>
+                        <div className="text-xs text-muted-foreground text-center py-8 border-2 border-dashed border-border rounded-md">
+                          Trascina qui
+                        </div>
                       )}
-                      {items.map(lead => {
-                        const Fonte = FONTE_ICON[lead.fonte];
-                        const days = differenceInDays(new Date(), new Date(lead.created_at));
-                        return (
-                          <div
-                            key={lead.id}
-                            draggable
-                            onDragStart={() => setDraggedId(lead.id)}
-                            onDragEnd={() => setDraggedId(null)}
-                            onClick={() => setSelected(lead)}
-                            className={cn(
-                              "bg-card border rounded-md p-3 cursor-pointer hover:shadow-md transition-shadow relative overflow-hidden",
-                              draggedId === lead.id && "opacity-50"
-                            )}
-                          >
-                            <div className={cn("absolute left-0 top-0 bottom-0 w-1", PRIORITA_COLOR[lead.priorita])} />
-                            <div className="pl-1.5 space-y-2">
-                              <div className="flex items-start gap-2">
-                                <Avatar className="h-7 w-7">
-                                  <AvatarFallback className="text-[10px]">{initials(lead.student_nome)}</AvatarFallback>
-                                </Avatar>
-                                <div className="flex-1 min-w-0">
-                                  <p className="font-medium text-sm truncate">{lead.student_nome}</p>
-                                  <p className="text-[11px] text-muted-foreground truncate">{lead.camera_nome}</p>
-                                </div>
-                                <Fonte className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
-                              </div>
-                              <div className="flex items-center justify-between text-[10px] text-muted-foreground">
-                                <span className="flex items-center gap-1"><CalendarDays className="h-3 w-3"/>{days}g in pipeline</span>
-                                {lead.budget_max && <span>€{lead.budget_max}/m</span>}
-                              </div>
-                              {lead.operatore_assegnato && (
-                                <div className="flex items-center gap-1.5">
-                                  <Avatar className="h-4 w-4"><AvatarFallback className="text-[8px]">{initials(lead.operatore_assegnato)}</AvatarFallback></Avatar>
-                                  <span className="text-[10px] text-muted-foreground truncate">{lead.operatore_assegnato}</span>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                );
-              })}
+                      {items.map(lead => (
+                        <DraggableLeadCard key={lead.id} lead={lead} onClick={() => setSelected(lead)} />
+                      ))}
+                    </PipelineColumn>
+                  );
+                })}
+              </div>
             </div>
-          </div>
+            <DragOverlay dropAnimation={null}>
+              {draggedId ? <LeadCardContent lead={leads.find(l => l.id === draggedId)!} dragging /> : null}
+            </DragOverlay>
+          </DndContext>
+        </FadeIn>
+      )}
+
+      {/* Calendar view */}
+      {view === "calendar" && (
+        <FadeIn delay={0.15}>
+          <CalendarView
+            leads={filtered}
+            month={calMonth}
+            onMonthChange={setCalMonth}
+            onSelectLead={setSelected}
+          />
         </FadeIn>
       )}
 
