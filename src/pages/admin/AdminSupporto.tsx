@@ -1,125 +1,457 @@
-import { useState } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { formatDistanceToNow } from "date-fns";
+import { it } from "date-fns/locale";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { mockTickets as initialTickets, type SupportTicket } from "@/data/mockData";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuLabel, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
+import { Search, Send, MessageSquare, Inbox, Clock, CheckCircle2, Timer, MoreVertical, Zap, X } from "lucide-react";
+import { mockTickets as initialTickets, mockProfiles, type SupportTicket, type TicketMessage } from "@/data/mockData";
 import { toast } from "sonner";
-import { PageTransition, FadeIn, StaggerContainer, StaggerItem } from "@/components/motion/MotionWrappers";
+import { PageTransition, FadeIn } from "@/components/motion/MotionWrappers";
+import { cn } from "@/lib/utils";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const prioritaColors: Record<string, string> = {
-  urgente: "bg-red-100 text-red-700 border-red-300",
-  alta: "bg-orange-100 text-orange-700 border-orange-300",
-  normale: "bg-yellow-100 text-yellow-700 border-yellow-300",
-  bassa: "bg-muted text-muted-foreground",
+  urgente: "bg-red-100 text-red-700 border-red-200",
+  alta: "bg-orange-100 text-orange-700 border-orange-200",
+  normale: "bg-yellow-100 text-yellow-700 border-yellow-200",
+  bassa: "bg-muted text-muted-foreground border-border",
+};
+
+const prioritaBar: Record<string, string> = {
+  urgente: "bg-red-500",
+  alta: "bg-orange-500",
+  normale: "bg-yellow-500",
+  bassa: "bg-muted-foreground/40",
 };
 
 const statoColors: Record<string, string> = {
-  aperto: "bg-blue-100 text-blue-700",
-  in_corso: "bg-yellow-100 text-yellow-700",
-  risolto: "bg-green-100 text-green-700",
+  aperto: "bg-blue-100 text-blue-700 border-blue-200",
+  in_corso: "bg-yellow-100 text-yellow-700 border-yellow-200",
+  risolto: "bg-green-100 text-green-700 border-green-200",
 };
 
-export default function AdminSupporto() {
-  const [tickets, setTickets] = useState(initialTickets);
-  const [selected, setSelected] = useState<SupportTicket | null>(null);
-  const [risposta, setRisposta] = useState("");
+const statoLabel: Record<string, string> = {
+  aperto: "Aperto",
+  in_corso: "In corso",
+  risolto: "Risolto",
+};
 
-  const handleRispondi = () => {
-    if (!selected || !risposta.trim()) return;
+const quickReplies = [
+  "Ciao, abbiamo ricevuto la tua segnalazione e la stiamo verificando. Ti aggiorniamo a breve.",
+  "Abbiamo programmato l'intervento del tecnico. Ti contatteremo per concordare l'orario.",
+  "Il problema è stato risolto. Fammi sapere se va tutto bene.",
+  "Ci servono ulteriori informazioni: puoi inviarci una foto del problema?",
+  "Ci scusiamo per il disagio. Ce ne occupiamo subito con priorità.",
+];
+
+function relTime(iso: string) {
+  try {
+    return formatDistanceToNow(new Date(iso), { addSuffix: true, locale: it });
+  } catch {
+    return iso;
+  }
+}
+
+type SortKey = "recenti" | "vecchi" | "priorita";
+
+const priorityOrder: Record<string, number> = { urgente: 0, alta: 1, normale: 2, bassa: 3 };
+
+export default function AdminSupporto() {
+  const [tickets, setTickets] = useState<SupportTicket[]>(initialTickets);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [reply, setReply] = useState("");
+  const [search, setSearch] = useState("");
+  const [fStato, setFStato] = useState<string>("all");
+  const [fPrio, setFPrio] = useState<string>("all");
+  const [fCat, setFCat] = useState<string>("all");
+  const [sort, setSort] = useState<SortKey>("recenti");
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
+
+  const selected = tickets.find((t) => t.id === selectedId) || null;
+
+  const stats = useMemo(() => {
+    const today = new Date().toDateString();
+    return {
+      aperti: tickets.filter((t) => t.stato === "aperto").length,
+      in_corso: tickets.filter((t) => t.stato === "in_corso").length,
+      risolti_oggi: tickets.filter((t) => t.stato === "risolto" && t.closedAt && new Date(t.closedAt).toDateString() === today).length,
+      tempo_medio: "2h 30m",
+    };
+  }, [tickets]);
+
+  const filtered = useMemo(() => {
+    let list = tickets.filter((t) => {
+      if (fStato !== "all" && t.stato !== fStato) return false;
+      if (fPrio !== "all" && t.priorita !== fPrio) return false;
+      if (fCat !== "all" && t.categoria !== fCat) return false;
+      if (search.trim()) {
+        const q = search.toLowerCase();
+        if (!t.titolo.toLowerCase().includes(q) && !t.student_nome.toLowerCase().includes(q) && !t.descrizione.toLowerCase().includes(q)) return false;
+      }
+      return true;
+    });
+    list = [...list].sort((a, b) => {
+      if (sort === "priorita") return priorityOrder[a.priorita] - priorityOrder[b.priorita];
+      const aT = a.updatedAt || a.created_at;
+      const bT = b.updatedAt || b.created_at;
+      return sort === "recenti" ? bT.localeCompare(aT) : aT.localeCompare(bT);
+    });
+    return list;
+  }, [tickets, fStato, fPrio, fCat, search, sort]);
+
+  useEffect(() => {
+    if (selected && messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth", block: "end" });
+    }
+  }, [selected?.messages.length, selectedId]);
+
+  // mark read for admin on open
+  useEffect(() => {
+    if (!selectedId) return;
+    setTickets((prev) => prev.map((t) => (t.id === selectedId ? { ...t, unreadForAdmin: false } : t)));
+  }, [selectedId]);
+
+  const handleSend = () => {
+    if (!selected || !reply.trim()) return;
+    const now = new Date().toISOString();
+    const msg: TicketMessage = {
+      id: `m${Date.now()}`,
+      author: "admin",
+      authorName: "Staff",
+      text: reply.trim(),
+      createdAt: now,
+    };
     setTickets((prev) =>
       prev.map((t) =>
         t.id === selected.id
-          ? { ...t, risposta_admin: risposta, stato: "in_corso" as const }
+          ? { ...t, messages: [...t.messages, msg], updatedAt: now, stato: t.stato === "aperto" ? "in_corso" : t.stato, unreadForStudent: true, risposta_admin: reply.trim() }
           : t
       )
     );
-    setSelected({ ...selected, risposta_admin: risposta, stato: "in_corso" });
-    setRisposta("");
-    toast.success("Risposta inviata!");
+    setReply("");
+    toast.success("Risposta inviata");
   };
 
-  const handleChiudi = () => {
+  const handleChangeStato = (stato: SupportTicket["stato"]) => {
     if (!selected) return;
     setTickets((prev) =>
-      prev.map((t) => (t.id === selected.id ? { ...t, stato: "risolto" as const } : t))
+      prev.map((t) =>
+        t.id === selected.id
+          ? { ...t, stato, closedAt: stato === "risolto" ? new Date().toISOString() : undefined, updatedAt: new Date().toISOString() }
+          : t
+      )
     );
-    setSelected({ ...selected, stato: "risolto" });
-    toast.success("Ticket chiuso");
+    toast.success(`Stato cambiato in ${statoLabel[stato]}`);
   };
 
-  return (
-    <PageTransition className="p-6 space-y-6">
-      <FadeIn><h1 className="font-heading text-2xl font-bold">Supporto</h1></FadeIn>
+  const handleChangePrio = (priorita: SupportTicket["priorita"]) => {
+    if (!selected) return;
+    setTickets((prev) => prev.map((t) => (t.id === selected.id ? { ...t, priorita } : t)));
+    toast.success(`Priorità cambiata in ${priorita}`);
+  };
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <StaggerContainer className="lg:col-span-2 space-y-3">
-          {tickets.map((t) => (
-            <StaggerItem key={t.id}>
-              <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
-                <Card
-                  className={`cursor-pointer transition-colors ${selected?.id === t.id ? "ring-2 ring-primary" : "hover:bg-muted/50"}`}
-                  onClick={() => { setSelected(t); setRisposta(""); }}
-                >
-                  <CardContent className="p-4 flex items-center gap-4">
-                    <div className="flex-1">
-                      <p className="font-medium">{t.titolo}</p>
-                      <p className="text-xs text-muted-foreground">{t.student_nome} · {t.created_at}</p>
-                    </div>
-                    <Badge variant="outline" className={prioritaColors[t.priorita]}>{t.priorita}</Badge>
-                    <Badge className={statoColors[t.stato]}>{t.stato.replace("_", " ")}</Badge>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            </StaggerItem>
-          ))}
-        </StaggerContainer>
+  const studentProfile = selected ? mockProfiles.find((p) => p.id === selected.student_id) : null;
 
-        <div>
-          <AnimatePresence mode="wait">
-            {selected ? (
-              <motion.div
-                key={selected.id}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-                transition={{ duration: 0.3 }}
-              >
-                <Card className="sticky top-6">
-                  <CardHeader><CardTitle className="text-base">{selected.titolo}</CardTitle></CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="text-sm space-y-2">
-                      <p><span className="text-muted-foreground">Studente:</span> {selected.student_nome}</p>
-                      <p><span className="text-muted-foreground">Categoria:</span> {selected.categoria}</p>
-                      <p><span className="text-muted-foreground">Descrizione:</span> {selected.descrizione}</p>
-                      {selected.risposta_admin && (
-                        <div className="p-3 bg-primary/5 rounded-lg border border-primary/20">
-                          <p className="text-xs font-medium text-primary mb-1">Risposta admin</p>
-                          <p className="text-sm">{selected.risposta_admin}</p>
-                        </div>
-                      )}
-                    </div>
-                    {selected.stato !== "risolto" && (
-                      <>
-                        <Textarea placeholder="Scrivi una risposta..." value={risposta} onChange={(e) => setRisposta(e.target.value)} />
-                        <div className="flex gap-2">
-                          <Button size="sm" onClick={handleRispondi} disabled={!risposta.trim()}>Rispondi</Button>
-                          <Button size="sm" variant="outline" onClick={handleChiudi}>Chiudi ticket</Button>
-                        </div>
-                      </>
-                    )}
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ) : (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                <Card className="p-6 text-center text-muted-foreground">Seleziona un ticket per vedere i dettagli</Card>
-              </motion.div>
-            )}
-          </AnimatePresence>
+  const detailPanel = selected && (
+    <div className="flex flex-col h-full">
+      {/* Header */}
+      <div className="border-b p-4 shrink-0 space-y-3">
+        <div className="flex items-start gap-3">
+          <Avatar className="h-10 w-10 shrink-0">
+            {studentProfile?.avatar && <AvatarImage src={studentProfile.avatar} alt={selected.student_nome} />}
+            <AvatarFallback>{selected.student_nome[0]}</AvatarFallback>
+          </Avatar>
+          <div className="flex-1 min-w-0">
+            <h3 className="font-semibold text-sm truncate">{selected.titolo}</h3>
+            <p className="text-xs text-muted-foreground truncate">{selected.student_nome} · {studentProfile?.camera_id || "—"}</p>
+          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0"><MoreVertical className="h-4 w-4" /></Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Cambia stato</DropdownMenuLabel>
+              <DropdownMenuItem onClick={() => handleChangeStato("aperto")}>Aperto</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleChangeStato("in_corso")}>In corso</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleChangeStato("risolto")}>Risolto</DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuLabel>Cambia priorità</DropdownMenuLabel>
+              <DropdownMenuItem onClick={() => handleChangePrio("urgente")}>Urgente</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleChangePrio("alta")}>Alta</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleChangePrio("normale")}>Normale</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleChangePrio("bassa")}>Bassa</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          {isMobile && (
+            <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" onClick={() => setSelectedId(null)}>
+              <X className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
+        <div className="flex flex-wrap gap-1.5">
+          <Badge variant="outline" className={cn("text-xs", statoColors[selected.stato])}>{statoLabel[selected.stato]}</Badge>
+          <Badge variant="outline" className={cn("text-xs capitalize", prioritaColors[selected.priorita])}>Priorità {selected.priorita}</Badge>
+          <Badge variant="outline" className="text-xs capitalize">{selected.categoria}</Badge>
+          {selected.rating && (
+            <Badge variant="outline" className="text-xs bg-yellow-50 text-yellow-700 border-yellow-200">★ {selected.rating}/5</Badge>
+          )}
         </div>
       </div>
+
+      {/* Messages */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-muted/20">
+        <AnimatePresence initial={false}>
+          {selected.messages.map((m) => {
+            const mine = m.author === "admin";
+            return (
+              <motion.div
+                key={m.id}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                className={cn("flex gap-2", mine ? "justify-end" : "justify-start")}
+              >
+                {!mine && (
+                  <Avatar className="h-7 w-7 shrink-0">
+                    {studentProfile?.avatar && <AvatarImage src={studentProfile.avatar} alt={m.authorName} />}
+                    <AvatarFallback className="text-[10px]">{m.authorName[0]}</AvatarFallback>
+                  </Avatar>
+                )}
+                <div className={cn("max-w-[80%] rounded-2xl px-3 py-2 text-sm",
+                  mine ? "bg-primary text-primary-foreground rounded-br-sm" : "bg-background border rounded-bl-sm")}>
+                  <p className="whitespace-pre-wrap break-words">{m.text}</p>
+                  <p className={cn("text-[10px] mt-1", mine ? "text-primary-foreground/70" : "text-muted-foreground")}>
+                    {m.authorName} · {relTime(m.createdAt)}
+                  </p>
+                </div>
+                {mine && (
+                  <Avatar className="h-7 w-7 shrink-0">
+                    <AvatarFallback className="text-[10px] bg-green-100 text-green-700">S</AvatarFallback>
+                  </Avatar>
+                )}
+              </motion.div>
+            );
+          })}
+        </AnimatePresence>
+        <div ref={messagesEndRef} />
+      </div>
+
+      {/* Composer */}
+      <div className="border-t p-3 shrink-0 bg-background space-y-2">
+        <div className="flex items-center justify-between gap-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="text-xs">
+                <Zap className="h-3.5 w-3.5 mr-1" /> Risposte rapide
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="max-w-xs">
+              {quickReplies.map((q, i) => (
+                <DropdownMenuItem key={i} onClick={() => setReply(q)} className="text-xs whitespace-normal cursor-pointer">
+                  {q}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+          {selected.stato !== "risolto" && (
+            <Button variant="outline" size="sm" className="text-xs" onClick={() => handleChangeStato("risolto")}>
+              <CheckCircle2 className="h-3.5 w-3.5 mr-1" /> Chiudi
+            </Button>
+          )}
+        </div>
+        <div className="flex gap-2 items-end">
+          <Textarea
+            placeholder="Scrivi una risposta..."
+            rows={1}
+            value={reply}
+            onChange={(e) => setReply(e.target.value)}
+            onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
+            className="min-h-[40px] max-h-32 resize-none"
+          />
+          <Button size="icon" onClick={handleSend} disabled={!reply.trim()} className="shrink-0">
+            <Send className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+
+  return (
+    <PageTransition className="p-4 md:p-6 space-y-4 md:space-y-6">
+      <FadeIn>
+        <div>
+          <h1 className="font-heading text-xl md:text-2xl font-bold">Supporto</h1>
+          <p className="text-sm text-muted-foreground">Gestisci i ticket degli studenti</p>
+        </div>
+      </FadeIn>
+
+      {/* Stats */}
+      <FadeIn delay={0.05}>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-3">
+          <StatCard icon={<Inbox className="h-4 w-4" />} label="Aperti" value={stats.aperti} tone="blue" />
+          <StatCard icon={<Clock className="h-4 w-4" />} label="In corso" value={stats.in_corso} tone="yellow" />
+          <StatCard icon={<CheckCircle2 className="h-4 w-4" />} label="Risolti oggi" value={stats.risolti_oggi} tone="green" />
+          <StatCard icon={<Timer className="h-4 w-4" />} label="Tempo medio" value={stats.tempo_medio} tone="muted" />
+        </div>
+      </FadeIn>
+
+      {/* Toolbar */}
+      <FadeIn delay={0.08}>
+        <Card>
+          <CardContent className="p-3 flex flex-col gap-2 lg:flex-row lg:items-center lg:gap-2">
+            <div className="relative flex-1 min-w-[200px]">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input placeholder="Cerca ticket o studente..." className="pl-9 h-9" value={search} onChange={(e) => setSearch(e.target.value)} />
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <Select value={fStato} onValueChange={setFStato}>
+                <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="Stato" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Tutti gli stati</SelectItem>
+                  <SelectItem value="aperto">Aperto</SelectItem>
+                  <SelectItem value="in_corso">In corso</SelectItem>
+                  <SelectItem value="risolto">Risolto</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={fPrio} onValueChange={setFPrio}>
+                <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="Priorità" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Tutte priorità</SelectItem>
+                  <SelectItem value="urgente">Urgente</SelectItem>
+                  <SelectItem value="alta">Alta</SelectItem>
+                  <SelectItem value="normale">Normale</SelectItem>
+                  <SelectItem value="bassa">Bassa</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={fCat} onValueChange={setFCat}>
+                <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="Categoria" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Tutte categorie</SelectItem>
+                  <SelectItem value="manutenzione">Manutenzione</SelectItem>
+                  <SelectItem value="wifi">Wi-Fi</SelectItem>
+                  <SelectItem value="pulizie">Pulizie</SelectItem>
+                  <SelectItem value="altro">Altro</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={sort} onValueChange={(v) => setSort(v as SortKey)}>
+                <SelectTrigger className="h-9 text-xs"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="recenti">Più recenti</SelectItem>
+                  <SelectItem value="vecchi">Più vecchi</SelectItem>
+                  <SelectItem value="priorita">Per priorità</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </CardContent>
+        </Card>
+      </FadeIn>
+
+      {/* List + detail */}
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+        {/* List */}
+        <div className="lg:col-span-2 space-y-2">
+          {filtered.length === 0 ? (
+            <Card className="p-8 text-center text-muted-foreground">
+              <Inbox className="h-8 w-8 mx-auto mb-2 opacity-50" />
+              Nessun ticket trovato
+            </Card>
+          ) : (
+            filtered.map((t) => {
+              const last = t.messages[t.messages.length - 1];
+              const profile = mockProfiles.find((p) => p.id === t.student_id);
+              return (
+                <motion.div key={t.id} whileHover={{ scale: 1.005 }} whileTap={{ scale: 0.995 }}>
+                  <Card
+                    className={cn(
+                      "cursor-pointer transition-all overflow-hidden",
+                      selectedId === t.id && !isMobile ? "ring-2 ring-primary" : "hover:bg-muted/30",
+                      t.unreadForAdmin && "border-primary/40"
+                    )}
+                    onClick={() => setSelectedId(t.id)}
+                  >
+                    <div className="flex">
+                      <div className={cn("w-1 shrink-0", prioritaBar[t.priorita])} />
+                      <CardContent className="p-3 flex-1 min-w-0">
+                        <div className="flex items-start gap-2">
+                          <Avatar className="h-8 w-8 shrink-0">
+                            {profile?.avatar && <AvatarImage src={profile.avatar} alt={t.student_nome} />}
+                            <AvatarFallback className="text-xs">{t.student_nome[0]}</AvatarFallback>
+                          </Avatar>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-start justify-between gap-2">
+                              <p className={cn("text-sm truncate", t.unreadForAdmin ? "font-semibold" : "font-medium")}>{t.titolo}</p>
+                              {t.unreadForAdmin && <span className="mt-1.5 h-2 w-2 rounded-full bg-primary shrink-0" />}
+                            </div>
+                            <p className="text-xs text-muted-foreground truncate">{t.student_nome}</p>
+                            {last && (
+                              <p className="text-xs text-muted-foreground line-clamp-1 mt-1">
+                                <span className="font-medium">{last.author === "admin" ? "Tu" : "Studente"}:</span> {last.text}
+                              </p>
+                            )}
+                            <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
+                              <Badge variant="outline" className={cn("text-[10px] px-1.5 py-0", statoColors[t.stato])}>{statoLabel[t.stato]}</Badge>
+                              <Badge variant="outline" className={cn("text-[10px] px-1.5 py-0 capitalize", prioritaColors[t.priorita])}>{t.priorita}</Badge>
+                              <span className="text-[10px] text-muted-foreground ml-auto">{relTime(t.updatedAt || t.created_at)}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </div>
+                  </Card>
+                </motion.div>
+              );
+            })
+          )}
+        </div>
+
+        {/* Detail desktop */}
+        {!isMobile && (
+          <div className="lg:col-span-3">
+            <Card className="sticky top-6 h-[calc(100vh-10rem)] overflow-hidden">
+              {selected ? detailPanel : (
+                <div className="h-full flex flex-col items-center justify-center text-muted-foreground p-8 text-center">
+                  <MessageSquare className="h-12 w-12 mb-3 opacity-30" />
+                  <p className="text-sm">Seleziona un ticket per vedere la conversazione</p>
+                </div>
+              )}
+            </Card>
+          </div>
+        )}
+      </div>
+
+      {/* Detail mobile dialog */}
+      {isMobile && (
+        <Dialog open={!!selected} onOpenChange={(o) => !o && setSelectedId(null)}>
+          <DialogContent className="max-w-none w-screen h-[100dvh] p-0 gap-0 rounded-none sm:rounded-none">
+            {detailPanel}
+          </DialogContent>
+        </Dialog>
+      )}
     </PageTransition>
+  );
+}
+
+function StatCard({ icon, label, value, tone }: { icon: React.ReactNode; label: string; value: number | string; tone: "blue" | "yellow" | "green" | "muted" }) {
+  const tones = {
+    blue: "bg-blue-50 text-blue-700 border-blue-100",
+    yellow: "bg-yellow-50 text-yellow-700 border-yellow-100",
+    green: "bg-green-50 text-green-700 border-green-100",
+    muted: "bg-muted/50 text-foreground border-border",
+  };
+  return (
+    <Card className={cn("border", tones[tone])}>
+      <CardContent className="p-3 md:p-4">
+        <div className="flex items-center gap-2 text-xs md:text-sm font-medium">{icon}<span>{label}</span></div>
+        <p className="text-xl md:text-2xl font-bold mt-1">{value}</p>
+      </CardContent>
+    </Card>
   );
 }
