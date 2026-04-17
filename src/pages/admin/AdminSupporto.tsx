@@ -1,4 +1,5 @@
 import { useState, useMemo, useRef, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { formatDistanceToNow } from "date-fns";
 import { it } from "date-fns/locale";
@@ -11,9 +12,10 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuLabel, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
-import { Search, Send, Inbox, Clock, CheckCircle2, Timer, MoreVertical, Zap, X, List, Kanban, AlertTriangle, UserCheck, Plus, ArrowRight, Flag, Lock, MessageCircle } from "lucide-react";
-import { mockTickets as initialTickets, mockProfiles, mockOperatori, type SupportTicket, type TicketMessage, type TicketActivity } from "@/data/mockData";
+import { Search, Send, Inbox, Clock, CheckCircle2, Timer, MoreVertical, Zap, X, List, Kanban, AlertTriangle, UserCheck, Plus, ArrowRight, Flag, Lock, MessageCircle, Phone, Mail, BedDouble, Calendar, ChevronDown, ExternalLink, User as UserIcon } from "lucide-react";
+import { mockTickets as initialTickets, mockProfiles, mockOperatori, mockRichieste, type SupportTicket, type TicketMessage, type TicketActivity } from "@/data/mockData";
 import { toast } from "sonner";
 import { PageTransition, FadeIn } from "@/components/motion/MotionWrappers";
 import { cn } from "@/lib/utils";
