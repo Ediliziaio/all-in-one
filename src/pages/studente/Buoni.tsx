@@ -22,9 +22,9 @@ export default function Buoni() {
   const filtered = mockBuoni.filter((b) => b.attivo && (cat === "Tutte" || b.categoria === cat));
 
   return (
-    <PageTransition className="p-6 space-y-6">
+    <PageTransition className="p-4 md:p-6 space-y-5 md:space-y-6">
       <FadeIn>
-        <h1 className="font-heading text-2xl font-bold">I tuoi vantaggi esclusivi</h1>
+        <h1 className="font-heading text-xl md:text-2xl font-bold">I tuoi vantaggi esclusivi</h1>
         <p className="text-sm text-muted-foreground">Sconti e offerte per gli studenti dello studentato</p>
       </FadeIn>
 

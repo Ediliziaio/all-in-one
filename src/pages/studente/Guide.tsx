@@ -27,9 +27,9 @@ export default function Guide() {
   );
 
   return (
-    <PageTransition className="p-6 space-y-6">
+    <PageTransition className="p-4 md:p-6 space-y-5 md:space-y-6">
       <FadeIn>
-        <h1 className="font-heading text-2xl font-bold">Le tue guide essenziali</h1>
+        <h1 className="font-heading text-xl md:text-2xl font-bold">Le tue guide essenziali</h1>
         <p className="text-sm text-muted-foreground">Tutto quello che devi sapere per sopravvivere a Padova</p>
       </FadeIn>
 
