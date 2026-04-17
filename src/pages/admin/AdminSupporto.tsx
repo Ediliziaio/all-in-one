@@ -125,6 +125,11 @@ export default function AdminSupporto() {
     if (typeof window === "undefined") return "lista";
     return (localStorage.getItem("admin_supporto_view") as "lista" | "pipeline") || "lista";
   });
+  const [onlyMine, setOnlyMine] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    return localStorage.getItem("admin_supporto_my") === "1";
+  });
+  const [onlyUrgent, setOnlyUrgent] = useState(false);
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
