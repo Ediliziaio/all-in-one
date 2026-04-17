@@ -759,11 +759,13 @@ function DraggableTicketCard({
   profile,
   onClick,
   isDragging,
+  onAssign,
 }: {
   ticket: SupportTicket;
   profile?: { avatar?: string };
   onClick: () => void;
   isDragging: boolean;
+  onAssign: (ticketId: string, op: string | undefined) => void;
 }) {
   const { attributes, listeners, setNodeRef } = useDraggable({ id: ticket.id });
   const downPos = useRef<{ x: number; y: number } | null>(null);
@@ -790,7 +792,7 @@ function DraggableTicketCard({
       onPointerUp={handlePointerUp}
       className={cn("touch-none cursor-pointer", isDragging && "opacity-30")}
     >
-      <TicketCardContent ticket={ticket} profile={profile} />
+      <TicketCardContent ticket={ticket} profile={profile} onAssign={onAssign} />
     </div>
   );
 }
@@ -798,13 +800,23 @@ function DraggableTicketCard({
 function TicketCardContent({
   ticket,
   profile,
+  onAssign,
 }: {
   ticket: SupportTicket;
   profile?: { avatar?: string };
+  onAssign?: (ticketId: string, op: string | undefined) => void;
 }) {
   const last = ticket.messages[ticket.messages.length - 1];
+  const sla = getSLA(ticket);
   return (
-    <Card className={cn("cursor-pointer hover:shadow-md transition-shadow overflow-hidden", ticket.unreadForAdmin && "border-primary/40")}>
+    <Card className={cn(
+      "cursor-pointer hover:shadow-md transition-shadow overflow-hidden relative",
+      ticket.unreadForAdmin && "border-primary/40",
+      sla.urgent && "border-red-400 ring-1 ring-red-300/60 animate-pulse"
+    )}>
+      {sla.urgent && (
+        <AlertTriangle className="absolute top-1.5 right-1.5 h-3 w-3 text-red-600 z-10" />
+      )}
       <div className="flex">
         <div className={cn("w-1 shrink-0", prioritaBar[ticket.priorita])} />
         <CardContent className="p-2.5 flex-1 min-w-0">
@@ -815,7 +827,7 @@ function TicketCardContent({
             </Avatar>
             <div className="flex-1 min-w-0">
               <div className="flex items-start justify-between gap-1">
-                <p className={cn("text-xs truncate", ticket.unreadForAdmin ? "font-semibold" : "font-medium")}>{ticket.titolo}</p>
+                <p className={cn("text-xs truncate pr-4", ticket.unreadForAdmin ? "font-semibold" : "font-medium")}>{ticket.titolo}</p>
                 {ticket.unreadForAdmin && <span className="mt-1 h-1.5 w-1.5 rounded-full bg-primary shrink-0" />}
               </div>
               <p className="text-[10px] text-muted-foreground truncate">{ticket.student_nome}</p>
@@ -827,7 +839,48 @@ function TicketCardContent({
               <div className="flex items-center gap-1 mt-1.5 flex-wrap">
                 <Badge variant="outline" className={cn("text-[9px] px-1 py-0 capitalize h-4", prioritaColors[ticket.priorita])}>{ticket.priorita}</Badge>
                 <Badge variant="outline" className="text-[9px] px-1 py-0 capitalize h-4">{ticket.categoria}</Badge>
-                <span className="text-[9px] text-muted-foreground ml-auto">{relTime(ticket.updatedAt || ticket.created_at)}</span>
+                <Badge variant="outline" className={cn("text-[9px] px-1 py-0 h-4 gap-0.5", slaBadgeColors[sla.color])}>
+                  <Clock className="h-2 w-2" /> {sla.label}
+                </Badge>
+              </div>
+              <div className="flex items-center gap-1 mt-1.5 justify-between">
+                {onAssign ? (
+                  <div onPointerDown={(e) => e.stopPropagation()} onClick={(e) => e.stopPropagation()}>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="sm" className="h-5 px-1 gap-1 text-[9px] font-normal">
+                          {ticket.assignedTo ? (
+                            <>
+                              <Avatar className="h-3.5 w-3.5"><AvatarFallback className="text-[7px]">{ticket.assignedTo[0]}</AvatarFallback></Avatar>
+                              <span className="truncate max-w-[80px]">{ticket.assignedTo}</span>
+                            </>
+                          ) : (
+                            <span className="text-muted-foreground">+ Assegna</span>
+                          )}
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="start">
+                        <DropdownMenuLabel>Assegna a</DropdownMenuLabel>
+                        {mockOperatori.map((op) => (
+                          <DropdownMenuItem key={op} onClick={() => onAssign(ticket.id, op)}>
+                            <Avatar className="h-5 w-5 mr-2"><AvatarFallback className="text-[9px]">{op[0]}</AvatarFallback></Avatar>
+                            {op === CURRENT_OPERATOR ? `${op} (io)` : op}
+                          </DropdownMenuItem>
+                        ))}
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={() => onAssign(ticket.id, undefined)} className="text-muted-foreground">
+                          Rimuovi
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                ) : ticket.assignedTo ? (
+                  <div className="flex items-center gap-1 text-[9px] text-muted-foreground">
+                    <Avatar className="h-3.5 w-3.5"><AvatarFallback className="text-[7px]">{ticket.assignedTo[0]}</AvatarFallback></Avatar>
+                    <span className="truncate max-w-[80px]">{ticket.assignedTo}</span>
+                  </div>
+                ) : <span />}
+                <span className="text-[9px] text-muted-foreground">{relTime(ticket.updatedAt || ticket.created_at)}</span>
               </div>
             </div>
           </div>
