@@ -600,7 +600,7 @@ function StudentDetail({ data }: { data: Enriched }) {
 
       {/* Tabs */}
       <Tabs defaultValue="anagrafica" className="flex-1 min-h-0 flex flex-col mt-4">
-        <TabsList className="grid grid-cols-4 w-full">
+        <TabsList className="grid grid-cols-5 w-full">
           <TabsTrigger value="anagrafica">Anagrafica</TabsTrigger>
           <TabsTrigger value="camera">Camera</TabsTrigger>
           <TabsTrigger value="pagamenti">
@@ -609,6 +609,7 @@ function StudentDetail({ data }: { data: Enriched }) {
           <TabsTrigger value="ticket">
             Ticket{tickets.length > 0 && ` (${tickets.length})`}
           </TabsTrigger>
+          <TabsTrigger value="timeline">Timeline</TabsTrigger>
         </TabsList>
 
         <ScrollArea className="flex-1 mt-3 pr-3">
