@@ -1,54 +1,42 @@
 
 
-# Migliora area /admin/studenti
+# Export CSV + Timeline studente
 
-## Stato attuale
-Lista piatta con avatar, nome, email, corso, anno, badge "Assegnato" e dialog dettaglio basico (corso, anno, piano, camera, bio, interessi). Non c'è ricerca, filtri, contesto contratto/pagamenti/ticket, né azioni rapide.
+## 1. Export CSV (toolbar)
 
-## Cosa miglioro
+**Bottone "Esporta CSV"** accanto al toggle vista nella toolbar. Esporta la lista **filtrata corrente** (rispetta ricerca, filtro tabs, ordinamento).
 
-### 1. Header con KPI
-4 card statistiche in alto:
-- Totale studenti
-- Con camera assegnata
-- Senza assegnazione
-- Ticket aperti collegati a studenti
+**Colonne**: Nome, Cognome, Email, Corso, Anno, Camera, Piano, Telefono, Stato pagamento (Regolare / In ritardo / Nessun pagamento).
 
-### 2. Toolbar
-- **Ricerca** per nome, cognome, email, corso (input con icona Search)
-- **Filtri**: tutti / assegnati / non assegnati (Tabs)
-- **Vista**: griglia card vs lista compatta (toggle icone)
-- **Ordinamento**: nome A-Z, anno, data assegnazione
+**Implementazione**:
+- Funzione `exportCSV(rows)` che costruisce stringa CSV (header + righe), escape virgolette/virgole, `Blob` + `URL.createObjectURL` + link `download="studenti-YYYY-MM-DD.csv"`.
+- Toast di conferma con `useToast`.
+- Icona `Download` da lucide.
 
-### 3. Lista/griglia migliorata
-Card studente con:
-- Avatar grande, nome, corso/anno
-- Badge stato camera (Assegnato verde / Non assegnato grigio)
-- Riga info compatta: camera + piano (se assegnato), telefono (da `mockRichieste`)
-- Mini-badge: ticket aperti ("2 ticket"), pagamenti scaduti ("⚠ in ritardo")
-- Click ovunque sulla card → apre popup dettaglio (più cliccabile della tabella attuale)
+## 2. Tab "Timeline" nel popup
 
-### 4. Popup dettaglio arricchito (Dialog più grande)
-Layout a 2 colonne con tabs:
-- **Header**: avatar grande, nome, contatti cliccabili (`tel:`, `mailto:`), badge stato, bottone "Vai al ticket" / "Crea ticket"
-- **Tab Anagrafica**: corso, anno, città provenienza, età, instagram, bio, interessi (dati esistenti + da `mockRichieste`)
-- **Tab Camera & Contratto**: camera assegnata + piano, date contratto inizio→fine, badge stato, link a `/admin/contratti`
-- **Tab Pagamenti**: ultimi pagamenti (mock condiviso), badge pagato/scaduto, totale incassato
-- **Tab Ticket**: ticket di supporto dello studente (filtra `mockTickets` per `student_id`), click → link a `/admin/supporto`
+**Quinto tab** `Timeline` nel `Tabs` del `StudentDetail` (dopo Ticket).
 
-### 5. Microinterazioni
-- Hover card: leggero shadow + scale
-- Empty state per ricerca senza risultati
-- Stagger animation conservato
+**Eventi unificati** (ordinati per data desc):
+- **Pagamenti** → `CreditCard` blu, "Pagamento {mese} — €{importo}" + badge stato
+- **Ticket** → `Headphones` arancio, "Ticket: {titolo}" + badge categoria
+- **Cambio camera / contratto** → `BedDouble` viola, "Assegnata camera {nome}" (da `richiesta.created_at` con stato approvata)
+- **CRM / richiesta iniziale** → `Sparkles` verde, "Richiesta inviata via {fonte}" (da `richiesta.created_at`)
+- **Registrazione profilo** → `UserPlus` grigio, "Profilo creato" (da `s.created_at` se esiste, fallback `richiesta.created_at`)
 
-## File modificati
-**Solo** `src/pages/admin/AdminStudenti.tsx` (1 file).
-Tutti i dati esistono già: `mockProfiles`, `mockRichieste`, `mockTickets`, `mockPagamenti`, `mockRooms` (per nome camera). Nessuna modifica a `mockData.ts`.
+**Layout timeline**:
+- Linea verticale grigia a sinistra, pallino colorato per tipo
+- Card compatta `bg-muted/30` con titolo, descrizione, data formattata + tempo relativo
+- Empty state se nessun evento
+
+**Helper**: funzione `buildTimeline(data)` pura che ritorna `Event[]` ordinati. Nessuna nuova dipendenza, nessuna modifica a `mockData.ts`.
+
+## File modificato (1)
+`src/pages/admin/AdminStudenti.tsx` — bottone export in toolbar, funzione CSV, nuovo tab Timeline + componente `StudentTimeline`.
 
 ## Tecnica
-- Riuso `Card`, `Tabs`, `Dialog`, `Badge`, `Input`, `Button`, `Avatar`, `ScrollArea`
-- Icone `lucide-react`: Search, Users, Home, AlertCircle, Phone, Mail, Calendar, BedDouble, FileText, Headphones, Grid, List, ExternalLink
-- Derivazioni memoizzate: per ogni studente calcolo ticket aperti, contratto attivo, telefono, pagamenti
-- Link da popup verso `/admin/contratti`, `/admin/supporto`, `/admin/camere` per navigazione cross-area
-- Nessuna nuova dipendenza
+- Riuso `Button`, `Tabs`, `Card`, `Badge`, icone lucide (`Download`, `Sparkles`, `UserPlus`, già: `CreditCard`, `Headphones`, `BedDouble`)
+- `useToast` da `@/hooks/use-toast`
+- CSV BOM `\uFEFF` iniziale per compat Excel italiano
+- Tempo relativo: helper inline (es. "3 giorni fa")
 
