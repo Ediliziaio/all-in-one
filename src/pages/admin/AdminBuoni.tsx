@@ -219,7 +219,26 @@ export default function AdminBuoni() {
         </div>
       </FadeIn>
 
-      {/* Toolbar */}
+      {/* Top usi chart */}
+      <FadeIn delay={0.07}>
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <BarChart3 className="h-4 w-4 text-primary" />
+              <p className="text-sm font-medium">Top 5 buoni più utilizzati</p>
+            </div>
+            <ChartContainer config={{ usi: { label: "Utilizzi", color: "hsl(var(--primary))" } }} className="h-[180px] w-full">
+              <BarChart data={topUsi} layout="vertical" margin={{ left: 0, right: 12 }}>
+                <XAxis type="number" hide />
+                <YAxis dataKey="name" type="category" tickLine={false} axisLine={false} width={130} tick={{ fontSize: 11 }} />
+                <ChartTooltip content={<ChartTooltipContent />} />
+                <Bar dataKey="usi" fill="var(--color-usi)" radius={[0, 4, 4, 0]} />
+              </BarChart>
+            </ChartContainer>
+          </CardContent>
+        </Card>
+      </FadeIn>
+
       <FadeIn delay={0.1}>
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
