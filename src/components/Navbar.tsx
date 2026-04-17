@@ -22,12 +22,12 @@ export function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 glass">
-      <div className="container flex h-16 items-center justify-between">
+      <div className="container flex h-20 items-center justify-between">
         <Link to="/" className="flex items-center gap-2">
           <img
             src={logoNapoleone}
             alt="Studentato Napoleone Padova"
-            className="h-10 w-auto"
+            className="h-14 w-auto"
           />
         </Link>
 

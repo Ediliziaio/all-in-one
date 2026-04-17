@@ -13,7 +13,7 @@ export function Footer() {
               <img
                 src={logoNapoleone}
                 alt="Studentato Napoleone Padova"
-                className="h-12 w-auto"
+                className="h-16 w-auto"
               />
             </div>
             <p className="text-sm text-primary-foreground/70">
