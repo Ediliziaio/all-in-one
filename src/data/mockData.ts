@@ -457,6 +457,10 @@ export const mockRichieste: RichiestaAffitto[] = [
 export const mockPrenotazioni = mockRichieste;
 
 // --- SUPPORT TICKETS ---
+// Helper: timestamps relative to "now" so SLA badges stay realistic
+const _now = Date.now();
+const _hAgo = (h: number) => new Date(_now - h * 3600 * 1000).toISOString();
+
 export const mockTickets: SupportTicket[] = [
   {
     id: "t1",
@@ -467,8 +471,9 @@ export const mockTickets: SupportTicket[] = [
     categoria: "wifi",
     priorita: "alta",
     stato: "aperto",
-    created_at: "2025-06-05T09:00:00",
-    updatedAt: "2025-06-05T09:00:00",
+    created_at: _hAgo(30),
+    updatedAt: _hAgo(30),
+    assignedTo: "Giulia Marchetti",
     unreadForAdmin: true,
     messages: [
       {
@@ -476,7 +481,7 @@ export const mockTickets: SupportTicket[] = [
         author: "studente",
         authorName: "Marco Rossi",
         text: "Da due giorni il WiFi nella mia stanza è molto lento, soprattutto la sera. Non riesco a seguire le lezioni online.",
-        createdAt: "2025-06-05T09:00:00",
+        createdAt: _hAgo(30),
       },
     ],
   },
