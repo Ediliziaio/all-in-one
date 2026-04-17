@@ -1,4 +1,5 @@
 import { useState, useMemo, useRef, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { formatDistanceToNow } from "date-fns";
 import { it } from "date-fns/locale";
@@ -11,9 +12,10 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuLabel, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
-import { Search, Send, Inbox, Clock, CheckCircle2, Timer, MoreVertical, Zap, X, List, Kanban, AlertTriangle, UserCheck, Plus, ArrowRight, Flag, Lock, MessageCircle } from "lucide-react";
-import { mockTickets as initialTickets, mockProfiles, mockOperatori, type SupportTicket, type TicketMessage, type TicketActivity } from "@/data/mockData";
+import { Search, Send, Inbox, Clock, CheckCircle2, Timer, MoreVertical, Zap, X, List, Kanban, AlertTriangle, UserCheck, Plus, ArrowRight, Flag, Lock, MessageCircle, Phone, Mail, BedDouble, Calendar, ChevronDown, ExternalLink, User as UserIcon } from "lucide-react";
+import { mockTickets as initialTickets, mockProfiles, mockOperatori, mockRichieste, type SupportTicket, type TicketMessage, type TicketActivity } from "@/data/mockData";
 import { toast } from "sonner";
 import { PageTransition, FadeIn } from "@/components/motion/MotionWrappers";
 import { cn } from "@/lib/utils";
@@ -304,6 +306,29 @@ export default function AdminSupporto() {
   const draggingTicket = draggingId ? tickets.find((t) => t.id === draggingId) || null : null;
 
   const studentProfile = selected ? mockProfiles.find((p) => p.id === selected.student_id) : null;
+  const studentContract = selected
+    ? mockRichieste.find((r) => r.student_id === selected.student_id && r.stato === "approvata")
+    : null;
+  const studentPhone = studentContract?.telefono
+    || (selected ? mockRichieste.find((r) => r.student_id === selected.student_id)?.telefono : undefined);
+
+  const fmtDate = (iso?: string) => {
+    if (!iso) return "—";
+    try {
+      return new Date(iso).toLocaleDateString("it-IT", { day: "2-digit", month: "2-digit", year: "2-digit" });
+    } catch {
+      return iso;
+    }
+  };
+
+  const cameraLabel = (() => {
+    if (!studentProfile?.camera_id) return "—";
+    const parts = studentProfile.camera_id.split("-");
+    const num = parts[parts.length - 1];
+    const tipo = parts.slice(0, -1).join(" ");
+    const cap = tipo.charAt(0).toUpperCase() + tipo.slice(1);
+    return studentProfile.piano ? `${cap} ${num} · Piano ${studentProfile.piano}` : `${cap} ${num}`;
+  })();
 
   const detailPanel = selected && (
     <div className="flex flex-col h-full">
@@ -400,7 +425,96 @@ export default function AdminSupporto() {
         </div>
       </div>
 
-      {/* Tabs: Conversazione / Cronologia */}
+      {/* Pannello info studente */}
+      <div className="border-b shrink-0 bg-muted/30">
+        <Collapsible defaultOpen={!isMobile}>
+          <CollapsibleTrigger className="w-full flex items-center justify-between px-4 py-2 text-xs font-medium hover:bg-muted/50 transition-colors group">
+            <div className="flex items-center gap-2">
+              <UserIcon className="h-3.5 w-3.5 text-muted-foreground" />
+              <span>Info studente</span>
+              <Avatar className="h-5 w-5">
+                {studentProfile?.avatar && <AvatarImage src={studentProfile.avatar} alt={selected.student_nome} />}
+                <AvatarFallback className="text-[9px]">{selected.student_nome[0]}</AvatarFallback>
+              </Avatar>
+              <span className="text-muted-foreground font-normal truncate max-w-[180px]">
+                {selected.student_nome}
+                {studentProfile?.corso && ` · ${studentProfile.corso}${studentProfile.anno ? ` (${studentProfile.anno}° anno)` : ""}`}
+              </span>
+            </div>
+            <ChevronDown className="h-3.5 w-3.5 text-muted-foreground transition-transform group-data-[state=open]:rotate-180" />
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <div className="px-4 pb-3 pt-1 space-y-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {/* Camera */}
+                <div className="flex items-start gap-2 p-2 rounded-md bg-background border">
+                  <BedDouble className="h-3.5 w-3.5 text-muted-foreground mt-0.5 shrink-0" />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Camera</p>
+                    <p className="text-xs font-medium truncate">{cameraLabel}</p>
+                  </div>
+                </div>
+                {/* Contratto */}
+                <div className="flex items-start gap-2 p-2 rounded-md bg-background border">
+                  <Calendar className="h-3.5 w-3.5 text-muted-foreground mt-0.5 shrink-0" />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[10px] uppercase tracking-wide text-muted-foreground flex items-center gap-1.5">
+                      Contratto
+                      {studentContract && (
+                        <Badge variant="outline" className="text-[9px] px-1 py-0 h-3.5 bg-green-100 text-green-700 border-green-200">Attivo</Badge>
+                      )}
+                    </p>
+                    <p className="text-xs font-medium">
+                      {studentContract ? `${fmtDate(studentContract.data_inizio)} → ${fmtDate(studentContract.data_fine)}` : "—"}
+                    </p>
+                  </div>
+                  {studentContract && (
+                    <Link to="/admin/contratti" className="text-[10px] text-primary hover:underline shrink-0 mt-0.5">
+                      Documenti
+                    </Link>
+                  )}
+                </div>
+                {/* Telefono */}
+                <div className="flex items-start gap-2 p-2 rounded-md bg-background border">
+                  <Phone className="h-3.5 w-3.5 text-muted-foreground mt-0.5 shrink-0" />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Telefono</p>
+                    {studentPhone ? (
+                      <a href={`tel:${studentPhone.replace(/\s+/g, "")}`} className="text-xs font-medium text-primary hover:underline truncate block">
+                        {studentPhone}
+                      </a>
+                    ) : (
+                      <p className="text-xs font-medium">—</p>
+                    )}
+                  </div>
+                </div>
+                {/* Email */}
+                <div className="flex items-start gap-2 p-2 rounded-md bg-background border">
+                  <Mail className="h-3.5 w-3.5 text-muted-foreground mt-0.5 shrink-0" />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Email</p>
+                    {studentProfile?.email ? (
+                      <a href={`mailto:${studentProfile.email}`} className="text-xs font-medium text-primary hover:underline truncate block">
+                        {studentProfile.email}
+                      </a>
+                    ) : (
+                      <p className="text-xs font-medium">—</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+              <Button asChild variant="outline" size="sm" className="w-full text-xs h-8">
+                <Link to="/admin/studenti">
+                  <ExternalLink className="h-3.5 w-3.5 mr-1.5" />
+                  Vedi profilo completo
+                </Link>
+              </Button>
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
+      </div>
+
+
       <Tabs defaultValue="chat" className="flex-1 flex flex-col min-h-0">
         <TabsList className="mx-4 mt-3 self-start">
           <TabsTrigger value="chat" className="text-xs gap-1.5"><MessageCircle className="h-3.5 w-3.5" /> Conversazione</TabsTrigger>
