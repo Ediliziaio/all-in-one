@@ -81,6 +81,33 @@ function relTime(iso: string) {
   }
 }
 
+const CURRENT_OPERATOR = "Giulia Marchetti";
+
+type SLAColor = "green" | "yellow" | "red";
+
+function getSLA(ticket: SupportTicket): { color: SLAColor; label: string; hours: number; urgent: boolean; needsReply: boolean } {
+  const last = ticket.messages[ticket.messages.length - 1];
+  const lastStudentMsg = [...ticket.messages].reverse().find((m) => m.author === "studente");
+  const refIso = lastStudentMsg?.createdAt || last?.createdAt || ticket.updatedAt || ticket.created_at;
+  const hours = (Date.now() - new Date(refIso).getTime()) / 3600_000;
+  const needsReply = ticket.stato !== "risolto" && !!last && last.author === "studente";
+  let color: SLAColor = "green";
+  if (hours >= 24) color = "red";
+  else if (hours >= 2) color = "yellow";
+  let label: string;
+  if (hours < 1) label = `${Math.max(1, Math.round(hours * 60))}m`;
+  else if (hours < 24) label = `${Math.round(hours)}h`;
+  else label = `${Math.round(hours / 24)}g`;
+  const urgent = ticket.priorita === "urgente" && needsReply && hours >= 2 && ticket.stato !== "risolto";
+  return { color, label, hours, urgent, needsReply };
+}
+
+const slaBadgeColors: Record<SLAColor, string> = {
+  green: "bg-green-100 text-green-700 border-green-200",
+  yellow: "bg-yellow-100 text-yellow-700 border-yellow-200",
+  red: "bg-red-100 text-red-700 border-red-200",
+};
+
 type SortKey = "recenti" | "vecchi" | "priorita";
 
 const priorityOrder: Record<string, number> = { urgente: 0, alta: 1, normale: 2, bassa: 3 };
