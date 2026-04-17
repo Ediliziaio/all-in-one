@@ -590,124 +590,114 @@ export default function AdminSupporto() {
           </DndContext>
         </FadeIn>
       ) : (
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
-        {/* List */}
-        <div className="lg:col-span-2 space-y-2">
-          {filtered.length === 0 ? (
-            <Card className="p-8 text-center text-muted-foreground">
-              <Inbox className="h-8 w-8 mx-auto mb-2 opacity-50" />
-              Nessun ticket trovato
-            </Card>
-          ) : (
-            filtered.map((t) => {
-              const last = t.messages[t.messages.length - 1];
-              const profile = mockProfiles.find((p) => p.id === t.student_id);
-              const sla = getSLA(t);
-              return (
-                <motion.div key={t.id} whileHover={{ scale: 1.005 }} whileTap={{ scale: 0.995 }}>
-                  <Card
-                    className={cn(
-                      "cursor-pointer transition-all overflow-hidden relative",
-                      selectedId === t.id && !isMobile ? "ring-2 ring-primary" : "hover:bg-muted/30",
-                      t.unreadForAdmin && "border-primary/40",
-                      sla.urgent && "border-red-400 ring-1 ring-red-300/60 animate-pulse"
-                    )}
-                    onClick={() => setSelectedId(t.id)}
-                  >
-                    {sla.urgent && (
-                      <AlertTriangle className="absolute top-2 right-2 h-3.5 w-3.5 text-red-600" />
-                    )}
-                    <div className="flex">
-                      <div className={cn("w-1 shrink-0", prioritaBar[t.priorita])} />
-                      <CardContent className="p-3 flex-1 min-w-0">
-                        <div className="flex items-start gap-2">
-                          <Avatar className="h-8 w-8 shrink-0">
-                            {profile?.avatar && <AvatarImage src={profile.avatar} alt={t.student_nome} />}
-                            <AvatarFallback className="text-xs">{t.student_nome[0]}</AvatarFallback>
-                          </Avatar>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-start justify-between gap-2">
-                              <p className={cn("text-sm truncate", t.unreadForAdmin ? "font-semibold" : "font-medium")}>{t.titolo}</p>
-                              {t.unreadForAdmin && <span className="mt-1.5 h-2 w-2 rounded-full bg-primary shrink-0" />}
-                            </div>
-                            <p className="text-xs text-muted-foreground truncate">{t.student_nome}</p>
-                            {last && (
-                              <p className="text-xs text-muted-foreground line-clamp-1 mt-1">
-                                <span className="font-medium">{last.author === "admin" ? "Tu" : "Studente"}:</span> {last.text}
-                              </p>
-                            )}
-                            <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
-                              <Badge variant="outline" className={cn("text-[10px] px-1.5 py-0", statoColors[t.stato])}>{statoLabel[t.stato]}</Badge>
-                              <Badge variant="outline" className={cn("text-[10px] px-1.5 py-0 capitalize", prioritaColors[t.priorita])}>{t.priorita}</Badge>
-                              <Badge variant="outline" className={cn("text-[10px] px-1.5 py-0 gap-0.5", slaBadgeColors[sla.color])}>
-                                <Clock className="h-2.5 w-2.5" /> {sla.label}
-                              </Badge>
-                              <span className="text-[10px] text-muted-foreground ml-auto">{relTime(t.updatedAt || t.created_at)}</span>
-                            </div>
-                            <div className="flex items-center gap-1.5 mt-1.5">
-                              <div onPointerDown={(e) => e.stopPropagation()} onClick={(e) => e.stopPropagation()}>
-                                <DropdownMenu>
-                                  <DropdownMenuTrigger asChild>
-                                    <Button variant="ghost" size="sm" className="h-6 px-1.5 gap-1 text-[10px] font-normal">
-                                      {t.assignedTo ? (
-                                        <>
-                                          <Avatar className="h-4 w-4"><AvatarFallback className="text-[8px]">{t.assignedTo[0]}</AvatarFallback></Avatar>
-                                          <span className="truncate max-w-[100px]">{t.assignedTo}</span>
-                                        </>
-                                      ) : (
-                                        <span className="text-muted-foreground">+ Assegna</span>
-                                      )}
-                                    </Button>
-                                  </DropdownMenuTrigger>
-                                  <DropdownMenuContent align="start">
-                                    <DropdownMenuLabel>Assegna a</DropdownMenuLabel>
-                                    {mockOperatori.map((op) => (
-                                      <DropdownMenuItem key={op} onClick={() => handleAssign(t.id, op)}>
-                                        <Avatar className="h-5 w-5 mr-2"><AvatarFallback className="text-[9px]">{op[0]}</AvatarFallback></Avatar>
-                                        {op === CURRENT_OPERATOR ? `${op} (io)` : op}
-                                      </DropdownMenuItem>
-                                    ))}
-                                    <DropdownMenuSeparator />
-                                    <DropdownMenuItem onClick={() => handleAssign(t.id, undefined)} className="text-muted-foreground">
-                                      Rimuovi
+      <div className="space-y-2">
+        {filtered.length === 0 ? (
+          <Card className="p-8 text-center text-muted-foreground">
+            <Inbox className="h-8 w-8 mx-auto mb-2 opacity-50" />
+            Nessun ticket trovato
+          </Card>
+        ) : (
+          filtered.map((t) => {
+            const last = t.messages[t.messages.length - 1];
+            const profile = mockProfiles.find((p) => p.id === t.student_id);
+            const sla = getSLA(t);
+            return (
+              <motion.div key={t.id} whileHover={{ scale: 1.005 }} whileTap={{ scale: 0.995 }}>
+                <Card
+                  className={cn(
+                    "cursor-pointer transition-all overflow-hidden relative",
+                    "hover:bg-muted/30",
+                    t.unreadForAdmin && "border-primary/40",
+                    sla.urgent && "border-red-400 ring-1 ring-red-300/60 animate-pulse"
+                  )}
+                  onClick={() => setSelectedId(t.id)}
+                >
+                  {sla.urgent && (
+                    <AlertTriangle className="absolute top-2 right-2 h-3.5 w-3.5 text-red-600" />
+                  )}
+                  <div className="flex">
+                    <div className={cn("w-1 shrink-0", prioritaBar[t.priorita])} />
+                    <CardContent className="p-3 flex-1 min-w-0">
+                      <div className="flex items-start gap-2">
+                        <Avatar className="h-8 w-8 shrink-0">
+                          {profile?.avatar && <AvatarImage src={profile.avatar} alt={t.student_nome} />}
+                          <AvatarFallback className="text-xs">{t.student_nome[0]}</AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between gap-2">
+                            <p className={cn("text-sm truncate", t.unreadForAdmin ? "font-semibold" : "font-medium")}>{t.titolo}</p>
+                            {t.unreadForAdmin && <span className="mt-1.5 h-2 w-2 rounded-full bg-primary shrink-0" />}
+                          </div>
+                          <p className="text-xs text-muted-foreground truncate">{t.student_nome}</p>
+                          {last && (
+                            <p className="text-xs text-muted-foreground line-clamp-1 mt-1">
+                              <span className="font-medium">{last.author === "admin" ? "Tu" : "Studente"}:</span> {last.text}
+                            </p>
+                          )}
+                          <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
+                            <Badge variant="outline" className={cn("text-[10px] px-1.5 py-0", statoColors[t.stato])}>{statoLabel[t.stato]}</Badge>
+                            <Badge variant="outline" className={cn("text-[10px] px-1.5 py-0 capitalize", prioritaColors[t.priorita])}>{t.priorita}</Badge>
+                            <Badge variant="outline" className={cn("text-[10px] px-1.5 py-0 gap-0.5", slaBadgeColors[sla.color])}>
+                              <Clock className="h-2.5 w-2.5" /> {sla.label}
+                            </Badge>
+                            <span className="text-[10px] text-muted-foreground ml-auto">{relTime(t.updatedAt || t.created_at)}</span>
+                          </div>
+                          <div className="flex items-center gap-1.5 mt-1.5">
+                            <div onPointerDown={(e) => e.stopPropagation()} onClick={(e) => e.stopPropagation()}>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" size="sm" className="h-6 px-1.5 gap-1 text-[10px] font-normal">
+                                    {t.assignedTo ? (
+                                      <>
+                                        <Avatar className="h-4 w-4"><AvatarFallback className="text-[8px]">{t.assignedTo[0]}</AvatarFallback></Avatar>
+                                        <span className="truncate max-w-[100px]">{t.assignedTo}</span>
+                                      </>
+                                    ) : (
+                                      <span className="text-muted-foreground">+ Assegna</span>
+                                    )}
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="start">
+                                  <DropdownMenuLabel>Assegna a</DropdownMenuLabel>
+                                  {mockOperatori.map((op) => (
+                                    <DropdownMenuItem key={op} onClick={() => handleAssign(t.id, op)}>
+                                      <Avatar className="h-5 w-5 mr-2"><AvatarFallback className="text-[9px]">{op[0]}</AvatarFallback></Avatar>
+                                      {op === CURRENT_OPERATOR ? `${op} (io)` : op}
                                     </DropdownMenuItem>
-                                  </DropdownMenuContent>
-                                </DropdownMenu>
-                              </div>
+                                  ))}
+                                  <DropdownMenuSeparator />
+                                  <DropdownMenuItem onClick={() => handleAssign(t.id, undefined)} className="text-muted-foreground">
+                                    Rimuovi
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
                             </div>
                           </div>
                         </div>
-                      </CardContent>
-                    </div>
-                  </Card>
-                </motion.div>
-              );
-            })
-          )}
-        </div>
-
-        {/* Detail desktop */}
-        {!isMobile && (
-          <div className="lg:col-span-3">
-            <Card className="sticky top-6 h-[calc(100vh-10rem)] overflow-hidden">
-              {selected ? detailPanel : (
-                <div className="h-full flex flex-col items-center justify-center text-muted-foreground p-8 text-center">
-                  <MessageSquare className="h-12 w-12 mb-3 opacity-30" />
-                  <p className="text-sm">Seleziona un ticket per vedere la conversazione</p>
-                </div>
-              )}
-            </Card>
-          </div>
+                      </div>
+                    </CardContent>
+                  </div>
+                </Card>
+              </motion.div>
+            );
+          })
         )}
       </div>
       )}
-      {isMobile && (
-        <Dialog open={!!selected} onOpenChange={(o) => !o && setSelectedId(null)}>
-          <DialogContent className="max-w-none w-screen h-[100dvh] p-0 gap-0 rounded-none sm:rounded-none">
-            {detailPanel}
-          </DialogContent>
-        </Dialog>
-      )}
+
+      {/* Ticket detail dialog (sempre popup, desktop e mobile) */}
+      <Dialog open={!!selected} onOpenChange={(o) => !o && setSelectedId(null)}>
+        <DialogContent
+          className={cn(
+            "p-0 gap-0 overflow-hidden",
+            isMobile
+              ? "max-w-none w-screen h-[100dvh] rounded-none sm:rounded-none"
+              : "max-w-3xl w-[95vw] h-[85vh] sm:rounded-lg"
+          )}
+        >
+          {detailPanel}
+        </DialogContent>
+      </Dialog>
     </PageTransition>
   );
 }
