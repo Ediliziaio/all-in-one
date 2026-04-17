@@ -51,8 +51,18 @@ export function UrgencySection() {
   const fillPct = (takenSpots / totalSpots) * 100;
 
   return (
-    <section className="py-20 bg-foreground text-background">
-      <div className="container max-w-4xl">
+    <section className="relative py-20 text-background overflow-hidden">
+      <img
+        src={padovaBg}
+        alt=""
+        aria-hidden="true"
+        loading="lazy"
+        width={1920}
+        height={1080}
+        className="absolute inset-0 h-full w-full object-cover"
+      />
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/95 via-primary/90 to-accent/80" />
+      <div className="container max-w-4xl relative">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
