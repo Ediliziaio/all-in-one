@@ -11,12 +11,24 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuLabel, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
-import { Search, Send, MessageSquare, Inbox, Clock, CheckCircle2, Timer, MoreVertical, Zap, X } from "lucide-react";
+import { Search, Send, MessageSquare, Inbox, Clock, CheckCircle2, Timer, MoreVertical, Zap, X, List, Kanban } from "lucide-react";
 import { mockTickets as initialTickets, mockProfiles, type SupportTicket, type TicketMessage } from "@/data/mockData";
 import { toast } from "sonner";
 import { PageTransition, FadeIn } from "@/components/motion/MotionWrappers";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
+import {
+  DndContext,
+  DragEndEvent,
+  DragOverlay,
+  DragStartEvent,
+  PointerSensor,
+  TouchSensor,
+  useDraggable,
+  useDroppable,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
 
 const prioritaColors: Record<string, string> = {
   urgente: "bg-red-100 text-red-700 border-red-200",
@@ -35,14 +47,23 @@ const prioritaBar: Record<string, string> = {
 const statoColors: Record<string, string> = {
   aperto: "bg-blue-100 text-blue-700 border-blue-200",
   in_corso: "bg-yellow-100 text-yellow-700 border-yellow-200",
+  attesa_studente: "bg-violet-100 text-violet-700 border-violet-200",
   risolto: "bg-green-100 text-green-700 border-green-200",
 };
 
 const statoLabel: Record<string, string> = {
   aperto: "Aperto",
   in_corso: "In corso",
+  attesa_studente: "Attesa studente",
   risolto: "Risolto",
 };
+
+const pipelineStages: { key: SupportTicket["stato"]; label: string; dot: string; bg: string }[] = [
+  { key: "aperto", label: "Nuovo", dot: "bg-blue-500", bg: "bg-blue-50/60" },
+  { key: "in_corso", label: "In lavorazione", dot: "bg-yellow-500", bg: "bg-yellow-50/60" },
+  { key: "attesa_studente", label: "Attesa studente", dot: "bg-violet-500", bg: "bg-violet-50/60" },
+  { key: "risolto", label: "Risolto", dot: "bg-green-500", bg: "bg-green-50/60" },
+];
 
 const quickReplies = [
   "Ciao, abbiamo ricevuto la tua segnalazione e la stiamo verificando. Ti aggiorniamo a breve.",
@@ -73,8 +94,22 @@ export default function AdminSupporto() {
   const [fPrio, setFPrio] = useState<string>("all");
   const [fCat, setFCat] = useState<string>("all");
   const [sort, setSort] = useState<SortKey>("recenti");
+  const [view, setView] = useState<"lista" | "pipeline">(() => {
+    if (typeof window === "undefined") return "lista";
+    return (localStorage.getItem("admin_supporto_view") as "lista" | "pipeline") || "lista";
+  });
+  const [draggingId, setDraggingId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 150, tolerance: 5 } }),
+  );
+
+  useEffect(() => {
+    localStorage.setItem("admin_supporto_view", view);
+  }, [view]);
 
   const selected = tickets.find((t) => t.id === selectedId) || null;
 
@@ -158,6 +193,25 @@ export default function AdminSupporto() {
     setTickets((prev) => prev.map((t) => (t.id === selected.id ? { ...t, priorita } : t)));
     toast.success(`Priorità cambiata in ${priorita}`);
   };
+
+  const handleDragEnd = (e: DragEndEvent) => {
+    setDraggingId(null);
+    const ticketId = e.active.id as string;
+    const newStato = e.over?.id as SupportTicket["stato"] | undefined;
+    if (!newStato) return;
+    const ticket = tickets.find((t) => t.id === ticketId);
+    if (!ticket || ticket.stato === newStato) return;
+    setTickets((prev) =>
+      prev.map((t) =>
+        t.id === ticketId
+          ? { ...t, stato: newStato, closedAt: newStato === "risolto" ? new Date().toISOString() : t.closedAt, updatedAt: new Date().toISOString() }
+          : t,
+      ),
+    );
+    toast.success(`Ticket spostato in ${statoLabel[newStato]}`);
+  };
+
+  const draggingTicket = draggingId ? tickets.find((t) => t.id === draggingId) || null : null;
 
   const studentProfile = selected ? mockProfiles.find((p) => p.id === selected.student_id) : null;
 
@@ -311,16 +365,19 @@ export default function AdminSupporto() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input placeholder="Cerca ticket o studente..." className="pl-9 h-9" value={search} onChange={(e) => setSearch(e.target.value)} />
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-              <Select value={fStato} onValueChange={setFStato}>
-                <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="Stato" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Tutti gli stati</SelectItem>
-                  <SelectItem value="aperto">Aperto</SelectItem>
-                  <SelectItem value="in_corso">In corso</SelectItem>
-                  <SelectItem value="risolto">Risolto</SelectItem>
-                </SelectContent>
-              </Select>
+            <div className={cn("grid gap-2", view === "pipeline" ? "grid-cols-2 sm:grid-cols-3" : "grid-cols-2 sm:grid-cols-4")}>
+              {view === "lista" && (
+                <Select value={fStato} onValueChange={setFStato}>
+                  <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="Stato" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Tutti gli stati</SelectItem>
+                    <SelectItem value="aperto">Aperto</SelectItem>
+                    <SelectItem value="in_corso">In corso</SelectItem>
+                    <SelectItem value="attesa_studente">Attesa studente</SelectItem>
+                    <SelectItem value="risolto">Risolto</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
               <Select value={fPrio} onValueChange={setFPrio}>
                 <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="Priorità" /></SelectTrigger>
                 <SelectContent>
@@ -350,11 +407,73 @@ export default function AdminSupporto() {
                 </SelectContent>
               </Select>
             </div>
+            <div className="flex items-center gap-1 rounded-md border bg-background p-0.5 lg:ml-auto">
+              <Button
+                variant={view === "lista" ? "default" : "ghost"}
+                size="sm"
+                className="h-8 px-2 text-xs"
+                onClick={() => setView("lista")}
+              >
+                <List className="h-3.5 w-3.5 mr-1" /> Lista
+              </Button>
+              <Button
+                variant={view === "pipeline" ? "default" : "ghost"}
+                size="sm"
+                className="h-8 px-2 text-xs"
+                onClick={() => setView("pipeline")}
+              >
+                <Kanban className="h-3.5 w-3.5 mr-1" /> Pipeline
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </FadeIn>
 
-      {/* List + detail */}
+      {view === "pipeline" ? (
+        <FadeIn delay={0.1}>
+          <DndContext
+            sensors={sensors}
+            onDragStart={(e: DragStartEvent) => setDraggingId(e.active.id as string)}
+            onDragCancel={() => setDraggingId(null)}
+            onDragEnd={handleDragEnd}
+          >
+            <div className="flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory">
+              {pipelineStages.map((stage) => {
+                const items = filtered.filter((t) => t.stato === stage.key);
+                return (
+                  <PipelineColumn key={stage.key} stage={stage} count={items.length}>
+                    {items.length === 0 ? (
+                      <div className="text-center text-xs text-muted-foreground py-8 border border-dashed rounded-md">
+                        Nessun ticket
+                      </div>
+                    ) : (
+                      items.map((t) => (
+                        <DraggableTicketCard
+                          key={t.id}
+                          ticket={t}
+                          profile={mockProfiles.find((p) => p.id === t.student_id)}
+                          onClick={() => setSelectedId(t.id)}
+                          isDragging={draggingId === t.id}
+                        />
+                      ))
+                    )}
+                  </PipelineColumn>
+                );
+              })}
+            </div>
+            <DragOverlay dropAnimation={null}>
+              {draggingTicket && (
+                <div className="rotate-2 opacity-95">
+                  <TicketCardContent
+                    ticket={draggingTicket}
+                    profile={mockProfiles.find((p) => p.id === draggingTicket.student_id)}
+                  />
+                </div>
+              )}
+            </DragOverlay>
+          </DndContext>
+        </FadeIn>
+      ) : (
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
         {/* List */}
         <div className="lg:col-span-2 space-y-2">
@@ -426,8 +545,7 @@ export default function AdminSupporto() {
           </div>
         )}
       </div>
-
-      {/* Detail mobile dialog */}
+      )}
       {isMobile && (
         <Dialog open={!!selected} onOpenChange={(o) => !o && setSelectedId(null)}>
           <DialogContent className="max-w-none w-screen h-[100dvh] p-0 gap-0 rounded-none sm:rounded-none">
@@ -452,6 +570,98 @@ function StatCard({ icon, label, value, tone }: { icon: React.ReactNode; label: 
         <div className="flex items-center gap-2 text-xs md:text-sm font-medium">{icon}<span>{label}</span></div>
         <p className="text-xl md:text-2xl font-bold mt-1">{value}</p>
       </CardContent>
+    </Card>
+  );
+}
+
+type PipelineStage = { key: SupportTicket["stato"]; label: string; dot: string; bg: string };
+
+function PipelineColumn({ stage, count, children }: { stage: PipelineStage; count: number; children: React.ReactNode }) {
+  const { setNodeRef, isOver } = useDroppable({ id: stage.key });
+  return (
+    <div
+      ref={setNodeRef}
+      className={cn(
+        "shrink-0 w-[280px] sm:w-[300px] snap-start rounded-lg border flex flex-col max-h-[calc(100vh-16rem)]",
+        stage.bg,
+        isOver && "ring-2 ring-primary ring-offset-2",
+      )}
+    >
+      <div className="flex items-center justify-between px-3 py-2 border-b bg-background/60 rounded-t-lg sticky top-0 z-10">
+        <div className="flex items-center gap-2">
+          <span className={cn("h-2 w-2 rounded-full", stage.dot)} />
+          <span className="text-xs font-semibold">{stage.label}</span>
+        </div>
+        <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-5">{count}</Badge>
+      </div>
+      <div className="flex-1 overflow-y-auto p-2 space-y-2">{children}</div>
+    </div>
+  );
+}
+
+function DraggableTicketCard({
+  ticket,
+  profile,
+  onClick,
+  isDragging,
+}: {
+  ticket: SupportTicket;
+  profile?: { avatar?: string };
+  onClick: () => void;
+  isDragging: boolean;
+}) {
+  const { attributes, listeners, setNodeRef } = useDraggable({ id: ticket.id });
+  return (
+    <div
+      ref={setNodeRef}
+      {...attributes}
+      {...listeners}
+      onClick={onClick}
+      className={cn("touch-none", isDragging && "opacity-30")}
+    >
+      <TicketCardContent ticket={ticket} profile={profile} />
+    </div>
+  );
+}
+
+function TicketCardContent({
+  ticket,
+  profile,
+}: {
+  ticket: SupportTicket;
+  profile?: { avatar?: string };
+}) {
+  const last = ticket.messages[ticket.messages.length - 1];
+  return (
+    <Card className={cn("cursor-pointer hover:shadow-md transition-shadow overflow-hidden", ticket.unreadForAdmin && "border-primary/40")}>
+      <div className="flex">
+        <div className={cn("w-1 shrink-0", prioritaBar[ticket.priorita])} />
+        <CardContent className="p-2.5 flex-1 min-w-0">
+          <div className="flex items-start gap-2">
+            <Avatar className="h-7 w-7 shrink-0">
+              {profile?.avatar && <AvatarImage src={profile.avatar} alt={ticket.student_nome} />}
+              <AvatarFallback className="text-[10px]">{ticket.student_nome[0]}</AvatarFallback>
+            </Avatar>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-start justify-between gap-1">
+                <p className={cn("text-xs truncate", ticket.unreadForAdmin ? "font-semibold" : "font-medium")}>{ticket.titolo}</p>
+                {ticket.unreadForAdmin && <span className="mt-1 h-1.5 w-1.5 rounded-full bg-primary shrink-0" />}
+              </div>
+              <p className="text-[10px] text-muted-foreground truncate">{ticket.student_nome}</p>
+              {last && (
+                <p className="text-[10px] text-muted-foreground line-clamp-1 mt-0.5">
+                  <span className="font-medium">{last.author === "admin" ? "Tu" : "Studente"}:</span> {last.text}
+                </p>
+              )}
+              <div className="flex items-center gap-1 mt-1.5 flex-wrap">
+                <Badge variant="outline" className={cn("text-[9px] px-1 py-0 capitalize h-4", prioritaColors[ticket.priorita])}>{ticket.priorita}</Badge>
+                <Badge variant="outline" className="text-[9px] px-1 py-0 capitalize h-4">{ticket.categoria}</Badge>
+                <span className="text-[9px] text-muted-foreground ml-auto">{relTime(ticket.updatedAt || ticket.created_at)}</span>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </div>
     </Card>
   );
 }

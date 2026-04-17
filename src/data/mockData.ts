@@ -94,7 +94,7 @@ export interface SupportTicket {
   descrizione: string;
   categoria: "manutenzione" | "wifi" | "pulizie" | "altro";
   priorita: "bassa" | "normale" | "alta" | "urgente";
-  stato: "aperto" | "in_corso" | "risolto";
+  stato: "aperto" | "in_corso" | "attesa_studente" | "risolto";
   risposta_admin?: string;
   created_at: string;
   messages: TicketMessage[];
@@ -539,6 +539,57 @@ export const mockTickets: SupportTicket[] = [
         authorName: "Staff",
         text: "Ciao Luca, ci scusiamo per il disagio. Abbiamo ripristinato il servizio di pulizia regolare a partire da oggi.",
         createdAt: "2025-05-29T16:30:00",
+      },
+    ],
+  },
+  {
+    id: "t4",
+    student_id: "p2",
+    student_nome: "Sara Bianchi",
+    titolo: "Richiesta cambio lampadina cucina",
+    descrizione: "La lampadina della cucina comune è bruciata.",
+    categoria: "manutenzione",
+    priorita: "bassa",
+    stato: "attesa_studente",
+    created_at: "2025-06-06T10:00:00",
+    updatedAt: "2025-06-07T09:30:00",
+    assignedTo: "Admin StudentatoPD",
+    messages: [
+      {
+        id: "m4a",
+        author: "studente",
+        authorName: "Sara Bianchi",
+        text: "La lampadina della cucina comune al primo piano è bruciata da ieri.",
+        createdAt: "2025-06-06T10:00:00",
+      },
+      {
+        id: "m4b",
+        author: "admin",
+        authorName: "Staff",
+        text: "Ciao Sara, abbiamo sostituito la lampadina. Puoi confermare che ora funzioni correttamente?",
+        createdAt: "2025-06-07T09:30:00",
+      },
+    ],
+  },
+  {
+    id: "t5",
+    student_id: "p1",
+    student_nome: "Marco Rossi",
+    titolo: "Riscaldamento non funziona",
+    descrizione: "Il termosifone della stanza non si accende.",
+    categoria: "manutenzione",
+    priorita: "urgente",
+    stato: "aperto",
+    created_at: "2025-06-08T07:45:00",
+    updatedAt: "2025-06-08T07:45:00",
+    unreadForAdmin: true,
+    messages: [
+      {
+        id: "m5a",
+        author: "studente",
+        authorName: "Marco Rossi",
+        text: "Il termosifone della mia stanza non si accende, fa molto freddo.",
+        createdAt: "2025-06-08T07:45:00",
       },
     ],
   },
