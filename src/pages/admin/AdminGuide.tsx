@@ -6,18 +6,24 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Plus, GripVertical, Search, Download, Pencil, Trash2,
-  BookOpen, Eye, LayoutGrid, List, Tag, AlertCircle,
+  BookOpen, Eye, EyeOff, LayoutGrid, List, Tag, AlertCircle, BarChart3,
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { mockGuide, type Guida } from "@/data/mockData";
 import { useToast } from "@/hooks/use-toast";
 import { PageTransition, FadeIn, StaggerContainer, StaggerItem } from "@/components/motion/MotionWrappers";
 import { downloadCSV, todayStamp } from "@/lib/csv";
+import { parseMarkdown } from "@/lib/markdown";
+import { MarkdownEditor } from "@/components/admin/MarkdownEditor";
+import { BulkActionsBar } from "@/components/admin/BulkActionsBar";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { Bar, BarChart, XAxis, YAxis } from "recharts";
 
 const CATEGORIES: Guida["categoria"][] = ["Burocrazia", "Università", "Vita in Città", "Risparmio", "Trasporti"];
 
@@ -30,7 +36,7 @@ const CAT_COLOR: Record<Guida["categoria"], string> = {
 };
 
 const TITLE_MAX = 100;
-const CONTENT_MAX = 2000;
+const CONTENT_MAX = 4000;
 
 interface FormState {
   titolo: string;
@@ -40,6 +46,8 @@ interface FormState {
 }
 
 const emptyForm: FormState = { titolo: "", contenuto: "", categoria: "Burocrazia", attiva: true };
+
+const letture = (id: string) => (id.charCodeAt(id.length - 1) * 13) % 500 + 45;
 
 export default function AdminGuide() {
   const { toast } = useToast();
@@ -51,6 +59,8 @@ export default function AdminGuide() {
   const [createOpen, setCreateOpen] = useState(false);
   const [editing, setEditing] = useState<Guida | null>(null);
   const [form, setForm] = useState<FormState>(emptyForm);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   const dialogOpen = createOpen || !!editing;
   const isEditing = !!editing;
@@ -79,6 +89,40 @@ export default function AdminGuide() {
     });
     return list;
   }, [guide, cat, search, sort]);
+
+  const topRead = useMemo(() => {
+    return guide
+      .map(g => ({ name: g.titolo.length > 22 ? g.titolo.slice(0, 22) + "…" : g.titolo, letture: letture(g.id) }))
+      .sort((a, b) => b.letture - a.letture)
+      .slice(0, 5);
+  }, [guide]);
+
+  const allVisibleSelected = filtered.length > 0 && filtered.every(g => selected.has(g.id));
+  const toggleSelect = (id: string) => {
+    setSelected(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+  const toggleSelectAll = () => {
+    if (allVisibleSelected) setSelected(new Set());
+    else setSelected(new Set(filtered.map(g => g.id)));
+  };
+  const clearSelection = () => setSelected(new Set());
+
+  const bulkDeactivate = () => {
+    setGuide(prev => prev.map(g => selected.has(g.id) ? { ...g, attiva: false } : g));
+    toast({ title: `Disattivate ${selected.size} guide` });
+    clearSelection();
+  };
+  const bulkDelete = () => {
+    const n = selected.size;
+    setGuide(prev => prev.filter(g => !selected.has(g.id)));
+    toast({ title: `Eliminate ${n} guide` });
+    clearSelection();
+    setConfirmDelete(false);
+  };
 
   const openCreate = () => { setForm(emptyForm); setCreateOpen(true); };
   const openEdit = (g: Guida) => {
@@ -120,8 +164,6 @@ export default function AdminGuide() {
     toast({ title: `Esportate ${filtered.length} guide` });
   };
 
-  const letture = (id: string) => (id.charCodeAt(id.length - 1) * 13) % 500 + 45;
-
   return (
     <PageTransition className="p-4 sm:p-6 space-y-6">
       <FadeIn>
@@ -158,6 +200,26 @@ export default function AdminGuide() {
         </div>
       </FadeIn>
 
+      {/* Top read chart */}
+      <FadeIn delay={0.07}>
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <BarChart3 className="h-4 w-4 text-primary" />
+              <p className="text-sm font-medium">Top 5 guide più lette (mese)</p>
+            </div>
+            <ChartContainer config={{ letture: { label: "Letture", color: "hsl(var(--primary))" } }} className="h-[180px] w-full">
+              <BarChart data={topRead} layout="vertical" margin={{ left: 0, right: 12 }}>
+                <XAxis type="number" hide />
+                <YAxis dataKey="name" type="category" tickLine={false} axisLine={false} width={140} tick={{ fontSize: 11 }} />
+                <ChartTooltip content={<ChartTooltipContent />} />
+                <Bar dataKey="letture" fill="var(--color-letture)" radius={[0, 4, 4, 0]} />
+              </BarChart>
+            </ChartContainer>
+          </CardContent>
+        </Card>
+      </FadeIn>
+
       {/* Toolbar */}
       <FadeIn delay={0.1}>
         <div className="flex flex-col sm:flex-row gap-3">
@@ -183,7 +245,7 @@ export default function AdminGuide() {
 
       {/* Category tabs */}
       <FadeIn delay={0.15}>
-        <Tabs value={cat} onValueChange={setCat}>
+        <Tabs value={cat} onValueChange={(v) => { setCat(v); clearSelection(); }}>
           <TabsList className="flex flex-wrap h-auto">
             <TabsTrigger value="tutti">Tutti ({guide.length})</TabsTrigger>
             {CATEGORIES.map(c => (
@@ -192,6 +254,26 @@ export default function AdminGuide() {
           </TabsList>
         </Tabs>
       </FadeIn>
+
+      {/* Bulk bar */}
+      <BulkActionsBar count={selected.size} onClear={clearSelection}>
+        <Button variant="secondary" size="sm" onClick={bulkDeactivate}>
+          <EyeOff className="h-3.5 w-3.5 mr-1.5" />Disattiva
+        </Button>
+        <Button variant="destructive" size="sm" onClick={() => setConfirmDelete(true)}>
+          <Trash2 className="h-3.5 w-3.5 mr-1.5" />Elimina
+        </Button>
+      </BulkActionsBar>
+
+      {/* Select all */}
+      {filtered.length > 0 && (
+        <div className="flex items-center gap-2 px-1 -mb-2">
+          <Checkbox checked={allVisibleSelected} onCheckedChange={toggleSelectAll} id="selall-guide" />
+          <label htmlFor="selall-guide" className="text-xs text-muted-foreground cursor-pointer">
+            Seleziona tutti i visibili ({filtered.length})
+          </label>
+        </div>
+      )}
 
       {/* List / Grid */}
       {filtered.length === 0 ? (
@@ -206,6 +288,7 @@ export default function AdminGuide() {
               <motion.div whileHover={{ x: 4 }} transition={{ type: "spring", stiffness: 300 }}>
                 <Card className={!g.attiva ? "opacity-60" : ""}>
                   <CardContent className="p-4 flex items-center gap-4">
+                    <Checkbox checked={selected.has(g.id)} onCheckedChange={() => toggleSelect(g.id)} />
                     <GripVertical className="h-5 w-5 text-muted-foreground cursor-grab shrink-0" />
                     <div className="flex-1 min-w-0">
                       <p className="font-medium truncate">{g.titolo}</p>
@@ -231,7 +314,10 @@ export default function AdminGuide() {
               <Card className={`h-full ${!g.attiva ? "opacity-60" : ""}`}>
                 <CardContent className="p-4 space-y-3 h-full flex flex-col">
                   <div className="flex items-start justify-between gap-2">
-                    <Badge variant="outline" className={CAT_COLOR[g.categoria]}>{g.categoria}</Badge>
+                    <div className="flex items-center gap-2">
+                      <Checkbox checked={selected.has(g.id)} onCheckedChange={() => toggleSelect(g.id)} />
+                      <Badge variant="outline" className={CAT_COLOR[g.categoria]}>{g.categoria}</Badge>
+                    </div>
                     <Switch checked={g.attiva} onCheckedChange={() => toggle(g.id)} />
                   </div>
                   <p className="font-heading font-semibold line-clamp-2">{g.titolo}</p>
@@ -250,9 +336,9 @@ export default function AdminGuide() {
         </StaggerContainer>
       )}
 
-      {/* Create / Edit dialog with split preview */}
+      {/* Create / Edit dialog with markdown editor + live preview */}
       <Dialog open={dialogOpen} onOpenChange={(o) => !o && closeAll()}>
-        <DialogContent className="w-[95vw] max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="w-[95vw] max-w-5xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{isEditing ? "Modifica Guida" : "Nuova Guida"}</DialogTitle>
           </DialogHeader>
@@ -281,14 +367,17 @@ export default function AdminGuide() {
               </div>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <Label>Contenuto *</Label>
+                  <Label>Contenuto * <span className="text-[10px] text-muted-foreground font-normal">(supporta markdown)</span></Label>
                   <span className={`text-xs ${form.contenuto.length > CONTENT_MAX ? "text-destructive" : "text-muted-foreground"}`}>
                     {form.contenuto.length}/{CONTENT_MAX}
                   </span>
                 </div>
-                <Textarea rows={10} value={form.contenuto}
-                  onChange={(e) => setForm({ ...form, contenuto: e.target.value })}
-                  placeholder="Scrivi la guida..." />
+                <MarkdownEditor
+                  value={form.contenuto}
+                  onChange={(v) => setForm({ ...form, contenuto: v })}
+                  rows={12}
+                  placeholder="## Titolo&#10;&#10;Scrivi qui usando **grassetto**, *corsivo*, [link](url), liste..."
+                />
               </div>
               <div className="flex items-center justify-between p-3 rounded-lg border bg-muted/30">
                 <div><p className="text-sm font-medium">Pubblicata</p><p className="text-xs text-muted-foreground">Visibile agli studenti</p></div>
@@ -297,14 +386,16 @@ export default function AdminGuide() {
             </div>
             {/* Preview */}
             <div className="space-y-2">
-              <Label className="text-xs text-muted-foreground">Anteprima</Label>
+              <Label className="text-xs text-muted-foreground">Anteprima live</Label>
               <Card className="h-full">
                 <CardContent className="p-4 space-y-3">
                   <Badge variant="outline" className={CAT_COLOR[form.categoria]}>{form.categoria}</Badge>
                   <h3 className="font-heading font-bold text-lg leading-tight">{form.titolo || "Titolo della guida"}</h3>
-                  <div className="text-sm whitespace-pre-wrap text-foreground/80 leading-relaxed">
-                    {form.contenuto || "Il contenuto della guida apparirà qui..."}
-                  </div>
+                  {form.contenuto ? (
+                    <div className="text-sm text-foreground/80" dangerouslySetInnerHTML={{ __html: parseMarkdown(form.contenuto) }} />
+                  ) : (
+                    <p className="text-sm text-muted-foreground italic">Il contenuto della guida apparirà qui...</p>
+                  )}
                 </CardContent>
               </Card>
             </div>
@@ -317,6 +408,20 @@ export default function AdminGuide() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Bulk delete confirm */}
+      <AlertDialog open={confirmDelete} onOpenChange={setConfirmDelete}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Eliminare {selected.size} guide?</AlertDialogTitle>
+            <AlertDialogDescription>L'azione è irreversibile.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annulla</AlertDialogCancel>
+            <AlertDialogAction onClick={bulkDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Elimina</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </PageTransition>
   );
 }
