@@ -55,7 +55,9 @@ export default function AdminContratti() {
   const mrrTrend = useMemo(() => {
     const months = ["Nov", "Dic", "Gen", "Feb", "Mar", "Apr"];
     const factors = [0.78, 0.83, 0.87, 0.91, 0.95, 1];
-    return months.map((m, i) => ({ mese: m, mrr: 0 }));
+    const baseMrr = mockContratti.filter(c => c.stato === "attivo" || c.stato === "in_scadenza")
+      .reduce((acc, c) => acc + c.canone_mensile, 0);
+    return months.map((m, i) => ({ mese: m, mrr: Math.round(baseMrr * factors[i]) }));
   }, []);
 
   // KPIs
