@@ -139,19 +139,137 @@ const CameraDettaglio = () => {
                 </div>
 
                 <Separator className="mb-6" />
-                <p className="text-foreground leading-relaxed mb-8">{room.description}</p>
-                <Separator className="mb-6" />
 
-                <h2 className="font-heading text-xl font-semibold text-foreground mb-4">Servizi inclusi</h2>
-                <div className="grid grid-cols-2 gap-3 mb-8">
-                  {room.features.map((f) => (
-                    <div key={f} className="flex items-center gap-2.5 text-sm text-foreground">
-                      <div className="h-6 w-6 rounded-full bg-success/15 flex items-center justify-center shrink-0">
-                        <Check className="h-3.5 w-3.5 text-success" />
-                      </div>
-                      {f}
+                {/* Mini info cards quick-scan */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
+                  {[
+                    { icon: Users, label: "Ideale per", value: room.type === "doppia" ? "2 studenti" : "1 studente" },
+                    { icon: Sun, label: "Esposizione", value: room.floor >= 2 ? "Luminosa" : "Cortile" },
+                    { icon: BedDouble, label: "Arredamento", value: "Moderno" },
+                    { icon: Bath, label: "Bagno", value: room.features.some(f => f.toLowerCase().includes("privato")) ? "Privato" : "Condiviso" },
+                  ].map((s) => (
+                    <div key={s.label} className="rounded-xl border bg-card/50 p-3">
+                      <s.icon className="h-4 w-4 text-primary mb-1.5" />
+                      <p className="text-[11px] uppercase tracking-wide text-muted-foreground">{s.label}</p>
+                      <p className="text-sm font-medium text-foreground mt-0.5">{s.value}</p>
                     </div>
                   ))}
+                </div>
+
+                <Tabs defaultValue="overview" className="mb-8">
+                  <TabsList className="grid grid-cols-2 md:grid-cols-4 h-auto">
+                    <TabsTrigger value="overview">Panoramica</TabsTrigger>
+                    <TabsTrigger value="services">Servizi</TabsTrigger>
+                    <TabsTrigger value="included">Incluso</TabsTrigger>
+                    <TabsTrigger value="rules">Regole</TabsTrigger>
+                  </TabsList>
+
+                  <TabsContent value="overview" className="pt-6">
+                    <div className="relative max-w-prose">
+                      <Quote className="absolute -left-2 -top-2 h-8 w-8 text-primary/15" />
+                      <p className="text-lg font-medium text-foreground leading-relaxed mb-3 pl-6">
+                        {room.description.split(".")[0]}.
+                      </p>
+                      <p className="text-foreground/80 leading-relaxed pl-6">
+                        {room.description.split(".").slice(1).join(".").trim() || "Pensata per offrirti il massimo comfort durante il tuo percorso universitario, in un ambiente curato nei minimi dettagli."}
+                      </p>
+                    </div>
+                  </TabsContent>
+
+                  <TabsContent value="services" className="pt-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {room.features.map((f) => {
+                        const Icon = featureIcon(f);
+                        return (
+                          <div key={f} className="flex items-center gap-3 p-3 rounded-lg border bg-card/40">
+                            <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                              <Icon className="h-4 w-4 text-primary" />
+                            </div>
+                            <span className="text-sm font-medium text-foreground">{f}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </TabsContent>
+
+                  <TabsContent value="included" className="pt-6">
+                    <ul className="space-y-3">
+                      {[
+                        { icon: Zap, label: "Utenze", desc: "Luce, gas, acqua sempre incluse" },
+                        { icon: Wifi, label: "Internet Fibra", desc: "1 Gbps in tutta la struttura" },
+                        { icon: Droplets, label: "Pulizie aree comuni", desc: "Bisettimanali" },
+                        { icon: Shield, label: "Manutenzione", desc: "Interventi entro 48 ore" },
+                      ].map((item) => (
+                        <li key={item.label} className="flex items-start gap-3 p-3 rounded-lg border bg-card/40">
+                          <div className="h-9 w-9 rounded-lg bg-success/10 flex items-center justify-center shrink-0">
+                            <item.icon className="h-4 w-4 text-success" />
+                          </div>
+                          <div>
+                            <p className="font-medium text-foreground text-sm">{item.label}</p>
+                            <p className="text-xs text-muted-foreground mt-0.5">{item.desc}</p>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  </TabsContent>
+
+                  <TabsContent value="rules" className="pt-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {[
+                        { icon: Moon, label: "Silenzio dalle 22:00", ok: true },
+                        { icon: Users, label: "Ospiti consentiti (max 1 notte)", ok: true },
+                        { icon: Cigarette, label: "Vietato fumare", ok: false },
+                        { icon: PawPrint, label: "Animali non ammessi", ok: false },
+                      ].map((r) => (
+                        <div key={r.label} className="flex items-center gap-3 p-3 rounded-lg border bg-card/40">
+                          <div className={`h-9 w-9 rounded-lg flex items-center justify-center shrink-0 ${r.ok ? "bg-success/10" : "bg-destructive/10"}`}>
+                            <r.icon className={`h-4 w-4 ${r.ok ? "text-success" : "text-destructive"}`} />
+                          </div>
+                          <span className="text-sm text-foreground">{r.label}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </TabsContent>
+                </Tabs>
+
+                <Separator className="mb-6" />
+
+                <h2 className="font-heading text-xl font-semibold text-foreground mb-4">La posizione</h2>
+                <div className="rounded-2xl overflow-hidden border bg-card mb-8">
+                  <div className="relative h-48 bg-muted">
+                    <img
+                      src="https://images.unsplash.com/photo-1524813686514-a57563d77965?w=1200&h=400&fit=crop"
+                      alt="Mappa posizione studentato"
+                      className="w-full h-full object-cover opacity-90"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="bg-background/95 backdrop-blur-sm rounded-full p-3 shadow-lg">
+                        <MapPin className="h-6 w-6 text-primary" />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="p-5 space-y-3">
+                    <div>
+                      <p className="font-semibold text-foreground">Via Napoleone, Padova</p>
+                      <p className="text-sm text-muted-foreground">Quartiere universitario · 35100</p>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                      {[
+                        { icon: GraduationCap, label: "Università", time: "5 min a piedi" },
+                        { icon: ShoppingBag, label: "Supermercato", time: "3 min" },
+                        { icon: Coffee, label: "Bar & Ristoranti", time: "2 min" },
+                      ].map((p) => (
+                        <div key={p.label} className="flex items-center gap-2 p-2 rounded-lg bg-muted/40">
+                          <p.icon className="h-4 w-4 text-primary shrink-0" />
+                          <div className="min-w-0">
+                            <p className="text-xs font-medium text-foreground truncate">{p.label}</p>
+                            <p className="text-[11px] text-muted-foreground">{p.time}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
 
                 {similar.length > 0 && (
