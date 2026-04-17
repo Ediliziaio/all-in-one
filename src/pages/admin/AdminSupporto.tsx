@@ -284,6 +284,7 @@ export default function AdminSupporto() {
     if (!newStato) return;
     const ticket = tickets.find((t) => t.id === ticketId);
     if (!ticket || ticket.stato === newStato) return;
+    const from = ticket.stato;
     setTickets((prev) =>
       prev.map((t) =>
         t.id === ticketId
@@ -291,6 +292,12 @@ export default function AdminSupporto() {
           : t,
       ),
     );
+    addActivity(ticketId, {
+      tipo: newStato === "risolto" ? "chiusura" : "cambio_stato",
+      testo: newStato === "risolto" ? "Ticket chiuso come Risolto" : `Stato cambiato in ${statoLabel[newStato]}`,
+      autore: CURRENT_OPERATOR,
+      meta: { from, to: newStato },
+    });
     toast.success(`Ticket spostato in ${statoLabel[newStato]}`);
   };
 
