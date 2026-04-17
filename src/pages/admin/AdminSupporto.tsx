@@ -143,15 +143,21 @@ export default function AdminSupporto() {
     localStorage.setItem("admin_supporto_view", view);
   }, [view]);
 
+  useEffect(() => {
+    localStorage.setItem("admin_supporto_my", onlyMine ? "1" : "0");
+  }, [onlyMine]);
+
   const selected = tickets.find((t) => t.id === selectedId) || null;
 
   const stats = useMemo(() => {
     const today = new Date().toDateString();
+    const urgenti = tickets.filter((t) => getSLA(t).urgent).length;
     return {
       aperti: tickets.filter((t) => t.stato === "aperto").length,
       in_corso: tickets.filter((t) => t.stato === "in_corso").length,
       risolti_oggi: tickets.filter((t) => t.stato === "risolto" && t.closedAt && new Date(t.closedAt).toDateString() === today).length,
       tempo_medio: "2h 30m",
+      urgenti,
     };
   }, [tickets]);
 
@@ -160,6 +166,8 @@ export default function AdminSupporto() {
       if (fStato !== "all" && t.stato !== fStato) return false;
       if (fPrio !== "all" && t.priorita !== fPrio) return false;
       if (fCat !== "all" && t.categoria !== fCat) return false;
+      if (onlyMine && t.assignedTo !== CURRENT_OPERATOR) return false;
+      if (onlyUrgent && !getSLA(t).urgent) return false;
       if (search.trim()) {
         const q = search.toLowerCase();
         if (!t.titolo.toLowerCase().includes(q) && !t.student_nome.toLowerCase().includes(q) && !t.descrizione.toLowerCase().includes(q)) return false;
@@ -173,7 +181,7 @@ export default function AdminSupporto() {
       return sort === "recenti" ? bT.localeCompare(aT) : aT.localeCompare(bT);
     });
     return list;
-  }, [tickets, fStato, fPrio, fCat, search, sort]);
+  }, [tickets, fStato, fPrio, fCat, search, sort, onlyMine, onlyUrgent]);
 
   useEffect(() => {
     if (selected && messagesEndRef.current) {
@@ -224,6 +232,11 @@ export default function AdminSupporto() {
     if (!selected) return;
     setTickets((prev) => prev.map((t) => (t.id === selected.id ? { ...t, priorita } : t)));
     toast.success(`Priorità cambiata in ${priorita}`);
+  };
+
+  const handleAssign = (ticketId: string, operator: string | undefined) => {
+    setTickets((prev) => prev.map((t) => (t.id === ticketId ? { ...t, assignedTo: operator } : t)));
+    toast.success(operator ? `Assegnato a ${operator}` : "Assegnazione rimossa");
   };
 
   const handleDragEnd = (e: DragEndEvent) => {
