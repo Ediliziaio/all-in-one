@@ -89,7 +89,7 @@ export default function AdminPrenotazioni() {
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(leads)); } catch {}
   }, [leads]);
 
-  const [view, setView] = useState<"pipeline" | "list">("pipeline");
+  const [view, setView] = useState<"pipeline" | "list" | "calendar">("pipeline");
   const [search, setSearch] = useState("");
   const [filterFonte, setFilterFonte] = useState<string>("all");
   const [filterOperatore, setFilterOperatore] = useState<string>("all");
@@ -102,6 +102,9 @@ export default function AdminPrenotazioni() {
   const [lostReason, setLostReason] = useState("");
   const [newLeadOpen, setNewLeadOpen] = useState(false);
   const [draggedId, setDraggedId] = useState<string | null>(null);
+  const [calMonth, setCalMonth] = useState<Date>(new Date());
+
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
 
   const filtered = useMemo(() => {
     return leads.filter(l => {
