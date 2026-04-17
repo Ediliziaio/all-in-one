@@ -1,51 +1,80 @@
 
 
-L'utente vuole migliorare l'area ticket sia lato studente (`/studente/supporto`) che lato admin (`/admin/supporto`).
+L'utente è sulla pagina `/admin/richieste` (AdminPrenotazioni.tsx) e vuole trasformarla in un mini-CRM con pipeline tipo Kanban, dettagli contatto completi, e gestione del lead/richiesta come un vero processo di vendita.
 
-Stato attuale:
-- **Studente**: ha già FAQ, form nuovo ticket, lista ticket, dialog dettaglio con timeline base, CTA WhatsApp. Manca: ricerca/filtro ticket, allegati, stato visivo migliore, conteggio risposte, tempo di risposta atteso, possibilità di riaprire ticket chiuso, valutazione del supporto ricevuto.
-- **Admin**: lista semplice + pannello dettaglio. Manca: filtri per stato/priorità/categoria, ricerca, statistiche in cima (aperti/in corso/risolti/tempo medio), assegnazione a operatore, cambio priorità, cronologia conversazione (non solo "una risposta admin"), risposta rapida con template, ordinamento, conteggio non letti.
+Stato attuale: tabella semplice con tabs per stato (pending/approvata/conclusa/rifiutata), dialog dettaglio minimale. Manca pipeline visuale, dati contatto (telefono, provenienza, note interne), storico attività, attribuzione operatore, follow-up.
 
-Mancano anche cose comuni: persistenza messaggi multipli (oggi `risposta_admin` è singola stringa), notifiche, badge "nuovo messaggio".
+# CRM Richieste di Affitto
 
-Estendo il modello dati `SupportTicket` per supportare un array di messaggi.
+## Diagnosi
+La pagina attuale è una lista a tabs: utile ma piatta. Manca tutto il processo che c'è dietro una richiesta: contatto, qualifica, visita, proposta, contratto. Niente note interne, niente storico interazioni, niente operatore assegnato, niente fonte del lead.
 
-# Migliorare area Ticket (Studente + Admin)
+## Modello dati esteso (`mockData.ts`)
 
-## Modello dati
-Estendo `SupportTicket` in `mockData.ts`:
-- aggiungo `messages: TicketMessage[]` con `{ id, author: 'studente'|'admin', authorName, text, createdAt }`
-- aggiungo `assignedTo?: string`, `unreadForAdmin: boolean`, `unreadForStudent: boolean`, `rating?: 1-5`, `closedAt?`
-- mantengo `risposta_admin` per compat ma migro alla timeline messaggi
+Estendo `RichiestaAffitto` con campi CRM:
+- **Contatto**: `telefono`, `email`, `eta`, `corso_universita`, `citta_provenienza`
+- **Lead**: `fonte` ('sito' | 'instagram' | 'passaparola' | 'google' | 'fiera' | 'altro'), `budget_max`, `data_visita?`
+- **Pipeline**: nuovo enum stato → `nuovo` | `contattato` | `visita_programmata` | `proposta_inviata` | `contratto_firmato` | `perso`
+- **Gestione**: `operatore_assegnato?`, `priorita` ('bassa'|'media'|'alta'), `prossimo_followup?`, `motivo_perdita?`
+- **Storico**: `attivita: Activity[]` con `{ id, tipo: 'nota'|'chiamata'|'email'|'visita'|'cambio_stato', testo, autore, createdAt }`
 
-## Lato Studente (`Supporto.tsx`)
-1. **Stats header compatto**: 3 card mini (Aperti / In corso / Risolti) con conteggi miei
-2. **Search + filtro stato** (tabs: Tutti / Aperti / Risolti) sopra lista
-3. **Ticket card migliorata**: badge non letti (pallino), preview ultima risposta, "tempo dall'ultima attività"
-4. **Form nuovo ticket** dentro `Dialog` invece di accordion (più pulito su mobile) + campo allegato (mock)
-5. **Detail dialog** trasformato in **chat-like timeline**: messaggi alternati left/right, input testo + invio sotto fisso, ogni nuovo invio aggiunge a `messages[]`
-6. **Riapri ticket** se chiuso (button dedicato)
-7. **Rating** dopo chiusura: 5 stelle "Come è stato il supporto?"
-8. **FAQ** resta ma collapsed di default su mobile
+Mantengo i vecchi stati come compat e mappo. Aggiungo `mockOperatori` (3-4 nomi staff).
 
-## Lato Admin (`AdminSupporto.tsx`)
-1. **Stats bar in cima**: 4 card (Aperti, In corso, Risolti oggi, Tempo medio risposta)
-2. **Toolbar filtri**: ricerca per testo/studente, select stato, select priorità, select categoria, ordinamento (Più recenti / Priorità / Più vecchi)
-3. **Lista ticket** con: badge non letti, preview ultimo messaggio, info studente con avatar, indicatore priorità a sinistra (barra colorata)
-4. **Pannello destro come chat completa**:
-   - header con info studente, badge stato/priorità, dropdown "Cambia stato" e "Cambia priorità"
-   - timeline messaggi scrollable
-   - composer in basso con: textarea, **template risposte rapide** (dropdown con 4-5 risposte predefinite), bottone Invia, bottone "Chiudi ticket"
-5. **Mobile**: lista full-width, click apre dialog full-screen con la chat
+## UI nuova pagina (`AdminPrenotazioni.tsx` → diventa CRM)
 
-## File modificati (3)
-1. **`src/data/mockData.ts`** — estendi tipo `SupportTicket` con `messages[]`, aggiungi `TicketMessage`, popola messaggi mock
-2. **`src/pages/studente/Supporto.tsx`** — stats, search/filter, dialog nuovo ticket, chat timeline, rating, riapertura
-3. **`src/pages/admin/AdminSupporto.tsx`** — stats bar, toolbar filtri, chat completa con template, cambio stato/priorità, mobile dialog
+### 1. Header con KPI
+4 mini-card: **Lead totali / Nuovi questa settimana / Tasso conversione / Valore pipeline (€)**
+
+### 2. Toolbar
+- Search per nome/email/telefono
+- Filtri: fonte, operatore assegnato, priorità, range data
+- Toggle vista: **Pipeline (Kanban)** ↔ **Lista**
+- Bottone "+ Nuovo lead" (dialog manuale)
+
+### 3. Vista Pipeline (default)
+6 colonne kanban scrollabili orizzontalmente:
+`Nuovo → Contattato → Visita programmata → Proposta inviata → Contratto firmato → Perso`
+
+Ogni card lead mostra: nome+avatar, camera richiesta, badge priorità (barra colorata sx), giorni in pipeline, operatore assegnato (avatar piccolo), icona fonte.
+
+Drag & drop per spostare tra colonne (uso `@dnd-kit/core` se presente, altrimenti bottoni "Sposta a →" nel menu della card per evitare nuove dipendenze).
+
+### 4. Vista Lista
+Tabella con colonne: Nome, Contatto, Camera, Stato, Operatore, Priorità, Ultima attività, Azioni.
+
+### 5. Dialog dettaglio lead (full-screen su mobile)
+Layout 2 colonne (stack su mobile):
+
+**Colonna sinistra - Info contatto**:
+- Avatar + nome grande, badge stato pipeline
+- Pulsanti rapidi: chiama, email, WhatsApp
+- Dati: età, corso, città provenienza, budget, fonte
+- Camera richiesta + date contratto
+- Operatore assegnato (dropdown cambio)
+- Priorità (dropdown)
+- Prossimo follow-up (date picker)
+
+**Colonna destra - Timeline attività + composer**:
+- Tabs: "Tutte / Note / Chiamate / Email / Cambi stato"
+- Timeline cronologica con icone per tipo
+- Composer in fondo: textarea + tipo attività (toggle: nota/chiamata/email/visita) + bottone Aggiungi
+- Bottoni in fondo: "Sposta a [stato successivo]", "Marca come Perso" (apre sub-dialog per motivo)
+
+### 6. Mobile
+- KPI: 2x2 grid
+- Kanban: scroll orizzontale con snap, 1 colonna visibile a tempo
+- Toolbar: filtri in Sheet
+- Dialog dettaglio: full-screen
+
+## File modificati (2)
+
+1. **`src/data/mockData.ts`** — estendi tipo `RichiestaAffitto` (campi contatto, lead, pipeline, attività), aggiungi `Activity`, `mockOperatori`, popola 6-8 lead di esempio distribuiti nelle nuove colonne pipeline
+2. **`src/pages/admin/AdminPrenotazioni.tsx`** — riscrittura: KPI, toolbar, vista Pipeline kanban + vista Lista, dialog CRM completo con timeline, gestione assegnazione/priorità/follow-up
 
 ## Tecnica
-- Nessuna nuova dipendenza
-- Riuso shadcn: `Dialog`, `Tabs`, `Select`, `DropdownMenu`, `Textarea`, `Avatar`, `Badge`, `Card`
-- `date-fns` (già nel progetto) per "2 ore fa" formato relativo
-- Mobile-first: lista admin diventa full-width sotto `lg`, dettaglio in `Dialog` invece di pannello laterale
+- Nessuna nuova dipendenza: drag&drop con HTML5 nativo (`draggable`, `onDragStart`, `onDrop`) per evitare di installare libs
+- Riuso shadcn: `Card`, `Tabs`, `Dialog`, `Sheet`, `Select`, `DropdownMenu`, `Popover`+`Calendar`, `Badge`, `Avatar`, `Textarea`, `ToggleGroup`
+- `date-fns` (già nel progetto) per "3 giorni fa", giorni in pipeline
+- State locale con `useState`, persistenza in `localStorage` per non perdere modifiche al refresh
+- Responsive mobile-first
 
