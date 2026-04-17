@@ -782,6 +782,11 @@ function StudentDetail({ data }: { data: Enriched }) {
               </Card>
             )}
           </TabsContent>
+
+          {/* Timeline */}
+          <TabsContent value="timeline" className="mt-0">
+            <StudentTimeline data={data} />
+          </TabsContent>
         </ScrollArea>
       </Tabs>
     </div>
