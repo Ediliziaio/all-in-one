@@ -1,4 +1,4 @@
-import { motion, useInView, useMotionValue, useSpring, useTransform, useScroll, animate, type HTMLMotionProps } from "framer-motion";
+import { motion, useInView, useTransform, useScroll, animate } from "framer-motion";
 import React, { useEffect, useRef, useState } from "react";
 
 // Page transition wrapper
@@ -110,7 +110,23 @@ export function HoverCard({
   );
 }
 
-// Animated count-up for numeric KPIs (supports prefix/suffix and decimals)
+// Animated count-up for numeric KPIs.
+// Supports two modes:
+//   1) numeric: <CountUp to={98} suffix="%" />
+//   2) string passthrough (legacy): <CountUp value="4.9★" /> — animated pop-in only.
+type CountUpProps = {
+  className?: string;
+  // numeric mode
+  to?: number;
+  from?: number;
+  duration?: number;
+  prefix?: string;
+  suffix?: string;
+  decimals?: number;
+  // legacy string mode
+  value?: string;
+};
+
 export function CountUp({
   to,
   from = 0,
@@ -118,22 +134,15 @@ export function CountUp({
   prefix = "",
   suffix = "",
   decimals = 0,
+  value,
   className,
-}: {
-  to: number;
-  from?: number;
-  duration?: number;
-  prefix?: string;
-  suffix?: string;
-  decimals?: number;
-  className?: string;
-}) {
+}: CountUpProps) {
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true, margin: "-40px" });
   const [val, setVal] = useState(from);
 
   useEffect(() => {
-    if (!inView) return;
+    if (typeof to !== "number" || !inView) return;
     const controls = animate(from, to, {
       duration,
       ease: "easeOut",
@@ -141,6 +150,22 @@ export function CountUp({
     });
     return () => controls.stop();
   }, [inView, from, to, duration]);
+
+  // Legacy string mode: just a spring pop-in.
+  if (value !== undefined) {
+    return (
+      <motion.span
+        ref={ref}
+        initial={{ opacity: 0, scale: 0.5 }}
+        whileInView={{ opacity: 1, scale: 1 }}
+        viewport={{ once: true }}
+        transition={{ type: "spring", stiffness: 200, damping: 15 }}
+        className={className}
+      >
+        {value}
+      </motion.span>
+    );
+  }
 
   return (
     <span ref={ref} className={className}>
