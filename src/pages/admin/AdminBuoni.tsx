@@ -268,7 +268,7 @@ export default function AdminBuoni() {
 
       {/* Category tabs */}
       <FadeIn delay={0.15}>
-        <Tabs value={cat} onValueChange={setCat}>
+        <Tabs value={cat} onValueChange={(v) => { setCat(v); clearSelection(); }}>
           <TabsList className="flex flex-wrap h-auto">
             <TabsTrigger value="tutti">Tutti ({buoni.length})</TabsTrigger>
             {CATEGORIES.map(c => (
@@ -279,6 +279,25 @@ export default function AdminBuoni() {
           </TabsList>
         </Tabs>
       </FadeIn>
+
+      {/* Bulk bar */}
+      <BulkActionsBar count={selected.size} onClear={clearSelection}>
+        <Button variant="secondary" size="sm" onClick={bulkDeactivate}>
+          <EyeOff className="h-3.5 w-3.5 mr-1.5" />Disattiva
+        </Button>
+        <Button variant="destructive" size="sm" onClick={() => setConfirmDelete(true)}>
+          <Trash2 className="h-3.5 w-3.5 mr-1.5" />Elimina
+        </Button>
+      </BulkActionsBar>
+
+      {filtered.length > 0 && (
+        <div className="flex items-center gap-2 px-1 -mb-2">
+          <Checkbox checked={allVisibleSelected} onCheckedChange={toggleSelectAll} id="selall-buoni" />
+          <label htmlFor="selall-buoni" className="text-xs text-muted-foreground cursor-pointer">
+            Seleziona tutti i visibili ({filtered.length})
+          </label>
+        </div>
+      )}
 
       {/* Grid */}
       {filtered.length === 0 ? (
@@ -295,9 +314,10 @@ export default function AdminBuoni() {
             return (
               <StaggerItem key={b.id}>
                 <HoverCard>
-                  <Card className={`overflow-hidden ${scaduto ? "opacity-60" : ""}`}>
+                  <Card className={`overflow-hidden ${scaduto ? "opacity-60" : ""} ${selected.has(b.id) ? "ring-2 ring-primary" : ""}`}>
                     <CardContent className="p-4 space-y-3">
                       <div className="flex items-center gap-3">
+                        <Checkbox checked={selected.has(b.id)} onCheckedChange={() => toggleSelect(b.id)} className="shrink-0" />
                         <img src={b.logo_url} alt={b.nome_esercizio} className="h-12 w-12 rounded-lg object-cover shrink-0" />
                         <div className="flex-1 min-w-0">
                           <p className="font-heading font-semibold truncate">{b.nome_esercizio}</p>
