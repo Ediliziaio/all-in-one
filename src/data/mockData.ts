@@ -509,6 +509,11 @@ export const mockTickets: SupportTicket[] = [
     updatedAt: _hAgo(1),
     assignedTo: "Federico Bianchi",
     unreadForStudent: true,
+    activity: [
+      { id: "a2-1", tipo: "assegnazione", testo: "Assegnato a Federico Bianchi", autore: "Sistema", createdAt: _hAgo(40), meta: { to: "Federico Bianchi" } },
+      { id: "a2-2", tipo: "cambio_stato", testo: "Stato cambiato in In corso", autore: "Federico Bianchi", createdAt: _hAgo(36), meta: { from: "aperto", to: "in_corso" } },
+      { id: "a2-3", tipo: "cambio_priorita", testo: "Priorità cambiata in Normale", autore: "Federico Bianchi", createdAt: _hAgo(36), meta: { from: "bassa", to: "normale" } },
+    ],
     messages: [
       {
         id: "m2a",
@@ -541,6 +546,11 @@ export const mockTickets: SupportTicket[] = [
     closedAt: _hAgo(192),
     assignedTo: "Sara Lombardi",
     rating: 5,
+    activity: [
+      { id: "a3-1", tipo: "assegnazione", testo: "Assegnato a Sara Lombardi", autore: "Sistema", createdAt: _hAgo(230), meta: { to: "Sara Lombardi" } },
+      { id: "a3-2", tipo: "cambio_stato", testo: "Stato cambiato in In corso", autore: "Sara Lombardi", createdAt: _hAgo(220), meta: { from: "aperto", to: "in_corso" } },
+      { id: "a3-3", tipo: "chiusura", testo: "Ticket chiuso come Risolto", autore: "Sara Lombardi", createdAt: _hAgo(192), meta: { from: "in_corso", to: "risolto" } },
+    ],
     messages: [
       {
         id: "m3a",
