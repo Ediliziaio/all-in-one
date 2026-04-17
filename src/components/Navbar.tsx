@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
-import { ThemeToggle } from "@/components/ThemeToggle";
 import logoNapoleone from "@/assets/logo-napoleone.png";
 
 const navLinks = [
@@ -22,12 +21,12 @@ export function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 glass">
-      <div className="container flex h-20 items-center justify-between">
-        <Link to="/" className="flex items-center gap-2">
+      <div className="container flex h-16 md:h-20 items-center justify-between">
+        <Link to="/" className="flex items-center gap-2 shrink-0">
           <img
             src={logoNapoleone}
             alt="Studentato Napoleone Padova"
-            className="h-14 w-auto"
+            className="h-10 md:h-14 w-auto"
           />
         </Link>
 
@@ -58,17 +57,15 @@ export function Navbar() {
         </nav>
 
         <div className="hidden md:flex items-center gap-2">
-          <ThemeToggle />
           <Button variant="ghost" size="sm" asChild><Link to="/login">Accedi</Link></Button>
           <Button size="sm" asChild><Link to="/contatti">Richiedi info</Link></Button>
         </div>
 
         {/* Mobile */}
         <div className="flex items-center gap-1 md:hidden">
-          <ThemeToggle />
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
-              <button className="md:hidden" aria-label="Menu">
+              <button className="md:hidden p-2 -mr-2" aria-label="Menu">
                 <Menu className="h-6 w-6" />
               </button>
             </SheetTrigger>
