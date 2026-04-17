@@ -141,6 +141,16 @@ export default function AdminPrenotazioni() {
     if (selected?.id === id) setSelected(prev => prev ? { ...prev, ...patch } : prev);
   };
 
+  const handleDragStart = (e: DragStartEvent) => setDraggedId(String(e.active.id));
+  const handleDragEnd = (e: DragEndEvent) => {
+    setDraggedId(null);
+    const overId = e.over?.id;
+    if (!overId) return;
+    const newStato = String(overId).replace(/^stage-/, "") as LeadStato;
+    if (!STAGES.some(s => s.id === newStato)) return;
+    moveStato(String(e.active.id), newStato);
+  };
+
   const moveStato = (id: string, newStato: LeadStato) => {
     const lead = leads.find(l => l.id === id);
     if (!lead || lead.pipeline_stato === newStato) return;
