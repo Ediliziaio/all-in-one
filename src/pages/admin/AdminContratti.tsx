@@ -108,6 +108,18 @@ export default function AdminContratti() {
     return (
       <FadeIn key={c.id} delay={i * 0.03}>
         <tr className="border-b hover:bg-muted/50 transition-colors group">
+          <td className="py-3 px-2 w-8">
+            <Checkbox
+              checked={bulkSelected.has(c.id)}
+              onCheckedChange={() => {
+                setBulkSelected(prev => {
+                  const n = new Set(prev);
+                  if (n.has(c.id)) n.delete(c.id); else n.add(c.id);
+                  return n;
+                });
+              }}
+            />
+          </td>
           <td className="py-3 px-4">
             <div className="flex items-center gap-3">
               <Avatar className="h-9 w-9">
@@ -222,7 +234,33 @@ export default function AdminContratti() {
           </div>
         </FadeIn>
 
-        {/* Toolbar */}
+        {/* MRR trend chart */}
+        <FadeIn delay={0.07}>
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <TrendingUp className="h-4 w-4 text-primary" />
+                <p className="text-sm font-medium">Trend MRR (ultimi 6 mesi)</p>
+              </div>
+              <ChartContainer config={{ mrr: { label: "MRR", color: "hsl(var(--primary))" } }} className="h-[180px] w-full">
+                <AreaChart data={mrrTrend} margin={{ left: 12, right: 12, top: 8 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                  <XAxis dataKey="mese" tickLine={false} axisLine={false} tick={{ fontSize: 11 }} />
+                  <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 11 }} tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} />
+                  <ChartTooltip content={<ChartTooltipContent formatter={(v) => formatEUR(Number(v))} />} />
+                  <defs>
+                    <linearGradient id="mrrFill" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="var(--color-mrr)" stopOpacity={0.4} />
+                      <stop offset="100%" stopColor="var(--color-mrr)" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <Area type="monotone" dataKey="mrr" stroke="var(--color-mrr)" fill="url(#mrrFill)" strokeWidth={2} />
+                </AreaChart>
+              </ChartContainer>
+            </CardContent>
+          </Card>
+        </FadeIn>
+
         <FadeIn delay={0.1}>
           <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
             <div className="relative flex-1">
