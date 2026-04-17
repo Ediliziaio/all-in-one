@@ -80,7 +80,8 @@ const Vantaggi = () => (
             <h2 className="font-heading text-3xl font-bold text-foreground text-center mb-3">Studentato Napoleone vs Affitto tradizionale</h2>
             <p className="text-muted-foreground text-center mb-10 text-sm">Un confronto onesto. Ogni soluzione ha i suoi pro.</p>
           </FadeIn>
-...
+          <FadeIn delay={0.1}>
+            <div className="rounded-xl border border-border bg-card overflow-hidden">
               <div className="grid grid-cols-3 text-center font-heading font-semibold text-sm p-4 border-b bg-muted/30">
                 <span className="text-left text-foreground">Caratteristica</span>
                 <span className="text-accent">Studentato Napoleone</span>
