@@ -10,7 +10,7 @@ import { PageTransition, FadeIn } from "@/components/motion/MotionWrappers";
 
 export default function AdminImpostazioni() {
   const [settings, setSettings] = useState({
-    nomeStruttura: "StudentatoPD",
+    nomeStruttura: "Studentato Napoleone Padova",
     email: "info@studentatopd.it",
     telefono: "+39 049 1234567",
     indirizzo: "Via Università 4, 35122 Padova PD",

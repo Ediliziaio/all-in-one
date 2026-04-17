@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Instagram, MessageCircle, Phone } from "lucide-react";
+import logoNapoleone from "@/assets/logo-napoleone.png";
 
 export function Footer() {
   return (
@@ -8,11 +9,12 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand */}
           <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <div className="h-8 w-8 rounded-lg bg-accent flex items-center justify-center">
-                <span className="text-accent-foreground font-heading font-bold text-sm">SP</span>
-              </div>
-              <span className="font-heading font-bold text-xl">StudentatoPD</span>
+            <div className="inline-flex items-center bg-white rounded-lg p-2">
+              <img
+                src={logoNapoleone}
+                alt="Studentato Napoleone Padova"
+                className="h-12 w-auto"
+              />
             </div>
             <p className="text-sm text-primary-foreground/70">
               La tua casa a Padova. Alloggi moderni per studenti universitari.
@@ -74,7 +76,7 @@ export function Footer() {
         </div>
 
         <div className="border-t border-primary-foreground/20 mt-8 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-primary-foreground/50">
-          <p>© {new Date().getFullYear()} StudentatoPD. Tutti i diritti riservati. P.IVA 01234567890</p>
+          <p>© {new Date().getFullYear()} Studentato Napoleone Padova. Tutti i diritti riservati. P.IVA 01234567890</p>
           <div className="flex gap-4">
             <Link to="/privacy" className="hover:text-primary-foreground transition-colors">Privacy Policy</Link>
             <Link to="/cookie" className="hover:text-primary-foreground transition-colors">Cookie Policy</Link>
