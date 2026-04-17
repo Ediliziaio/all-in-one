@@ -94,8 +94,22 @@ export default function AdminSupporto() {
   const [fPrio, setFPrio] = useState<string>("all");
   const [fCat, setFCat] = useState<string>("all");
   const [sort, setSort] = useState<SortKey>("recenti");
+  const [view, setView] = useState<"lista" | "pipeline">(() => {
+    if (typeof window === "undefined") return "lista";
+    return (localStorage.getItem("admin_supporto_view") as "lista" | "pipeline") || "lista";
+  });
+  const [draggingId, setDraggingId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 150, tolerance: 5 } }),
+  );
+
+  useEffect(() => {
+    localStorage.setItem("admin_supporto_view", view);
+  }, [view]);
 
   const selected = tickets.find((t) => t.id === selectedId) || null;
 
