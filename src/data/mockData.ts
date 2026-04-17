@@ -258,7 +258,18 @@ export const mockTickets: SupportTicket[] = [
     categoria: "wifi",
     priorita: "alta",
     stato: "aperto",
-    created_at: "2025-06-05",
+    created_at: "2025-06-05T09:00:00",
+    updatedAt: "2025-06-05T09:00:00",
+    unreadForAdmin: true,
+    messages: [
+      {
+        id: "m1",
+        author: "studente",
+        authorName: "Marco Rossi",
+        text: "Da due giorni il WiFi nella mia stanza è molto lento, soprattutto la sera. Non riesco a seguire le lezioni online.",
+        createdAt: "2025-06-05T09:00:00",
+      },
+    ],
   },
   {
     id: "t2",
@@ -270,7 +281,26 @@ export const mockTickets: SupportTicket[] = [
     priorita: "normale",
     stato: "in_corso",
     risposta_admin: "Abbiamo programmato l'intervento del tecnico per giovedì mattina.",
-    created_at: "2025-06-03",
+    created_at: "2025-06-03T14:20:00",
+    updatedAt: "2025-06-04T10:15:00",
+    assignedTo: "Admin StudentatoPD",
+    unreadForStudent: true,
+    messages: [
+      {
+        id: "m2a",
+        author: "studente",
+        authorName: "Sara Bianchi",
+        text: "Il rubinetto del bagno gocciola continuamente. Oltre al rumore è anche uno spreco d'acqua.",
+        createdAt: "2025-06-03T14:20:00",
+      },
+      {
+        id: "m2b",
+        author: "admin",
+        authorName: "Staff",
+        text: "Ciao Sara, abbiamo programmato l'intervento del tecnico per giovedì mattina. Ti aggiorniamo appena finito.",
+        createdAt: "2025-06-04T10:15:00",
+      },
+    ],
   },
   {
     id: "t3",
@@ -282,7 +312,26 @@ export const mockTickets: SupportTicket[] = [
     priorita: "bassa",
     stato: "risolto",
     risposta_admin: "Ci scusiamo, abbiamo ripristinato il servizio di pulizia regolare.",
-    created_at: "2025-05-28",
+    created_at: "2025-05-28T11:00:00",
+    updatedAt: "2025-05-29T16:30:00",
+    closedAt: "2025-05-29T16:30:00",
+    rating: 5,
+    messages: [
+      {
+        id: "m3a",
+        author: "studente",
+        authorName: "Luca Verdi",
+        text: "Le scale del piano terra non vengono pulite da una settimana.",
+        createdAt: "2025-05-28T11:00:00",
+      },
+      {
+        id: "m3b",
+        author: "admin",
+        authorName: "Staff",
+        text: "Ciao Luca, ci scusiamo per il disagio. Abbiamo ripristinato il servizio di pulizia regolare a partire da oggi.",
+        createdAt: "2025-05-29T16:30:00",
+      },
+    ],
   },
 ];
 
