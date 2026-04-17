@@ -1,70 +1,62 @@
 
 
-L'utente vuole due cose:
-1. Migliorare l'area descrizione/contenuto della pagina dettaglio camera (`/camere/:id`) — il blocco con descrizione, servizi, info
-2. Soprattutto migliorare l'area admin dove si caricano foto e descrizioni delle camere (`AdminCamere.tsx`)
+# Ottimizzazione pagine Vantaggi, Servizi e Community
 
-Guardo lo stato attuale: in `CameraDettaglio.tsx` la descrizione è un singolo paragrafo seguito da una griglia di feature flat. In `AdminCamere.tsx` il dialog "Aggiungi Camera" è basico (3 input + textarea), niente upload foto reale, niente preview, niente gestione galleria, nessun campo per features/tipo dettagliato.
+## Diagnosi attuale
 
-# Migliorie pagina camera + admin upload foto/descrizioni
+**Vantaggi**: hero piatta, grid di 6 card identiche, comparison table OK ma fredda, testimonial stesso pattern visto altrove. Manca gerarchia e numeri/dati che convincano.
 
-## 1. Pagina dettaglio camera (`CameraDettaglio.tsx`) — blocco contenuti più ricco
+**Servizi**: hero simile, 6 card servizi con foto generiche, "Per i genitori" buona idea ma sezione troppo piccola. Manca un "highlights bar" rapido e una sezione che mostri i servizi in azione.
 
-Sostituisco il blocco "descrizione + servizi" piatto con una struttura editoriale a sezioni:
+**Community**: esiste solo come *sezione* della home (`CommunitySection.tsx`). Non c'è una pagina pubblica `/community`. La sezione è discreta ma corta: 3 card + collage 5 foto + CTA.
 
-**a. Descrizione potenziata**
-- Prima riga "highlight" grande (drop-cap o frase d'apertura in `text-lg font-medium`)
-- Resto del testo in colonna leggibile (max-width prosa, line-height generoso)
-- Icona quote decorativa sottile
+## Cosa cambio
 
-**b. Tabs informativi** (Tabs shadcn già disponibili)
-- **Panoramica** — descrizione + highlight
-- **Servizi & Dotazioni** — griglia features esistente, ma raggruppata per categoria (icone diverse: Wifi/Bagno/Clima/Studio)
-- **Cosa è incluso** — lista chiara: utenze, pulizie, internet, manutenzione (mock)
-- **Regole della casa** — orari, ospiti, animali, fumo (mock con icone)
+### 1. `Vantaggi.tsx` — più impatto e numeri
 
-**c. Mini "info card" sopra la descrizione**
-- 3-4 mini-stat con icona: "Ideale per", "Esposizione", "Arredamento", "Bagno" — visual quick-scan
+- **Hero ridisegnato**: badge "Vantaggi reali", titolo più grande, sotto-titolo + 3 mini-stat in bar (€100/mese risparmiati, 5 min uni, 0 bollette extra)
+- **Sezione "Quanto risparmi davvero"**: calcolatore visivo statico — affianca colonna "Affitto tradizionale" (€350 + €150 bollette + €40 wifi + €60 palestra = €600) vs "Studentato Napoleone" (€480 tutto incluso) con la differenza evidenziata in verde
+- **Vantaggi grid**: card più ricche con bordo accent al hover, numero/icona grande in alto, micro-stat sotto la descrizione (es. "5 min a piedi", "1Gbps", "100+ studenti")
+- **Comparison table**: aggiungo colonna "Cosa significa" con descrizione breve sotto al check, sticky header su mobile
+- **Sezione nuova "Storie reali"**: 3 testimonial con foto avatar, badge corso/anno, virgolette decorative grandi, layout asimmetrico (non grid uniforme)
+- **CTA finale rafforzata** con countdown posti
 
-**d. Sezione "La posizione" (mini-mappa mock)**
-- Card con immagine statica/placeholder mappa + indirizzo + "5 min da Università" + lista punti di interesse
+### 2. `Servizi.tsx` — più visivo e tangibile
 
-## 2. Admin — upload foto e gestione camera (priorità alta)
+- **Hero**: come Vantaggi, badge "Tutto incluso" + 3 mini-stat (12 servizi inclusi, 24/7, €0 extra)
+- **Bar "highlights" subito sotto hero**: 6 mini-icone in linea (Wifi, Palestra, Lavanderia, Cucina, Sale studio, Sicurezza) con label, sticky-feel
+- **Services grid**: card più editoriali — immagine grande, overlay gradient con titolo sopra, descrizione sotto con bullet "Cosa include" (3 punti per servizio)
+- **Sezione nuova "Una giornata tipo"**: timeline orizzontale che mostra come uno studente usa i servizi durante la giornata (07:00 palestra → 09:00 sala studio → 13:00 cucina → 18:00 lavanderia → 21:00 area lounge)
+- **"Per i genitori" potenziata**: aggiungo 4° punto, layout split con immagine genitore-figlio
+- **FAQ rapida** (4 domande): "Posso disdire?", "Posso ricevere ospiti?", "Cosa succede se si rompe qualcosa?", "Sono coperto da assicurazione?"
 
-Riscrivo il dialog "Nuova Camera" (e il dialog "Modifica") con un'esperienza completa:
+### 3. Nuova pagina pubblica `/community` 
 
-**a. Layout dialog più grande** — `max-w-3xl`, con tabs interne:
-- **Info Base** — nome, tipo, prezzo, piano, mq, descrizione (textarea grande)
-- **Foto** — uploader drag-and-drop + galleria preview
-- **Servizi** — checkbox grid con tutte le features standard (Wifi, Aria condizionata, Riscaldamento, Bagno privato, Scrivania, Armadio, Balcone, Cucina condivisa, Lavanderia, ecc.)
-- **Disponibilità** — switch disponibile/occupata, data disponibilità (date picker), prezzo
+(Attualmente `/studente/community` è interna. Creo `src/pages/Community.tsx` pubblica.)
 
-**b. Uploader foto realistico** (mock, no backend)
-- Drop-zone con bordo tratteggiato + icona Upload + testo "Trascina foto qui o clicca per sfogliare"
-- Accetta file via `<input type="file" multiple accept="image/*">`
-- Genera preview tramite `URL.createObjectURL()` e le mostra in griglia
-- Ogni preview ha: thumbnail, badge "Copertina" sulla prima, X per rimuovere, drag-handle per riordinare (uso semplice up/down arrows o `react-beautiful` no — uso swap con frecce per non aggiungere dipendenze)
-- Counter "X/10 foto"
+- **Hero immersivo**: foto gruppo studenti + titolo "La tua nuova famiglia a Padova"
+- **Manifesto community**: 3 paragrafi grandi con icona — "Vivere insieme", "Crescere insieme", "Divertirsi insieme"
+- **Eventi del mese** mock: 4-6 card eventi con data/orario/descrizione (Aperitivo benvenuto, Cena internazionale, Torneo calcetto, Serata cinema, Workshop CV, Brunch domenica)
+- **Tipi di attività**: 6 categorie con icona (Sport, Studio, Cultura, Cucina, Volontariato, Viaggi)
+- **Galleria momenti**: collage più ricco (8-10 foto) con masonry layout
+- **Storie community**: 2-3 testimonianze lunghe con foto, focus su amicizie nate
+- **"Come funziona"**: 3 step — entri → conosci → partecipi
+- **CTA**: "Vieni a trovarci a un evento" + link camere
 
-**c. Editor descrizione migliorato**
-- Textarea con char counter (es. 500 caratteri max consigliati)
-- Suggerimento sotto: "Descrivi atmosfera, luminosità, vista, arredamento. Evita info già presenti nei servizi."
+Aggiungo route in `App.tsx` e link in navbar (`Navbar.tsx`).
 
-**d. Card admin più informative nella griglia**
-- Aggiungo overlay hover sulle immagini con bottoni rapidi (Modifica / Foto / Disponibilità) invece dei 3 button sotto
-- Badge "X foto" sopra l'immagine
-- Indicatore "Descrizione mancante" se vuota
-- Quick stats: prezzo + tipo + mq in linea pulita
+## Tecnica
 
-**e. Drawer/Dialog riordino foto separato** quando si clicca "Foto"
-- Mostra galleria full-size con drag-to-reorder (semplice swap con frecce)
-- Set copertina con click
+- Riuso `MotionWrappers` (FadeIn, StaggerContainer, HoverCard, Parallax)
+- Niente nuove dipendenze
+- Token semantici brand (primary navy, accent verde) — niente hardcoded
+- Foto Unsplash via URL diretti
 
-## File modificati (3)
+## File modificati/creati (5)
 
-1. **`src/pages/CameraDettaglio.tsx`** — Tabs descrizione/servizi/incluso/regole, mini-stat card, sezione posizione
-2. **`src/pages/admin/AdminCamere.tsx`** — Dialog ricco con tabs interne, uploader drag-and-drop con preview, checkbox features, char counter; card griglia con overlay hover
-3. **`src/components/ui/textarea.tsx`** — già OK, nessuna modifica
-
-Nessuna nuova dipendenza: uso `Tabs`, `Checkbox`, `Switch`, `Calendar/Popover` già presenti in shadcn.
+1. `src/pages/Vantaggi.tsx` — ridisegno completo
+2. `src/pages/Servizi.tsx` — ridisegno completo  
+3. `src/pages/Community.tsx` — **nuovo file** (pagina pubblica)
+4. `src/App.tsx` — aggiungo route `/community`
+5. `src/components/Navbar.tsx` — aggiungo link "Community" nel menu
 
