@@ -6,17 +6,22 @@ import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Plus, Copy, Search, Download, Pencil, Tag, Gift,
-  AlertCircle, Calendar, TrendingUp,
+  AlertCircle, Calendar, TrendingUp, BarChart3, EyeOff, Trash2,
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { mockBuoni, type Buono } from "@/data/mockData";
 import { useToast } from "@/hooks/use-toast";
 import { PageTransition, FadeIn, StaggerContainer, StaggerItem, HoverCard } from "@/components/motion/MotionWrappers";
 import { downloadCSV, daysUntil, todayStamp } from "@/lib/csv";
+import { BulkActionsBar } from "@/components/admin/BulkActionsBar";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { Bar, BarChart, XAxis, YAxis } from "recharts";
 
 const CATEGORIES: Buono["categoria"][] = ["Cibo", "Sport", "Libri", "Divertimento", "Servizi"];
 
@@ -55,6 +60,8 @@ export default function AdminBuoni() {
   const [createOpen, setCreateOpen] = useState(false);
   const [editing, setEditing] = useState<Buono | null>(null);
   const [form, setForm] = useState<FormState>(emptyForm);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   const dialogOpen = createOpen || !!editing;
   const isEditing = !!editing;
@@ -138,6 +145,40 @@ export default function AdminBuoni() {
   // Mock counter — usi from hashing id
   const usiCount = (id: string) => (id.charCodeAt(id.length - 1) * 7) % 200 + 12;
 
+  const topUsi = useMemo(() => {
+    return buoni
+      .map(b => ({ name: b.nome_esercizio.length > 18 ? b.nome_esercizio.slice(0, 18) + "…" : b.nome_esercizio, usi: usiCount(b.id) }))
+      .sort((a, b) => b.usi - a.usi)
+      .slice(0, 5);
+  }, [buoni]);
+
+  const allVisibleSelected = filtered.length > 0 && filtered.every(b => selected.has(b.id));
+  const toggleSelect = (id: string) => {
+    setSelected(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+  const toggleSelectAll = () => {
+    if (allVisibleSelected) setSelected(new Set());
+    else setSelected(new Set(filtered.map(b => b.id)));
+  };
+  const clearSelection = () => setSelected(new Set());
+
+  const bulkDeactivate = () => {
+    setBuoni(prev => prev.map(b => selected.has(b.id) ? { ...b, attivo: false } : b));
+    toast({ title: `Disattivati ${selected.size} buoni` });
+    clearSelection();
+  };
+  const bulkDelete = () => {
+    const n = selected.size;
+    setBuoni(prev => prev.filter(b => !selected.has(b.id)));
+    toast({ title: `Eliminati ${n} buoni` });
+    clearSelection();
+    setConfirmDelete(false);
+  };
+
   return (
     <PageTransition className="p-4 sm:p-6 space-y-6">
       <FadeIn>
@@ -178,7 +219,26 @@ export default function AdminBuoni() {
         </div>
       </FadeIn>
 
-      {/* Toolbar */}
+      {/* Top usi chart */}
+      <FadeIn delay={0.07}>
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <BarChart3 className="h-4 w-4 text-primary" />
+              <p className="text-sm font-medium">Top 5 buoni più utilizzati</p>
+            </div>
+            <ChartContainer config={{ usi: { label: "Utilizzi", color: "hsl(var(--primary))" } }} className="h-[180px] w-full">
+              <BarChart data={topUsi} layout="vertical" margin={{ left: 0, right: 12 }}>
+                <XAxis type="number" hide />
+                <YAxis dataKey="name" type="category" tickLine={false} axisLine={false} width={130} tick={{ fontSize: 11 }} />
+                <ChartTooltip content={<ChartTooltipContent />} />
+                <Bar dataKey="usi" fill="var(--color-usi)" radius={[0, 4, 4, 0]} />
+              </BarChart>
+            </ChartContainer>
+          </CardContent>
+        </Card>
+      </FadeIn>
+
       <FadeIn delay={0.1}>
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
@@ -208,7 +268,7 @@ export default function AdminBuoni() {
 
       {/* Category tabs */}
       <FadeIn delay={0.15}>
-        <Tabs value={cat} onValueChange={setCat}>
+        <Tabs value={cat} onValueChange={(v) => { setCat(v); clearSelection(); }}>
           <TabsList className="flex flex-wrap h-auto">
             <TabsTrigger value="tutti">Tutti ({buoni.length})</TabsTrigger>
             {CATEGORIES.map(c => (
@@ -219,6 +279,25 @@ export default function AdminBuoni() {
           </TabsList>
         </Tabs>
       </FadeIn>
+
+      {/* Bulk bar */}
+      <BulkActionsBar count={selected.size} onClear={clearSelection}>
+        <Button variant="secondary" size="sm" onClick={bulkDeactivate}>
+          <EyeOff className="h-3.5 w-3.5 mr-1.5" />Disattiva
+        </Button>
+        <Button variant="destructive" size="sm" onClick={() => setConfirmDelete(true)}>
+          <Trash2 className="h-3.5 w-3.5 mr-1.5" />Elimina
+        </Button>
+      </BulkActionsBar>
+
+      {filtered.length > 0 && (
+        <div className="flex items-center gap-2 px-1 -mb-2">
+          <Checkbox checked={allVisibleSelected} onCheckedChange={toggleSelectAll} id="selall-buoni" />
+          <label htmlFor="selall-buoni" className="text-xs text-muted-foreground cursor-pointer">
+            Seleziona tutti i visibili ({filtered.length})
+          </label>
+        </div>
+      )}
 
       {/* Grid */}
       {filtered.length === 0 ? (
@@ -235,9 +314,10 @@ export default function AdminBuoni() {
             return (
               <StaggerItem key={b.id}>
                 <HoverCard>
-                  <Card className={`overflow-hidden ${scaduto ? "opacity-60" : ""}`}>
+                  <Card className={`overflow-hidden ${scaduto ? "opacity-60" : ""} ${selected.has(b.id) ? "ring-2 ring-primary" : ""}`}>
                     <CardContent className="p-4 space-y-3">
                       <div className="flex items-center gap-3">
+                        <Checkbox checked={selected.has(b.id)} onCheckedChange={() => toggleSelect(b.id)} className="shrink-0" />
                         <img src={b.logo_url} alt={b.nome_esercizio} className="h-12 w-12 rounded-lg object-cover shrink-0" />
                         <div className="flex-1 min-w-0">
                           <p className="font-heading font-semibold truncate">{b.nome_esercizio}</p>
@@ -348,6 +428,19 @@ export default function AdminBuoni() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={confirmDelete} onOpenChange={setConfirmDelete}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Eliminare {selected.size} buoni?</AlertDialogTitle>
+            <AlertDialogDescription>L'azione è irreversibile.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annulla</AlertDialogCancel>
+            <AlertDialogAction onClick={bulkDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Elimina</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </PageTransition>
   );
 }

@@ -9,13 +9,17 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Eye, Download, Search, FileText, TrendingUp, Users, Calendar,
-  AlertCircle, RefreshCw, Home, ExternalLink, CheckCircle2, Clock,
+  AlertCircle, RefreshCw, Home, ExternalLink, CheckCircle2, Clock, BellRing,
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
 import { mockContratti, mockProfiles, mockPagamenti, type Contratto } from "@/data/mockData";
 import { toast } from "sonner";
 import { PageTransition, FadeIn } from "@/components/motion/MotionWrappers";
 import { downloadCSV, daysUntil, formatEUR, todayStamp } from "@/lib/csv";
+import { BulkActionsBar } from "@/components/admin/BulkActionsBar";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 
 const statoBadge: Record<string, string> = {
   attivo: "bg-success/15 text-success border-success/20",
@@ -45,6 +49,16 @@ export default function AdminContratti() {
   const [tab, setTab] = useState("tutti");
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<"recenti" | "scadenza" | "canone">("recenti");
+  const [bulkSelected, setBulkSelected] = useState<Set<string>>(new Set());
+
+  // MRR trend (mock 6 months)
+  const mrrTrend = useMemo(() => {
+    const months = ["Nov", "Dic", "Gen", "Feb", "Mar", "Apr"];
+    const factors = [0.78, 0.83, 0.87, 0.91, 0.95, 1];
+    const baseMrr = mockContratti.filter(c => c.stato === "attivo" || c.stato === "in_scadenza")
+      .reduce((acc, c) => acc + c.canone_mensile, 0);
+    return months.map((m, i) => ({ mese: m, mrr: Math.round(baseMrr * factors[i]) }));
+  }, []);
 
   // KPIs
   const kpi = useMemo(() => {
@@ -94,6 +108,18 @@ export default function AdminContratti() {
     return (
       <FadeIn key={c.id} delay={i * 0.03}>
         <tr className="border-b hover:bg-muted/50 transition-colors group">
+          <td className="py-3 px-2 w-8">
+            <Checkbox
+              checked={bulkSelected.has(c.id)}
+              onCheckedChange={() => {
+                setBulkSelected(prev => {
+                  const n = new Set(prev);
+                  if (n.has(c.id)) n.delete(c.id); else n.add(c.id);
+                  return n;
+                });
+              }}
+            />
+          </td>
           <td className="py-3 px-4">
             <div className="flex items-center gap-3">
               <Avatar className="h-9 w-9">
@@ -208,7 +234,33 @@ export default function AdminContratti() {
           </div>
         </FadeIn>
 
-        {/* Toolbar */}
+        {/* MRR trend chart */}
+        <FadeIn delay={0.07}>
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <TrendingUp className="h-4 w-4 text-primary" />
+                <p className="text-sm font-medium">Trend MRR (ultimi 6 mesi)</p>
+              </div>
+              <ChartContainer config={{ mrr: { label: "MRR", color: "hsl(var(--primary))" } }} className="h-[180px] w-full">
+                <AreaChart data={mrrTrend} margin={{ left: 12, right: 12, top: 8 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                  <XAxis dataKey="mese" tickLine={false} axisLine={false} tick={{ fontSize: 11 }} />
+                  <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 11 }} tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} />
+                  <ChartTooltip content={<ChartTooltipContent formatter={(v) => formatEUR(Number(v))} />} />
+                  <defs>
+                    <linearGradient id="mrrFill" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="var(--color-mrr)" stopOpacity={0.4} />
+                      <stop offset="100%" stopColor="var(--color-mrr)" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <Area type="monotone" dataKey="mrr" stroke="var(--color-mrr)" fill="url(#mrrFill)" strokeWidth={2} />
+                </AreaChart>
+              </ChartContainer>
+            </CardContent>
+          </Card>
+        </FadeIn>
+
         <FadeIn delay={0.1}>
           <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
             <div className="relative flex-1">

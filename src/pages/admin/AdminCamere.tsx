@@ -23,6 +23,8 @@ import { mockProfiles } from "@/data/mockData";
 import { toast } from "sonner";
 import { PageTransition, FadeIn, StaggerContainer, StaggerItem, HoverCard } from "@/components/motion/MotionWrappers";
 import { downloadCSV, formatEUR, todayStamp } from "@/lib/csv";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
 
 const ALL_FEATURES = [
   "WiFi Fibra", "Aria condizionata", "Riscaldamento", "Bagno privato",
@@ -448,7 +450,34 @@ export default function AdminCamere() {
         </div>
       </FadeIn>
 
-      {/* Toolbar */}
+      {/* Occupancy historical chart */}
+      <FadeIn delay={0.07}>
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <TrendingUp className="h-4 w-4 text-primary" />
+              <p className="text-sm font-medium">Occupazione storica (ultimi 6 mesi)</p>
+            </div>
+            <ChartContainer config={{ tasso: { label: "Occupazione %", color: "hsl(var(--primary))" } }} className="h-[180px] w-full">
+              <LineChart
+                data={["Nov", "Dic", "Gen", "Feb", "Mar", "Apr"].map((m, i) => ({
+                  mese: m,
+                  tasso: Math.max(0, Math.min(100, Math.round(kpi.tasso * [0.82, 0.86, 0.9, 0.93, 0.97, 1][i]))),
+                }))}
+                margin={{ left: 0, right: 12, top: 8 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                <XAxis dataKey="mese" tickLine={false} axisLine={false} tick={{ fontSize: 11 }} />
+                <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 11 }} tickFormatter={(v) => `${v}%`} domain={[0, 100]} />
+                <ChartTooltip content={<ChartTooltipContent formatter={(v) => `${v}%`} />} />
+                <Line type="monotone" dataKey="tasso" stroke="var(--color-tasso)" strokeWidth={2} dot={{ fill: "var(--color-tasso)", r: 3 }} />
+              </LineChart>
+            </ChartContainer>
+          </CardContent>
+        </Card>
+      </FadeIn>
+
+
       <FadeIn delay={0.1}>
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
