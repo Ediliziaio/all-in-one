@@ -939,3 +939,100 @@ function TicketCardContent({
     </Card>
   );
 }
+
+type TimelineItem = {
+  id: string;
+  kind: "creazione" | "cambio_stato" | "assegnazione" | "cambio_priorita" | "chiusura" | "risposta_admin" | "risposta_studente";
+  testo: string;
+  autore: string;
+  createdAt: string;
+};
+
+function buildTimeline(ticket: SupportTicket): TimelineItem[] {
+  const items: TimelineItem[] = [];
+
+  items.push({
+    id: `create-${ticket.id}`,
+    kind: "creazione",
+    testo: "Ticket creato",
+    autore: ticket.student_nome,
+    createdAt: ticket.created_at,
+  });
+
+  (ticket.activity || []).forEach((a) => {
+    items.push({
+      id: a.id,
+      kind: a.tipo,
+      testo: a.testo,
+      autore: a.autore,
+      createdAt: a.createdAt,
+    });
+  });
+
+  ticket.messages.forEach((m, idx) => {
+    if (idx === 0 && m.author === "studente" && m.createdAt === ticket.created_at) return;
+    items.push({
+      id: `msg-${m.id}`,
+      kind: m.author === "admin" ? "risposta_admin" : "risposta_studente",
+      testo: m.text.length > 120 ? m.text.slice(0, 120) + "…" : m.text,
+      autore: m.authorName,
+      createdAt: m.createdAt,
+    });
+  });
+
+  if (ticket.closedAt && !items.some((i) => i.kind === "chiusura")) {
+    items.push({
+      id: `close-${ticket.id}`,
+      kind: "chiusura",
+      testo: "Ticket chiuso come Risolto",
+      autore: ticket.assignedTo || "Sistema",
+      createdAt: ticket.closedAt,
+    });
+  }
+
+  return items.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+}
+
+const timelineMeta: Record<TimelineItem["kind"], { Icon: React.ComponentType<{ className?: string }>; bg: string; text: string }> = {
+  creazione: { Icon: Plus, bg: "bg-green-100", text: "text-green-700" },
+  cambio_stato: { Icon: ArrowRight, bg: "bg-blue-100", text: "text-blue-700" },
+  assegnazione: { Icon: UserCheck, bg: "bg-violet-100", text: "text-violet-700" },
+  cambio_priorita: { Icon: Flag, bg: "bg-orange-100", text: "text-orange-700" },
+  risposta_admin: { Icon: MessageCircle, bg: "bg-primary/10", text: "text-primary" },
+  risposta_studente: { Icon: MessageCircle, bg: "bg-muted", text: "text-foreground" },
+  chiusura: { Icon: Lock, bg: "bg-muted", text: "text-muted-foreground" },
+};
+
+function TicketTimeline({ ticket }: { ticket: SupportTicket }) {
+  const items = useMemo(() => buildTimeline(ticket), [ticket]);
+
+  if (items.length === 0) {
+    return <p className="text-sm text-muted-foreground text-center py-8">Nessuna attività ancora.</p>;
+  }
+
+  return (
+    <div className="relative pl-2">
+      <div className="absolute left-[18px] top-2 bottom-2 w-px bg-border" />
+      <ul className="space-y-3">
+        {items.map((item) => {
+          const meta = timelineMeta[item.kind];
+          const Icon = meta.Icon;
+          return (
+            <li key={item.id} className="relative flex gap-3 items-start">
+              <div className={cn("relative z-10 h-9 w-9 rounded-full flex items-center justify-center shrink-0 border-2 border-background", meta.bg)}>
+                <Icon className={cn("h-4 w-4", meta.text)} />
+              </div>
+              <div className="flex-1 min-w-0 rounded-lg border bg-background/80 px-3 py-2">
+                <p className="text-sm text-foreground break-words">{item.testo}</p>
+                <p className="text-[11px] text-muted-foreground mt-0.5">
+                  {item.autore} · {relTime(item.createdAt)}
+                </p>
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+}
+
