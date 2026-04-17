@@ -16,14 +16,23 @@ import {
   Phone, Mail, MessageCircle, Search, Filter, Plus, LayoutGrid, List as ListIcon,
   TrendingUp, Users, Euro, CalendarDays, MapPin, GraduationCap, User as UserIcon,
   StickyNote, PhoneCall, Send, CalendarCheck2, ArrowRight, X, Globe, Instagram,
-  MessageSquare, Building2, CalendarIcon, Flame
+  MessageSquare, Building2, CalendarIcon, Flame, CalendarRange, ChevronLeft, ChevronRight,
+  Clock, FileSignature, AlertCircle, GripVertical
 } from "lucide-react";
 import { mockRichieste, mockOperatori, type RichiestaAffitto, type LeadStato, type LeadFonte, type LeadPriorita, type Activity } from "@/data/mockData";
 import { toast } from "sonner";
 import { PageTransition, FadeIn } from "@/components/motion/MotionWrappers";
-import { format, formatDistanceToNow, differenceInDays } from "date-fns";
+import {
+  format, formatDistanceToNow, differenceInDays, startOfMonth, endOfMonth,
+  startOfWeek, endOfWeek, eachDayOfInterval, isSameMonth, isSameDay,
+  addMonths, subMonths, isToday, parseISO, isValid
+} from "date-fns";
 import { it } from "date-fns/locale";
 import { cn } from "@/lib/utils";
+import {
+  DndContext, DragOverlay, PointerSensor, useSensor, useSensors,
+  useDraggable, useDroppable, closestCenter, type DragStartEvent, type DragEndEvent
+} from "@dnd-kit/core";
 
 const STORAGE_KEY = "crm_richieste_v1";
 
