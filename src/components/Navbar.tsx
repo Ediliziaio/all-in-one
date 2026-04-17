@@ -12,7 +12,7 @@ const navLinks = [
   { label: "Camere", href: "/camere" },
   { label: "Servizi", href: "/servizi" },
   { label: "Vantaggi", href: "/vantaggi" },
-  { label: "Community", href: "/studente/community" },
+  { label: "Community", href: "/community" },
   { label: "Contatti", href: "/contatti" },
 ];
 
