@@ -16,6 +16,25 @@ export interface Profile {
   camera_id?: string;
 }
 
+export type LeadStato =
+  | "nuovo"
+  | "contattato"
+  | "visita_programmata"
+  | "proposta_inviata"
+  | "contratto_firmato"
+  | "perso";
+
+export type LeadFonte = "sito" | "instagram" | "passaparola" | "google" | "fiera" | "altro";
+export type LeadPriorita = "bassa" | "media" | "alta";
+
+export interface Activity {
+  id: string;
+  tipo: "nota" | "chiamata" | "email" | "visita" | "cambio_stato";
+  testo: string;
+  autore: string;
+  createdAt: string;
+}
+
 export interface RichiestaAffitto {
   id: string;
   camera_id: string;
@@ -24,10 +43,37 @@ export interface RichiestaAffitto {
   student_nome: string;
   data_inizio: string;
   data_fine: string;
+  // Legacy stato (kept for compat with other pages)
   stato: "pending" | "approvata" | "rifiutata" | "conclusa";
+  // CRM pipeline stato
+  pipeline_stato: LeadStato;
   note?: string;
   created_at: string;
+  // Contatto
+  telefono: string;
+  email: string;
+  eta?: number;
+  corso_universita?: string;
+  citta_provenienza?: string;
+  // Lead
+  fonte: LeadFonte;
+  budget_max?: number;
+  data_visita?: string;
+  // Gestione
+  operatore_assegnato?: string;
+  priorita: LeadPriorita;
+  prossimo_followup?: string;
+  motivo_perdita?: string;
+  // Storico
+  attivita: Activity[];
 }
+
+export const mockOperatori: string[] = [
+  "Giulia Marchetti",
+  "Federico Bianchi",
+  "Sara Lombardi",
+  "Matteo Rinaldi",
+];
 
 // Backward-compatible alias
 export type Prenotazione = RichiestaAffitto;
@@ -206,7 +252,23 @@ export const mockRichieste: RichiestaAffitto[] = [
     data_inizio: "2025-09-01",
     data_fine: "2026-07-31",
     stato: "approvata",
+    pipeline_stato: "contratto_firmato",
     created_at: "2025-05-15",
+    telefono: "+39 333 1234567",
+    email: "marco.rossi@studenti.unipd.it",
+    eta: 21,
+    corso_universita: "Ingegneria Informatica",
+    citta_provenienza: "Verona",
+    fonte: "sito",
+    budget_max: 550,
+    operatore_assegnato: "Giulia Marchetti",
+    priorita: "alta",
+    attivita: [
+      { id: "a1", tipo: "cambio_stato", testo: "Lead creato dal sito", autore: "Sistema", createdAt: "2025-05-15T09:00:00" },
+      { id: "a2", tipo: "chiamata", testo: "Prima chiamata: molto interessato, lavora già a Padova", autore: "Giulia Marchetti", createdAt: "2025-05-16T11:30:00" },
+      { id: "a3", tipo: "visita", testo: "Visita effettuata, gli è piaciuta la 101", autore: "Giulia Marchetti", createdAt: "2025-05-22T15:00:00" },
+      { id: "a4", tipo: "cambio_stato", testo: "Contratto firmato 🎉", autore: "Giulia Marchetti", createdAt: "2025-07-15T10:00:00" },
+    ],
   },
   {
     id: "pren2",
@@ -217,7 +279,22 @@ export const mockRichieste: RichiestaAffitto[] = [
     data_inizio: "2025-09-01",
     data_fine: "2026-07-31",
     stato: "approvata",
+    pipeline_stato: "contratto_firmato",
     created_at: "2025-05-20",
+    telefono: "+39 347 9876543",
+    email: "sara.bianchi@studenti.unipd.it",
+    eta: 23,
+    corso_universita: "Medicina",
+    citta_provenienza: "Bologna",
+    fonte: "instagram",
+    budget_max: 520,
+    operatore_assegnato: "Federico Bianchi",
+    priorita: "media",
+    attivita: [
+      { id: "a5", tipo: "cambio_stato", testo: "Lead da campagna Instagram", autore: "Sistema", createdAt: "2025-05-20T14:00:00" },
+      { id: "a6", tipo: "email", testo: "Inviato listino e foto camere", autore: "Federico Bianchi", createdAt: "2025-05-21T09:15:00" },
+      { id: "a7", tipo: "cambio_stato", testo: "Contratto firmato", autore: "Federico Bianchi", createdAt: "2025-07-20T16:00:00" },
+    ],
   },
   {
     id: "pren3",
@@ -228,8 +305,24 @@ export const mockRichieste: RichiestaAffitto[] = [
     data_inizio: "2025-09-01",
     data_fine: "2026-07-31",
     stato: "pending",
+    pipeline_stato: "proposta_inviata",
     note: "Vorrei la camera con il mio amico Andrea",
     created_at: "2025-06-01",
+    telefono: "+39 320 5551234",
+    email: "luca.verdi@studenti.unipd.it",
+    eta: 19,
+    corso_universita: "Economia",
+    citta_provenienza: "Milano",
+    fonte: "passaparola",
+    budget_max: 400,
+    operatore_assegnato: "Sara Lombardi",
+    priorita: "alta",
+    prossimo_followup: "2025-06-18",
+    attivita: [
+      { id: "a8", tipo: "cambio_stato", testo: "Lead da passaparola (referral di Marco Rossi)", autore: "Sistema", createdAt: "2025-06-01T10:00:00" },
+      { id: "a9", tipo: "chiamata", testo: "Chiamata fatta, vuole condividere doppia con amico", autore: "Sara Lombardi", createdAt: "2025-06-02T11:00:00" },
+      { id: "a10", tipo: "email", testo: "Inviata proposta per Doppia 103 a 380€/mese cad.", autore: "Sara Lombardi", createdAt: "2025-06-05T14:30:00" },
+    ],
   },
   {
     id: "pren4",
@@ -240,7 +333,123 @@ export const mockRichieste: RichiestaAffitto[] = [
     data_inizio: "2025-10-01",
     data_fine: "2026-07-31",
     stato: "pending",
+    pipeline_stato: "visita_programmata",
     created_at: "2025-06-10",
+    telefono: "+39 388 1112233",
+    email: "giulia.ferrari@studenti.unipd.it",
+    eta: 24,
+    corso_universita: "Giurisprudenza",
+    citta_provenienza: "Trieste",
+    fonte: "google",
+    budget_max: 600,
+    operatore_assegnato: "Giulia Marchetti",
+    priorita: "media",
+    data_visita: "2025-06-20",
+    prossimo_followup: "2025-06-20",
+    attivita: [
+      { id: "a11", tipo: "cambio_stato", testo: "Lead da Google Ads", autore: "Sistema", createdAt: "2025-06-10T08:30:00" },
+      { id: "a12", tipo: "chiamata", testo: "Molto interessata alla Plus, vuole vedere la stanza", autore: "Giulia Marchetti", createdAt: "2025-06-11T10:00:00" },
+      { id: "a13", tipo: "nota", testo: "Visita programmata per il 20 giugno alle 16:00", autore: "Giulia Marchetti", createdAt: "2025-06-12T09:00:00" },
+    ],
+  },
+  {
+    id: "pren5",
+    camera_id: "singola-204",
+    camera_nome: "Singola Standard 204",
+    student_id: "p5",
+    student_nome: "Elena Conti",
+    data_inizio: "2025-09-15",
+    data_fine: "2026-07-31",
+    stato: "pending",
+    pipeline_stato: "contattato",
+    created_at: "2025-06-12",
+    telefono: "+39 333 4445566",
+    email: "elena.conti@gmail.com",
+    eta: 20,
+    corso_universita: "Lettere",
+    citta_provenienza: "Pescara",
+    fonte: "instagram",
+    budget_max: 480,
+    operatore_assegnato: "Federico Bianchi",
+    priorita: "media",
+    prossimo_followup: "2025-06-19",
+    attivita: [
+      { id: "a14", tipo: "cambio_stato", testo: "Lead da Instagram DM", autore: "Sistema", createdAt: "2025-06-12T19:00:00" },
+      { id: "a15", tipo: "chiamata", testo: "Risponde, sta ancora valutando altre opzioni", autore: "Federico Bianchi", createdAt: "2025-06-13T15:00:00" },
+    ],
+  },
+  {
+    id: "pren6",
+    camera_id: "doppia-201",
+    camera_nome: "Doppia 201",
+    student_id: "p6",
+    student_nome: "Tommaso Greco",
+    data_inizio: "2025-09-01",
+    data_fine: "2026-07-31",
+    stato: "pending",
+    pipeline_stato: "nuovo",
+    created_at: "2025-06-14",
+    telefono: "+39 340 7778899",
+    email: "tommaso.greco@gmail.com",
+    eta: 19,
+    corso_universita: "Scienze Politiche",
+    citta_provenienza: "Bari",
+    fonte: "sito",
+    budget_max: 400,
+    priorita: "media",
+    attivita: [
+      { id: "a16", tipo: "cambio_stato", testo: "Nuova richiesta dal sito", autore: "Sistema", createdAt: "2025-06-14T22:00:00" },
+    ],
+  },
+  {
+    id: "pren7",
+    camera_id: "singola-plus-301",
+    camera_nome: "Singola Plus 301",
+    student_id: "p7",
+    student_nome: "Chiara Esposito",
+    data_inizio: "2025-09-01",
+    data_fine: "2026-07-31",
+    stato: "pending",
+    pipeline_stato: "nuovo",
+    created_at: "2025-06-15",
+    telefono: "+39 366 1234500",
+    email: "chiara.esposito@gmail.com",
+    eta: 22,
+    corso_universita: "Architettura",
+    citta_provenienza: "Napoli",
+    fonte: "fiera",
+    budget_max: 620,
+    priorita: "alta",
+    attivita: [
+      { id: "a17", tipo: "cambio_stato", testo: "Lead raccolto a Salone dello Studente Padova", autore: "Sistema", createdAt: "2025-06-15T11:00:00" },
+    ],
+  },
+  {
+    id: "pren8",
+    camera_id: "singola-103",
+    camera_nome: "Singola Standard 103",
+    student_id: "p8",
+    student_nome: "Davide Russo",
+    data_inizio: "2025-09-01",
+    data_fine: "2026-07-31",
+    stato: "rifiutata",
+    pipeline_stato: "perso",
+    created_at: "2025-05-25",
+    telefono: "+39 351 9990001",
+    email: "davide.russo@gmail.com",
+    eta: 25,
+    corso_universita: "Ingegneria Civile",
+    citta_provenienza: "Catania",
+    fonte: "google",
+    budget_max: 350,
+    operatore_assegnato: "Matteo Rinaldi",
+    priorita: "bassa",
+    motivo_perdita: "Budget non compatibile",
+    attivita: [
+      { id: "a18", tipo: "cambio_stato", testo: "Lead da Google", autore: "Sistema", createdAt: "2025-05-25T10:00:00" },
+      { id: "a19", tipo: "chiamata", testo: "Cercava sotto 350€, fuori range", autore: "Matteo Rinaldi", createdAt: "2025-05-26T14:00:00" },
+      { id: "a20", tipo: "cambio_stato", testo: "Marcato come perso: budget non compatibile", autore: "Matteo Rinaldi", createdAt: "2025-05-27T09:00:00" },
+    ],
   },
 ];
 
