@@ -1,53 +1,54 @@
 
 
-# Pannello info studente nel popup ticket
+# Migliora area /admin/studenti
 
-## Cosa aggiungo
-Dentro il popup del ticket aggiungo un **pannello compatto "Info studente"** posizionato sopra i Tabs (Conversazione/Cronologia), collassabile, con:
-- Avatar + nome + corso/anno
-- **Camera** assegnata (link cliccabile alla camera)
-- **Contratto attivo** (data inizio → fine, stato) con link a documenti
-- **Telefono** (con `tel:` per chiamare)
-- **Email** (con `mailto:` per scrivere)
-- Bottone **"Vedi profilo completo"** → link a `/admin/studenti` (la pagina admin esistente)
+## Stato attuale
+Lista piatta con avatar, nome, email, corso, anno, badge "Assegnato" e dialog dettaglio basico (corso, anno, piano, camera, bio, interessi). Non c'è ricerca, filtri, contesto contratto/pagamenti/ticket, né azioni rapide.
 
-## Modifiche
+## Cosa miglioro
 
-### `src/pages/admin/AdminSupporto.tsx` (1 file)
+### 1. Header con KPI
+4 card statistiche in alto:
+- Totale studenti
+- Con camera assegnata
+- Senza assegnazione
+- Ticket aperti collegati a studenti
 
-**Import nuovi**:
-- `Link` da `react-router-dom`
-- `mockRichieste` da `@/data/mockData`
-- icone: `Phone`, `Mail`, `BedDouble`, `FileText`, `ChevronDown`, `ExternalLink`, `Calendar`
+### 2. Toolbar
+- **Ricerca** per nome, cognome, email, corso (input con icona Search)
+- **Filtri**: tutti / assegnati / non assegnati (Tabs)
+- **Vista**: griglia card vs lista compatta (toggle icone)
+- **Ordinamento**: nome A-Z, anno, data assegnazione
 
-**Derivazioni** (sotto `studentProfile`):
-```ts
-const studentContract = selected
-  ? mockRichieste.find(r => r.student_id === selected.student_id && r.stato === "approvata")
-  : null;
-```
+### 3. Lista/griglia migliorata
+Card studente con:
+- Avatar grande, nome, corso/anno
+- Badge stato camera (Assegnato verde / Non assegnato grigio)
+- Riga info compatta: camera + piano (se assegnato), telefono (da `mockRichieste`)
+- Mini-badge: ticket aperti ("2 ticket"), pagamenti scaduti ("⚠ in ritardo")
+- Click ovunque sulla card → apre popup dettaglio (più cliccabile della tabella attuale)
 
-**Nuovo blocco UI** dentro `detailPanel`, inserito dopo l'header (riga ~401) e prima dei Tabs (riga ~404):
+### 4. Popup dettaglio arricchito (Dialog più grande)
+Layout a 2 colonne con tabs:
+- **Header**: avatar grande, nome, contatti cliccabili (`tel:`, `mailto:`), badge stato, bottone "Vai al ticket" / "Crea ticket"
+- **Tab Anagrafica**: corso, anno, città provenienza, età, instagram, bio, interessi (dati esistenti + da `mockRichieste`)
+- **Tab Camera & Contratto**: camera assegnata + piano, date contratto inizio→fine, badge stato, link a `/admin/contratti`
+- **Tab Pagamenti**: ultimi pagamenti (mock condiviso), badge pagato/scaduto, totale incassato
+- **Tab Ticket**: ticket di supporto dello studente (filtra `mockTickets` per `student_id`), click → link a `/admin/supporto`
 
-Una `Collapsible` (shadcn) **aperta di default su desktop, chiusa su mobile**:
-- Trigger: riga compatta con icona utente + "Info studente" + chevron + avatar mini
-- Content: card con grid 2 colonne (1 su mobile):
-  - **Camera**: icona BedDouble + numero camera + piano (es. "Singola 101 · Piano 1")
-  - **Contratto**: icona Calendar + "01/09/25 → 31/07/26" + badge "Attivo" verde, link "Documenti" → `/admin/contratti`
-  - **Telefono**: icona Phone + numero come `<a href="tel:...">` cliccabile
-  - **Email**: icona Mail + email come `<a href="mailto:...">` cliccabile (truncate)
-- Footer card: bottone outline "Vedi profilo completo" → link a `/admin/studenti` con `<ExternalLink>`
+### 5. Microinterazioni
+- Hover card: leggero shadow + scale
+- Empty state per ricerca senza risultati
+- Stagger animation conservato
 
-**Stili**: bg `bg-muted/30`, padding compatto, testo `text-xs`/`text-sm`, icone `h-3.5 w-3.5 text-muted-foreground`. Se dato mancante mostro "—".
-
-**Telefono mock**: prendo da `mockRichieste` (campo `telefono`) collegato allo studente; se non esiste, fallback "—".
-
-### Nessuna modifica a `mockData.ts`
-Tutti i dati esistono già: `mockProfiles` (camera, piano, email, corso, avatar) + `mockRichieste` (telefono, contratto date, stato).
+## File modificati
+**Solo** `src/pages/admin/AdminStudenti.tsx` (1 file).
+Tutti i dati esistono già: `mockProfiles`, `mockRichieste`, `mockTickets`, `mockPagamenti`, `mockRooms` (per nome camera). Nessuna modifica a `mockData.ts`.
 
 ## Tecnica
-- Riuso `Collapsible` shadcn (già nel progetto: `src/components/ui/collapsible.tsx`)
+- Riuso `Card`, `Tabs`, `Dialog`, `Badge`, `Input`, `Button`, `Avatar`, `ScrollArea`
+- Icone `lucide-react`: Search, Users, Home, AlertCircle, Phone, Mail, Calendar, BedDouble, FileText, Headphones, Grid, List, ExternalLink
+- Derivazioni memoizzate: per ogni studente calcolo ticket aperti, contratto attivo, telefono, pagamenti
+- Link da popup verso `/admin/contratti`, `/admin/supporto`, `/admin/camere` per navigazione cross-area
 - Nessuna nuova dipendenza
-- Nessun cambio dati: tutto deriva da mock già esistenti
-- Pannello non rompe la timeline — è un blocco statico tra header e tabs
 
