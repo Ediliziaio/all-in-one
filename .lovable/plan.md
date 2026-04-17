@@ -1,39 +1,70 @@
 
 
-# UrgencySection redesign + nuova CommunitySection
+L'utente vuole due cose:
+1. Migliorare l'area descrizione/contenuto della pagina dettaglio camera (`/camere/:id`) — il blocco con descrizione, servizi, info
+2. Soprattutto migliorare l'area admin dove si caricano foto e descrizioni delle camere (`AdminCamere.tsx`)
 
-## 1. UrgencySection — sfondo più caldo e visivo
+Guardo lo stato attuale: in `CameraDettaglio.tsx` la descrizione è un singolo paragrafo seguito da una griglia di feature flat. In `AdminCamere.tsx` il dialog "Aggiungi Camera" è basico (3 input + textarea), niente upload foto reale, niente preview, niente gestione galleria, nessun campo per features/tipo dettagliato.
 
-Sostituisco il grigio piatto (`bg-foreground`) con:
-- **Background image** di Padova/studenti (uso un'immagine già presente nel progetto o Unsplash via URL diretto: studenti/città universitaria di sera)
-- **Overlay gradient** navy → verde brand semi-trasparente (`from-primary/95 via-primary/90 to-accent/80`) per leggibilità + coerenza col brand Napoleone
-- **Noise/grain sottile** opzionale per profondità
-- Le card countdown e progress bar restano ma con `bg-background/10 backdrop-blur-md` rinforzato per staccare dall'immagine
+# Migliorie pagina camera + admin upload foto/descrizioni
 
-Risultato: sezione che "respira", calda, on-brand (navy + verde) invece del grigio neutro.
+## 1. Pagina dettaglio camera (`CameraDettaglio.tsx`) — blocco contenuti più ricco
 
-## 2. Nuova CommunitySection
+Sostituisco il blocco "descrizione + servizi" piatto con una struttura editoriale a sezioni:
 
-Inserita tra `TestimonialsSection` e `UrgencySection` in `Index.tsx`.
+**a. Descrizione potenziata**
+- Prima riga "highlight" grande (drop-cap o frase d'apertura in `text-lg font-medium`)
+- Resto del testo in colonna leggibile (max-width prosa, line-height generoso)
+- Icona quote decorativa sottile
 
-**Contenuto**:
-- Titolo: "Più di una camera. Una **community**."
-- Sottotitolo: "Eventi, aperitivi, gruppi studio. A Studentato Napoleone non sei mai solo."
-- **3 card visive** con icona + foto:
-  1. **Eventi mensili** — aperitivi, cene, serate film
-  2. **Gruppi studio** — incontra coinquilini del tuo corso
-  3. **Bacheca community** — scambia libri, organizza viaggi, trova compagni
-- **Mini-galleria** stile collage: 4-5 foto piccole di momenti community (ridenti, gruppo, studio insieme) con leggero hover-zoom
-- **CTA** "Scopri l'area community" → link a `/studente/community` (o `/vantaggi`)
+**b. Tabs informativi** (Tabs shadcn già disponibili)
+- **Panoramica** — descrizione + highlight
+- **Servizi & Dotazioni** — griglia features esistente, ma raggruppata per categoria (icone diverse: Wifi/Bagno/Clima/Studio)
+- **Cosa è incluso** — lista chiara: utenze, pulizie, internet, manutenzione (mock)
+- **Regole della casa** — orari, ospiti, animali, fumo (mock con icone)
 
-**Stile**: 
-- Background `bg-muted/40` con accenti verde brand
-- Card con `HoverCard` + StaggerContainer (riuso `MotionWrappers` esistenti)
-- Foto da Unsplash (URL diretti, niente download)
+**c. Mini "info card" sopra la descrizione**
+- 3-4 mini-stat con icona: "Ideale per", "Esposizione", "Arredamento", "Bagno" — visual quick-scan
+
+**d. Sezione "La posizione" (mini-mappa mock)**
+- Card con immagine statica/placeholder mappa + indirizzo + "5 min da Università" + lista punti di interesse
+
+## 2. Admin — upload foto e gestione camera (priorità alta)
+
+Riscrivo il dialog "Nuova Camera" (e il dialog "Modifica") con un'esperienza completa:
+
+**a. Layout dialog più grande** — `max-w-3xl`, con tabs interne:
+- **Info Base** — nome, tipo, prezzo, piano, mq, descrizione (textarea grande)
+- **Foto** — uploader drag-and-drop + galleria preview
+- **Servizi** — checkbox grid con tutte le features standard (Wifi, Aria condizionata, Riscaldamento, Bagno privato, Scrivania, Armadio, Balcone, Cucina condivisa, Lavanderia, ecc.)
+- **Disponibilità** — switch disponibile/occupata, data disponibilità (date picker), prezzo
+
+**b. Uploader foto realistico** (mock, no backend)
+- Drop-zone con bordo tratteggiato + icona Upload + testo "Trascina foto qui o clicca per sfogliare"
+- Accetta file via `<input type="file" multiple accept="image/*">`
+- Genera preview tramite `URL.createObjectURL()` e le mostra in griglia
+- Ogni preview ha: thumbnail, badge "Copertina" sulla prima, X per rimuovere, drag-handle per riordinare (uso semplice up/down arrows o `react-beautiful` no — uso swap con frecce per non aggiungere dipendenze)
+- Counter "X/10 foto"
+
+**c. Editor descrizione migliorato**
+- Textarea con char counter (es. 500 caratteri max consigliati)
+- Suggerimento sotto: "Descrivi atmosfera, luminosità, vista, arredamento. Evita info già presenti nei servizi."
+
+**d. Card admin più informative nella griglia**
+- Aggiungo overlay hover sulle immagini con bottoni rapidi (Modifica / Foto / Disponibilità) invece dei 3 button sotto
+- Badge "X foto" sopra l'immagine
+- Indicatore "Descrizione mancante" se vuota
+- Quick stats: prezzo + tipo + mq in linea pulita
+
+**e. Drawer/Dialog riordino foto separato** quando si clicca "Foto"
+- Mostra galleria full-size con drag-to-reorder (semplice swap con frecce)
+- Set copertina con click
 
 ## File modificati (3)
 
-1. **`src/components/home/UrgencySection.tsx`** — background image + overlay brand
-2. **`src/components/home/CommunitySection.tsx`** — nuovo file
-3. **`src/pages/Index.tsx`** — import e inserimento `<CommunitySection />` dopo `<TestimonialsSection />`
+1. **`src/pages/CameraDettaglio.tsx`** — Tabs descrizione/servizi/incluso/regole, mini-stat card, sezione posizione
+2. **`src/pages/admin/AdminCamere.tsx`** — Dialog ricco con tabs interne, uploader drag-and-drop con preview, checkbox features, char counter; card griglia con overlay hover
+3. **`src/components/ui/textarea.tsx`** — già OK, nessuna modifica
+
+Nessuna nuova dipendenza: uso `Tabs`, `Checkbox`, `Switch`, `Calendar/Popover` già presenti in shadcn.
 
