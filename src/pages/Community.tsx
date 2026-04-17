@@ -154,7 +154,7 @@ const Community = () => (
   <Layout>
     <PageTransition>
       {/* Hero immersivo */}
-      <section className="relative min-h-[70vh] flex items-center overflow-hidden">
+      <section className="relative min-h-[60vh] md:min-h-[70vh] flex items-center overflow-hidden">
         <div className="absolute inset-0">
           <KenBurns
             src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1800&h=1000&fit=crop"
@@ -163,33 +163,33 @@ const Community = () => (
           />
           <div className="absolute inset-0 bg-gradient-to-r from-primary/95 via-primary/70 to-primary/40" />
         </div>
-        <div className="container relative z-10 py-20">
+        <div className="container relative z-10 py-12 md:py-20">
           <FadeIn>
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/20 text-accent-foreground bg-accent text-xs font-semibold mb-4">
               <Sparkles className="h-3.5 w-3.5" />
               Community
             </div>
-            <h1 className="font-heading text-4xl md:text-6xl lg:text-7xl font-bold text-primary-foreground max-w-3xl leading-tight">
+            <h1 className="font-heading text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold text-primary-foreground max-w-3xl leading-tight">
               La tua nuova<br />
               <span className="text-accent">famiglia</span> a Padova.
             </h1>
-            <p className="text-primary-foreground/80 mt-6 text-lg md:text-xl max-w-xl">
+            <p className="text-primary-foreground/80 mt-4 md:mt-6 text-base md:text-xl max-w-xl">
               Vivere qui non significa avere una camera. Significa avere persone con cui crescere, ridere, studiare, viaggiare.
             </p>
           </FadeIn>
 
           <FadeIn delay={0.2}>
-            <div className="mt-10 grid grid-cols-3 gap-4 max-w-xl">
+            <div className="mt-8 md:mt-10 grid grid-cols-3 gap-2 sm:gap-4 max-w-xl">
               {[
                 { v: 100, s: "+", l: "studenti" },
                 { v: 4, s: "/mese", l: "eventi" },
                 { v: 25, s: "+", l: "nazionalità" },
               ].map((s) => (
                 <div key={s.l}>
-                  <div className="font-heading text-3xl md:text-4xl font-bold text-accent">
+                  <div className="font-heading text-2xl sm:text-3xl md:text-4xl font-bold text-accent">
                     <CountUp to={s.v} suffix={s.s} />
                   </div>
-                  <div className="text-xs md:text-sm text-primary-foreground/70 mt-1">{s.l}</div>
+                  <div className="text-[11px] sm:text-xs md:text-sm text-primary-foreground/70 mt-1 leading-tight">{s.l}</div>
                 </div>
               ))}
             </div>

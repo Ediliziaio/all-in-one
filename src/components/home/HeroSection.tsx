@@ -25,7 +25,7 @@ export function HeroSection() {
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-muted via-background to-muted">
       <GradientMesh />
-      <div className="container relative py-16 md:py-24">
+      <div className="container relative py-12 md:py-24">
         <motion.div
           variants={containerVariants}
           initial="hidden"
@@ -46,7 +46,7 @@ export function HeroSection() {
 
             <motion.h1
               variants={itemVariants}
-              className="font-heading text-4xl font-extrabold leading-tight md:text-5xl lg:text-6xl text-foreground"
+              className="font-heading text-3xl sm:text-4xl font-extrabold leading-tight md:text-5xl lg:text-6xl text-foreground"
             >
               La Tua Casa a Padova,{" "}
               <span className="text-primary">Senza Pensieri.</span>
@@ -60,20 +60,20 @@ export function HeroSection() {
               <strong className="text-foreground"> a partire da €480/mese</strong>. A pochi minuti dall'università.
             </motion.p>
 
-            <motion.div variants={itemVariants} className="flex flex-wrap gap-3">
-              <Button asChild size="lg" className="text-base">
+            <motion.div variants={itemVariants} className="flex flex-col sm:flex-row flex-wrap gap-3">
+              <Button asChild size="lg" className="text-base w-full sm:w-auto">
                 <Link to="/camere">
                   Scopri le Camere <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
-              <Button asChild variant="outline" size="lg" className="text-base">
+              <Button asChild variant="outline" size="lg" className="text-base w-full sm:w-auto">
                 <Link to="/contatti">Prenota una visita</Link>
               </Button>
             </motion.div>
 
             <motion.div
               variants={itemVariants}
-              className="flex flex-wrap gap-8 pt-6 border-t border-border"
+              className="flex flex-wrap gap-4 sm:gap-8 pt-6 border-t border-border"
             >
               <div className="flex items-center gap-2">
                 <Star className="h-5 w-5 text-[hsl(var(--google-yellow))]" />

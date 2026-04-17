@@ -10,7 +10,7 @@ const distances = [
 
 export function MapSection() {
   return (
-    <section className="py-20 bg-muted/50">
+    <section className="py-12 md:py-20 bg-muted/50">
       <div className="container">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

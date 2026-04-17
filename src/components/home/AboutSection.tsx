@@ -10,7 +10,7 @@ const stats = [
 
 export function AboutSection() {
   return (
-    <section className="py-20 bg-muted/30">
+    <section className="py-12 md:py-20 bg-muted/30">
       <div className="container max-w-4xl">
         <FadeIn className="text-center mb-12">
           <h2 className="font-heading text-3xl md:text-4xl font-bold text-foreground mb-4">

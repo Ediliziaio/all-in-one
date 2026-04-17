@@ -1,7 +1,6 @@
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { NotificationBell } from "@/components/NotificationBell";
-import { ThemeToggle } from "@/components/ThemeToggle";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 interface DashboardHeaderProps {
@@ -19,7 +18,6 @@ export function DashboardHeader({ userName, userAvatar, userInitials }: Dashboar
           <Input placeholder="Cerca..." className="pl-9 h-9 bg-muted/50 border-none" />
         </div>
         <div className="flex items-center gap-1">
-          <ThemeToggle />
           <NotificationBell />
           <div className="flex items-center gap-2 ml-2">
             <Avatar className="h-8 w-8">

@@ -46,7 +46,7 @@ function TiltCard({ children }: { children: React.ReactNode }) {
 
 export function RoomsPreview() {
   return (
-    <section className="py-20 bg-muted/50">
+    <section className="py-12 md:py-20 bg-muted/50">
       <div className="container">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -61,7 +61,7 @@ export function RoomsPreview() {
           <p className="text-muted-foreground mt-3">Prezzi chiari. Tutto incluso. €0 extra, mai.</p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
           {previewRooms.map(({ room, remaining, badge }, i) => (
             <motion.div
               key={room.id}

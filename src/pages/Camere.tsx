@@ -111,15 +111,15 @@ const Camere = () => {
     <Layout>
       <PageTransition>
         {/* Hero */}
-        <section className="relative py-20 overflow-hidden">
+        <section className="relative py-12 md:py-20 overflow-hidden">
           <div className="absolute inset-0">
             <img src="https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=1400&h=500&fit=crop" alt="Camere dello studentato" className="w-full h-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/80 to-background/40" />
           </div>
           <div className="container relative z-10">
             <FadeIn>
-              <h1 className="font-heading text-4xl md:text-5xl font-bold text-foreground max-w-xl">Trova la tua camera ideale</h1>
-              <p className="text-muted-foreground mt-3 text-lg max-w-lg">
+              <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl font-bold text-foreground max-w-xl">Trova la tua camera ideale</h1>
+              <p className="text-muted-foreground mt-3 text-base md:text-lg max-w-lg">
                 Esplora le nostre camere singole, plus e doppie. Tutte arredate, con servizi inclusi e a pochi passi dall'università.
               </p>
             </FadeIn>

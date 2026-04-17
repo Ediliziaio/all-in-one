@@ -199,19 +199,19 @@ export default function AdminCamere() {
 
   const renderRoomDialog = () => (
     <Dialog open={dialogOpen} onOpenChange={(o) => !o && closeAll()}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="w-[95vw] max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{isEditing ? `Modifica ${editRoom?.name}` : "Nuova Camera"}</DialogTitle>
         </DialogHeader>
 
         <Tabs defaultValue="info" className="mt-2">
           <TabsList className="grid grid-cols-4 w-full">
-            <TabsTrigger value="info">Info Base</TabsTrigger>
-            <TabsTrigger value="photos">
-              Foto {form.images.length > 0 && <Badge variant="secondary" className="ml-2 h-5">{form.images.length}</Badge>}
+            <TabsTrigger value="info" className="text-xs sm:text-sm px-1 sm:px-3">Info</TabsTrigger>
+            <TabsTrigger value="photos" className="text-xs sm:text-sm px-1 sm:px-3">
+              Foto {form.images.length > 0 && <Badge variant="secondary" className="ml-1 sm:ml-2 h-5">{form.images.length}</Badge>}
             </TabsTrigger>
-            <TabsTrigger value="services">Servizi</TabsTrigger>
-            <TabsTrigger value="availability">Disponibilità</TabsTrigger>
+            <TabsTrigger value="services" className="text-xs sm:text-sm px-1 sm:px-3">Servizi</TabsTrigger>
+            <TabsTrigger value="availability" className="text-xs sm:text-sm px-1 sm:px-3"><span className="hidden sm:inline">Disponibilità</span><span className="sm:hidden">Disp.</span></TabsTrigger>
           </TabsList>
 
           {/* INFO */}
@@ -311,7 +311,7 @@ export default function AdminCamere() {
                         <Star className="h-3 w-3 mr-1 fill-current" /> Copertina
                       </Badge>
                     )}
-                    <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/60 transition-colors flex items-center justify-center gap-1 opacity-0 group-hover:opacity-100">
+                    <div className="absolute inset-0 bg-foreground/0 sm:group-hover:bg-foreground/60 transition-colors flex items-center justify-center gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100">
                       <Button size="icon" variant="secondary" className="h-7 w-7"
                         onClick={(e) => { e.stopPropagation(); moveImage(idx, -1); }} disabled={idx === 0}>
                         <ArrowLeft className="h-3 w-3" />
@@ -390,20 +390,20 @@ export default function AdminCamere() {
   );
 
   return (
-    <PageTransition className="p-6 space-y-6">
+    <PageTransition className="p-4 sm:p-6 space-y-4 sm:space-y-6">
       <FadeIn>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
-            <h1 className="font-heading text-2xl font-bold">Gestione Camere</h1>
-            <p className="text-sm text-muted-foreground">{roomList.length} camere totali · {roomList.filter(r => r.available).length} disponibili</p>
+            <h1 className="font-heading text-xl sm:text-2xl font-bold">Gestione Camere</h1>
+            <p className="text-xs sm:text-sm text-muted-foreground">{roomList.length} camere totali · {roomList.filter(r => r.available).length} disponibili</p>
           </div>
           <div className="flex items-center gap-2">
             <div className="flex border rounded-lg">
               <button onClick={() => setView("grid")} className={`p-2 ${view === "grid" ? "bg-muted" : ""}`}><LayoutGrid className="h-4 w-4" /></button>
               <button onClick={() => setView("list")} className={`p-2 ${view === "list" ? "bg-muted" : ""}`}><List className="h-4 w-4" /></button>
             </div>
-            <Button onClick={openCreate}>
-              <Plus className="h-4 w-4 mr-2" /> Aggiungi Camera
+            <Button onClick={openCreate} className="flex-1 sm:flex-initial">
+              <Plus className="h-4 w-4 mr-2" /> <span className="hidden sm:inline">Aggiungi Camera</span><span className="sm:hidden">Aggiungi</span>
             </Button>
           </div>
         </div>

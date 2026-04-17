@@ -34,7 +34,7 @@ export function HowItWorksSection() {
   const lineWidth = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
 
   return (
-    <section className="py-20 bg-muted/30">
+    <section className="py-12 md:py-20 bg-muted/30">
       <div className="container">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
