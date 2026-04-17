@@ -60,6 +60,8 @@ export default function AdminBuoni() {
   const [createOpen, setCreateOpen] = useState(false);
   const [editing, setEditing] = useState<Buono | null>(null);
   const [form, setForm] = useState<FormState>(emptyForm);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   const dialogOpen = createOpen || !!editing;
   const isEditing = !!editing;
