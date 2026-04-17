@@ -23,6 +23,8 @@ import { mockProfiles } from "@/data/mockData";
 import { toast } from "sonner";
 import { PageTransition, FadeIn, StaggerContainer, StaggerItem, HoverCard } from "@/components/motion/MotionWrappers";
 import { downloadCSV, formatEUR, todayStamp } from "@/lib/csv";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
 
 const ALL_FEATURES = [
   "WiFi Fibra", "Aria condizionata", "Riscaldamento", "Bagno privato",

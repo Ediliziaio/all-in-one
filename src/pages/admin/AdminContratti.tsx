@@ -9,13 +9,17 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Eye, Download, Search, FileText, TrendingUp, Users, Calendar,
-  AlertCircle, RefreshCw, Home, ExternalLink, CheckCircle2, Clock,
+  AlertCircle, RefreshCw, Home, ExternalLink, CheckCircle2, Clock, BellRing,
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
 import { mockContratti, mockProfiles, mockPagamenti, type Contratto } from "@/data/mockData";
 import { toast } from "sonner";
 import { PageTransition, FadeIn } from "@/components/motion/MotionWrappers";
 import { downloadCSV, daysUntil, formatEUR, todayStamp } from "@/lib/csv";
+import { BulkActionsBar } from "@/components/admin/BulkActionsBar";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 
 const statoBadge: Record<string, string> = {
   attivo: "bg-success/15 text-success border-success/20",
