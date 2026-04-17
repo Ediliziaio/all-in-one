@@ -11,7 +11,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuLabel, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
-import { Search, Send, MessageSquare, Inbox, Clock, CheckCircle2, Timer, MoreVertical, Zap, X, List, Kanban, AlertTriangle, UserCheck } from "lucide-react";
+import { Search, Send, Inbox, Clock, CheckCircle2, Timer, MoreVertical, Zap, X, List, Kanban, AlertTriangle, UserCheck } from "lucide-react";
 import { mockTickets as initialTickets, mockProfiles, mockOperatori, type SupportTicket, type TicketMessage } from "@/data/mockData";
 import { toast } from "sonner";
 import { PageTransition, FadeIn } from "@/components/motion/MotionWrappers";
