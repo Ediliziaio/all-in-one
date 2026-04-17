@@ -11,8 +11,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuLabel, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
-import { Search, Send, MessageSquare, Inbox, Clock, CheckCircle2, Timer, MoreVertical, Zap, X, List, Kanban } from "lucide-react";
-import { mockTickets as initialTickets, mockProfiles, type SupportTicket, type TicketMessage } from "@/data/mockData";
+import { Search, Send, MessageSquare, Inbox, Clock, CheckCircle2, Timer, MoreVertical, Zap, X, List, Kanban, AlertTriangle, UserCheck } from "lucide-react";
+import { mockTickets as initialTickets, mockProfiles, mockOperatori, type SupportTicket, type TicketMessage } from "@/data/mockData";
 import { toast } from "sonner";
 import { PageTransition, FadeIn } from "@/components/motion/MotionWrappers";
 import { cn } from "@/lib/utils";
@@ -81,6 +81,33 @@ function relTime(iso: string) {
   }
 }
 
+const CURRENT_OPERATOR = "Giulia Marchetti";
+
+type SLAColor = "green" | "yellow" | "red";
+
+function getSLA(ticket: SupportTicket): { color: SLAColor; label: string; hours: number; urgent: boolean; needsReply: boolean } {
+  const last = ticket.messages[ticket.messages.length - 1];
+  const lastStudentMsg = [...ticket.messages].reverse().find((m) => m.author === "studente");
+  const refIso = lastStudentMsg?.createdAt || last?.createdAt || ticket.updatedAt || ticket.created_at;
+  const hours = (Date.now() - new Date(refIso).getTime()) / 3600_000;
+  const needsReply = ticket.stato !== "risolto" && !!last && last.author === "studente";
+  let color: SLAColor = "green";
+  if (hours >= 24) color = "red";
+  else if (hours >= 2) color = "yellow";
+  let label: string;
+  if (hours < 1) label = `${Math.max(1, Math.round(hours * 60))}m`;
+  else if (hours < 24) label = `${Math.round(hours)}h`;
+  else label = `${Math.round(hours / 24)}g`;
+  const urgent = ticket.priorita === "urgente" && needsReply && hours >= 2 && ticket.stato !== "risolto";
+  return { color, label, hours, urgent, needsReply };
+}
+
+const slaBadgeColors: Record<SLAColor, string> = {
+  green: "bg-green-100 text-green-700 border-green-200",
+  yellow: "bg-yellow-100 text-yellow-700 border-yellow-200",
+  red: "bg-red-100 text-red-700 border-red-200",
+};
+
 type SortKey = "recenti" | "vecchi" | "priorita";
 
 const priorityOrder: Record<string, number> = { urgente: 0, alta: 1, normale: 2, bassa: 3 };
@@ -98,6 +125,11 @@ export default function AdminSupporto() {
     if (typeof window === "undefined") return "lista";
     return (localStorage.getItem("admin_supporto_view") as "lista" | "pipeline") || "lista";
   });
+  const [onlyMine, setOnlyMine] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    return localStorage.getItem("admin_supporto_my") === "1";
+  });
+  const [onlyUrgent, setOnlyUrgent] = useState(false);
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
@@ -111,15 +143,21 @@ export default function AdminSupporto() {
     localStorage.setItem("admin_supporto_view", view);
   }, [view]);
 
+  useEffect(() => {
+    localStorage.setItem("admin_supporto_my", onlyMine ? "1" : "0");
+  }, [onlyMine]);
+
   const selected = tickets.find((t) => t.id === selectedId) || null;
 
   const stats = useMemo(() => {
     const today = new Date().toDateString();
+    const urgenti = tickets.filter((t) => getSLA(t).urgent).length;
     return {
       aperti: tickets.filter((t) => t.stato === "aperto").length,
       in_corso: tickets.filter((t) => t.stato === "in_corso").length,
       risolti_oggi: tickets.filter((t) => t.stato === "risolto" && t.closedAt && new Date(t.closedAt).toDateString() === today).length,
       tempo_medio: "2h 30m",
+      urgenti,
     };
   }, [tickets]);
 
@@ -128,6 +166,8 @@ export default function AdminSupporto() {
       if (fStato !== "all" && t.stato !== fStato) return false;
       if (fPrio !== "all" && t.priorita !== fPrio) return false;
       if (fCat !== "all" && t.categoria !== fCat) return false;
+      if (onlyMine && t.assignedTo !== CURRENT_OPERATOR) return false;
+      if (onlyUrgent && !getSLA(t).urgent) return false;
       if (search.trim()) {
         const q = search.toLowerCase();
         if (!t.titolo.toLowerCase().includes(q) && !t.student_nome.toLowerCase().includes(q) && !t.descrizione.toLowerCase().includes(q)) return false;
@@ -141,7 +181,7 @@ export default function AdminSupporto() {
       return sort === "recenti" ? bT.localeCompare(aT) : aT.localeCompare(bT);
     });
     return list;
-  }, [tickets, fStato, fPrio, fCat, search, sort]);
+  }, [tickets, fStato, fPrio, fCat, search, sort, onlyMine, onlyUrgent]);
 
   useEffect(() => {
     if (selected && messagesEndRef.current) {
@@ -194,6 +234,11 @@ export default function AdminSupporto() {
     toast.success(`Priorità cambiata in ${priorita}`);
   };
 
+  const handleAssign = (ticketId: string, operator: string | undefined) => {
+    setTickets((prev) => prev.map((t) => (t.id === ticketId ? { ...t, assignedTo: operator } : t)));
+    toast.success(operator ? `Assegnato a ${operator}` : "Assegnazione rimossa");
+  };
+
   const handleDragEnd = (e: DragEndEvent) => {
     setDraggingId(null);
     const ticketId = e.active.id as string;
@@ -243,6 +288,16 @@ export default function AdminSupporto() {
               <DropdownMenuItem onClick={() => handleChangePrio("alta")}>Alta</DropdownMenuItem>
               <DropdownMenuItem onClick={() => handleChangePrio("normale")}>Normale</DropdownMenuItem>
               <DropdownMenuItem onClick={() => handleChangePrio("bassa")}>Bassa</DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuLabel>Assegna a</DropdownMenuLabel>
+              {mockOperatori.map((op) => (
+                <DropdownMenuItem key={op} onClick={() => handleAssign(selected.id, op)}>
+                  {op === CURRENT_OPERATOR ? `${op} (io)` : op}
+                </DropdownMenuItem>
+              ))}
+              <DropdownMenuItem onClick={() => handleAssign(selected.id, undefined)} className="text-muted-foreground">
+                Rimuovi assegnazione
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
           {isMobile && (
@@ -251,13 +306,52 @@ export default function AdminSupporto() {
             </Button>
           )}
         </div>
-        <div className="flex flex-wrap gap-1.5">
+        <div className="flex flex-wrap items-center gap-1.5">
           <Badge variant="outline" className={cn("text-xs", statoColors[selected.stato])}>{statoLabel[selected.stato]}</Badge>
           <Badge variant="outline" className={cn("text-xs capitalize", prioritaColors[selected.priorita])}>Priorità {selected.priorita}</Badge>
           <Badge variant="outline" className="text-xs capitalize">{selected.categoria}</Badge>
+          {(() => {
+            const sla = getSLA(selected);
+            return (
+              <Badge variant="outline" className={cn("text-xs gap-1", slaBadgeColors[sla.color])}>
+                <Clock className="h-3 w-3" /> {sla.label}
+              </Badge>
+            );
+          })()}
           {selected.rating && (
             <Badge variant="outline" className="text-xs bg-yellow-50 text-yellow-700 border-yellow-200">★ {selected.rating}/5</Badge>
           )}
+        </div>
+        <div className="flex items-center gap-2 text-xs">
+          <span className="text-muted-foreground">Assegnato a:</span>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="h-7 px-2 gap-1.5 text-xs font-normal">
+                {selected.assignedTo ? (
+                  <>
+                    <Avatar className="h-4 w-4">
+                      <AvatarFallback className="text-[8px]">{selected.assignedTo[0]}</AvatarFallback>
+                    </Avatar>
+                    <span>{selected.assignedTo}</span>
+                  </>
+                ) : (
+                  <span className="text-muted-foreground">Non assegnato</span>
+                )}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start">
+              {mockOperatori.map((op) => (
+                <DropdownMenuItem key={op} onClick={() => handleAssign(selected.id, op)}>
+                  <Avatar className="h-5 w-5 mr-2"><AvatarFallback className="text-[9px]">{op[0]}</AvatarFallback></Avatar>
+                  {op === CURRENT_OPERATOR ? `${op} (io)` : op}
+                </DropdownMenuItem>
+              ))}
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => handleAssign(selected.id, undefined)} className="text-muted-foreground">
+                Rimuovi assegnazione
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 
@@ -407,23 +501,44 @@ export default function AdminSupporto() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="flex items-center gap-1 rounded-md border bg-background p-0.5 lg:ml-auto">
+            <div className="flex flex-wrap items-center gap-2 lg:ml-auto">
               <Button
-                variant={view === "lista" ? "default" : "ghost"}
+                variant={onlyMine ? "default" : "outline"}
                 size="sm"
-                className="h-8 px-2 text-xs"
-                onClick={() => setView("lista")}
+                className="h-8 px-2.5 text-xs gap-1.5"
+                onClick={() => setOnlyMine((v) => !v)}
+                title={`Mostra solo ticket assegnati a ${CURRENT_OPERATOR}`}
               >
-                <List className="h-3.5 w-3.5 mr-1" /> Lista
+                <UserCheck className="h-3.5 w-3.5" /> I miei
               </Button>
-              <Button
-                variant={view === "pipeline" ? "default" : "ghost"}
-                size="sm"
-                className="h-8 px-2 text-xs"
-                onClick={() => setView("pipeline")}
-              >
-                <Kanban className="h-3.5 w-3.5 mr-1" /> Pipeline
-              </Button>
+              {stats.urgenti > 0 && (
+                <Button
+                  variant={onlyUrgent ? "destructive" : "outline"}
+                  size="sm"
+                  className={cn("h-8 px-2.5 text-xs gap-1.5", !onlyUrgent && "text-red-600 border-red-200 hover:bg-red-50")}
+                  onClick={() => setOnlyUrgent((v) => !v)}
+                >
+                  <AlertTriangle className="h-3.5 w-3.5" /> Urgenti {stats.urgenti}
+                </Button>
+              )}
+              <div className="flex items-center gap-1 rounded-md border bg-background p-0.5">
+                <Button
+                  variant={view === "lista" ? "default" : "ghost"}
+                  size="sm"
+                  className="h-7 px-2 text-xs"
+                  onClick={() => setView("lista")}
+                >
+                  <List className="h-3.5 w-3.5 mr-1" /> Lista
+                </Button>
+                <Button
+                  variant={view === "pipeline" ? "default" : "ghost"}
+                  size="sm"
+                  className="h-7 px-2 text-xs"
+                  onClick={() => setView("pipeline")}
+                >
+                  <Kanban className="h-3.5 w-3.5 mr-1" /> Pipeline
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -454,6 +569,7 @@ export default function AdminSupporto() {
                           profile={mockProfiles.find((p) => p.id === t.student_id)}
                           onClick={() => setSelectedId(t.id)}
                           isDragging={draggingId === t.id}
+                          onAssign={handleAssign}
                         />
                       ))
                     )}
@@ -486,16 +602,21 @@ export default function AdminSupporto() {
             filtered.map((t) => {
               const last = t.messages[t.messages.length - 1];
               const profile = mockProfiles.find((p) => p.id === t.student_id);
+              const sla = getSLA(t);
               return (
                 <motion.div key={t.id} whileHover={{ scale: 1.005 }} whileTap={{ scale: 0.995 }}>
                   <Card
                     className={cn(
-                      "cursor-pointer transition-all overflow-hidden",
+                      "cursor-pointer transition-all overflow-hidden relative",
                       selectedId === t.id && !isMobile ? "ring-2 ring-primary" : "hover:bg-muted/30",
-                      t.unreadForAdmin && "border-primary/40"
+                      t.unreadForAdmin && "border-primary/40",
+                      sla.urgent && "border-red-400 ring-1 ring-red-300/60 animate-pulse"
                     )}
                     onClick={() => setSelectedId(t.id)}
                   >
+                    {sla.urgent && (
+                      <AlertTriangle className="absolute top-2 right-2 h-3.5 w-3.5 text-red-600" />
+                    )}
                     <div className="flex">
                       <div className={cn("w-1 shrink-0", prioritaBar[t.priorita])} />
                       <CardContent className="p-3 flex-1 min-w-0">
@@ -518,7 +639,41 @@ export default function AdminSupporto() {
                             <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
                               <Badge variant="outline" className={cn("text-[10px] px-1.5 py-0", statoColors[t.stato])}>{statoLabel[t.stato]}</Badge>
                               <Badge variant="outline" className={cn("text-[10px] px-1.5 py-0 capitalize", prioritaColors[t.priorita])}>{t.priorita}</Badge>
+                              <Badge variant="outline" className={cn("text-[10px] px-1.5 py-0 gap-0.5", slaBadgeColors[sla.color])}>
+                                <Clock className="h-2.5 w-2.5" /> {sla.label}
+                              </Badge>
                               <span className="text-[10px] text-muted-foreground ml-auto">{relTime(t.updatedAt || t.created_at)}</span>
+                            </div>
+                            <div className="flex items-center gap-1.5 mt-1.5">
+                              <div onPointerDown={(e) => e.stopPropagation()} onClick={(e) => e.stopPropagation()}>
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" size="sm" className="h-6 px-1.5 gap-1 text-[10px] font-normal">
+                                      {t.assignedTo ? (
+                                        <>
+                                          <Avatar className="h-4 w-4"><AvatarFallback className="text-[8px]">{t.assignedTo[0]}</AvatarFallback></Avatar>
+                                          <span className="truncate max-w-[100px]">{t.assignedTo}</span>
+                                        </>
+                                      ) : (
+                                        <span className="text-muted-foreground">+ Assegna</span>
+                                      )}
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="start">
+                                    <DropdownMenuLabel>Assegna a</DropdownMenuLabel>
+                                    {mockOperatori.map((op) => (
+                                      <DropdownMenuItem key={op} onClick={() => handleAssign(t.id, op)}>
+                                        <Avatar className="h-5 w-5 mr-2"><AvatarFallback className="text-[9px]">{op[0]}</AvatarFallback></Avatar>
+                                        {op === CURRENT_OPERATOR ? `${op} (io)` : op}
+                                      </DropdownMenuItem>
+                                    ))}
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem onClick={() => handleAssign(t.id, undefined)} className="text-muted-foreground">
+                                      Rimuovi
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -604,11 +759,13 @@ function DraggableTicketCard({
   profile,
   onClick,
   isDragging,
+  onAssign,
 }: {
   ticket: SupportTicket;
   profile?: { avatar?: string };
   onClick: () => void;
   isDragging: boolean;
+  onAssign: (ticketId: string, op: string | undefined) => void;
 }) {
   const { attributes, listeners, setNodeRef } = useDraggable({ id: ticket.id });
   const downPos = useRef<{ x: number; y: number } | null>(null);
@@ -635,7 +792,7 @@ function DraggableTicketCard({
       onPointerUp={handlePointerUp}
       className={cn("touch-none cursor-pointer", isDragging && "opacity-30")}
     >
-      <TicketCardContent ticket={ticket} profile={profile} />
+      <TicketCardContent ticket={ticket} profile={profile} onAssign={onAssign} />
     </div>
   );
 }
@@ -643,13 +800,23 @@ function DraggableTicketCard({
 function TicketCardContent({
   ticket,
   profile,
+  onAssign,
 }: {
   ticket: SupportTicket;
   profile?: { avatar?: string };
+  onAssign?: (ticketId: string, op: string | undefined) => void;
 }) {
   const last = ticket.messages[ticket.messages.length - 1];
+  const sla = getSLA(ticket);
   return (
-    <Card className={cn("cursor-pointer hover:shadow-md transition-shadow overflow-hidden", ticket.unreadForAdmin && "border-primary/40")}>
+    <Card className={cn(
+      "cursor-pointer hover:shadow-md transition-shadow overflow-hidden relative",
+      ticket.unreadForAdmin && "border-primary/40",
+      sla.urgent && "border-red-400 ring-1 ring-red-300/60 animate-pulse"
+    )}>
+      {sla.urgent && (
+        <AlertTriangle className="absolute top-1.5 right-1.5 h-3 w-3 text-red-600 z-10" />
+      )}
       <div className="flex">
         <div className={cn("w-1 shrink-0", prioritaBar[ticket.priorita])} />
         <CardContent className="p-2.5 flex-1 min-w-0">
@@ -660,7 +827,7 @@ function TicketCardContent({
             </Avatar>
             <div className="flex-1 min-w-0">
               <div className="flex items-start justify-between gap-1">
-                <p className={cn("text-xs truncate", ticket.unreadForAdmin ? "font-semibold" : "font-medium")}>{ticket.titolo}</p>
+                <p className={cn("text-xs truncate pr-4", ticket.unreadForAdmin ? "font-semibold" : "font-medium")}>{ticket.titolo}</p>
                 {ticket.unreadForAdmin && <span className="mt-1 h-1.5 w-1.5 rounded-full bg-primary shrink-0" />}
               </div>
               <p className="text-[10px] text-muted-foreground truncate">{ticket.student_nome}</p>
@@ -672,7 +839,48 @@ function TicketCardContent({
               <div className="flex items-center gap-1 mt-1.5 flex-wrap">
                 <Badge variant="outline" className={cn("text-[9px] px-1 py-0 capitalize h-4", prioritaColors[ticket.priorita])}>{ticket.priorita}</Badge>
                 <Badge variant="outline" className="text-[9px] px-1 py-0 capitalize h-4">{ticket.categoria}</Badge>
-                <span className="text-[9px] text-muted-foreground ml-auto">{relTime(ticket.updatedAt || ticket.created_at)}</span>
+                <Badge variant="outline" className={cn("text-[9px] px-1 py-0 h-4 gap-0.5", slaBadgeColors[sla.color])}>
+                  <Clock className="h-2 w-2" /> {sla.label}
+                </Badge>
+              </div>
+              <div className="flex items-center gap-1 mt-1.5 justify-between">
+                {onAssign ? (
+                  <div onPointerDown={(e) => e.stopPropagation()} onClick={(e) => e.stopPropagation()}>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="sm" className="h-5 px-1 gap-1 text-[9px] font-normal">
+                          {ticket.assignedTo ? (
+                            <>
+                              <Avatar className="h-3.5 w-3.5"><AvatarFallback className="text-[7px]">{ticket.assignedTo[0]}</AvatarFallback></Avatar>
+                              <span className="truncate max-w-[80px]">{ticket.assignedTo}</span>
+                            </>
+                          ) : (
+                            <span className="text-muted-foreground">+ Assegna</span>
+                          )}
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="start">
+                        <DropdownMenuLabel>Assegna a</DropdownMenuLabel>
+                        {mockOperatori.map((op) => (
+                          <DropdownMenuItem key={op} onClick={() => onAssign(ticket.id, op)}>
+                            <Avatar className="h-5 w-5 mr-2"><AvatarFallback className="text-[9px]">{op[0]}</AvatarFallback></Avatar>
+                            {op === CURRENT_OPERATOR ? `${op} (io)` : op}
+                          </DropdownMenuItem>
+                        ))}
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={() => onAssign(ticket.id, undefined)} className="text-muted-foreground">
+                          Rimuovi
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                ) : ticket.assignedTo ? (
+                  <div className="flex items-center gap-1 text-[9px] text-muted-foreground">
+                    <Avatar className="h-3.5 w-3.5"><AvatarFallback className="text-[7px]">{ticket.assignedTo[0]}</AvatarFallback></Avatar>
+                    <span className="truncate max-w-[80px]">{ticket.assignedTo}</span>
+                  </div>
+                ) : <span />}
+                <span className="text-[9px] text-muted-foreground">{relTime(ticket.updatedAt || ticket.created_at)}</span>
               </div>
             </div>
           </div>
