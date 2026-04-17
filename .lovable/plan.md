@@ -1,80 +1,39 @@
 
 
-Analizzo la home attuale: ha già `framer-motion` su Hero, ma le altre sezioni (`ProblemSection`, `ServicesSection`, `RoomsPreview`, ecc.) sono statiche. Il flusso visivo è una sequenza piatta di blocchi simili, senza ritmo né momenti "wow".
+# UrgencySection redesign + nuova CommunitySection
 
-# Rendere la Home più viva e dinamica
+## 1. UrgencySection — sfondo più caldo e visivo
 
-## Diagnosi
-- **Hero** ha animazioni, ma le immagini fluttuanti sono solo decorative
-- **Tutte le sezioni successive** appaiono insieme allo scroll senza gerarchia
-- **Nessun parallax, counter animati, hover ricchi, o transizioni tra sezioni**
-- **Background uniforme** (alternanza muted/background) → monotono
-- **CTA finale debole**, manca tensione narrativa
+Sostituisco il grigio piatto (`bg-foreground`) con:
+- **Background image** di Padova/studenti (uso un'immagine già presente nel progetto o Unsplash via URL diretto: studenti/città universitaria di sera)
+- **Overlay gradient** navy → verde brand semi-trasparente (`from-primary/95 via-primary/90 to-accent/80`) per leggibilità + coerenza col brand Napoleone
+- **Noise/grain sottile** opzionale per profondità
+- Le card countdown e progress bar restano ma con `bg-background/10 backdrop-blur-md` rinforzato per staccare dall'immagine
 
-## Cosa cambio
+Risultato: sezione che "respira", calda, on-brand (navy + verde) invece del grigio neutro.
 
-### 1. Hero più immersivo
-- **Ken Burns** lento sull'immagine principale (zoom 1.0 → 1.08 in 20s, loop)
-- **Badge "Posti limitati"** con pulse sottile sul pallino
-- **Counter animati** sui numeri (4.9★, 98%, €0) che partono da 0 quando entrano in viewport
-- **Gradient mesh animato** dietro al testo (blob che si muovono lentamente)
+## 2. Nuova CommunitySection
 
-### 2. Scroll storytelling
-- **Reveal scaglionati** su ogni sezione: titolo → sottotitolo → cards (stagger 100ms)
-- **Parallax leggero** sulle immagini di sezione (`y: [-20, 20]` su scroll)
-- **Sticky section headers** opzionale per `HowItWorks` (numeri step che restano visibili)
+Inserita tra `TestimonialsSection` e `UrgencySection` in `Index.tsx`.
 
-### 3. Sezione Problem → soluzione (drammatizzazione)
-- Card "problema" con bordo rosso sottile + icona shake all'hover
-- Frecce animate che collegano problema → soluzione (Studentato Napoleone)
+**Contenuto**:
+- Titolo: "Più di una camera. Una **community**."
+- Sottotitolo: "Eventi, aperitivi, gruppi studio. A Studentato Napoleone non sei mai solo."
+- **3 card visive** con icona + foto:
+  1. **Eventi mensili** — aperitivi, cene, serate film
+  2. **Gruppi studio** — incontra coinquilini del tuo corso
+  3. **Bacheca community** — scambia libri, organizza viaggi, trova compagni
+- **Mini-galleria** stile collage: 4-5 foto piccole di momenti community (ridenti, gruppo, studio insieme) con leggero hover-zoom
+- **CTA** "Scopri l'area community" → link a `/studente/community` (o `/vantaggi`)
 
-### 4. RoomsPreview dinamica
-- **Carousel auto-play** con immagini camere + indicatori
-- **Hover 3D tilt** sulle card camera (rotazione lieve su mouse move)
-- **Badge "Solo 3 disponibili"** animato
+**Stile**: 
+- Background `bg-muted/40` con accenti verde brand
+- Card con `HoverCard` + StaggerContainer (riuso `MotionWrappers` esistenti)
+- Foto da Unsplash (URL diretti, niente download)
 
-### 5. HowItWorks più visivo
-- **Timeline verticale** con linea che si "disegna" allo scroll
-- Numeri step grandi con effetto **gradient text** che si muove
+## File modificati (3)
 
-### 6. Testimonials carousel auto-rotante
-- Sostituisco grid statica con carousel infinito (3 visibili, swipe automatico ogni 5s)
-- Stelle che appaiono una alla volta
-
-### 7. UrgencySection con countdown
-- **Countdown live** "Settembre 2025 - X giorni rimasti"
-- **Barra "12 posti su 50"** che si riempie animata
-
-### 8. Sezione di transizione divisori
-- Tra una sezione e l'altra: **wave SVG** o **gradient blend** invece di stacchi netti
-- Background leggermente diverso per ogni sezione (warm/cool alternato)
-
-### 9. Floating CTA mobile
-- Pulsante WhatsApp già esiste → aggiungo **mini-CTA "Prenota visita"** che appare dopo 30% scroll
-
-### 10. Micro-interazioni
-- Cursore custom su elementi interattivi (opzionale)
-- Ripple effect sui bottoni primari
-- Smooth scroll tra sezioni con anchor links nella navbar
-
-## Approccio tecnico
-Uso `framer-motion` (già installato): `useScroll`, `useTransform`, `motion.div` con `whileInView`. Niente nuove dipendenze pesanti. Counter via `useMotionValue` + `animate`. Carousel sfrutto `embla-carousel-react` (già in `components/ui/carousel.tsx`).
-
-## File modificati (~9)
-1. `src/components/home/HeroSection.tsx` — Ken Burns, counter, mesh
-2. `src/components/home/ProblemSection.tsx` — drammatizzazione, frecce
-3. `src/components/home/RoomsPreview.tsx` — carousel + tilt
-4. `src/components/home/HowItWorksSection.tsx` — timeline animata
-5. `src/components/home/TestimonialsSection.tsx` — carousel auto
-6. `src/components/home/UrgencySection.tsx` — countdown + progress bar
-7. `src/components/home/ServicesSection.tsx` — stagger + hover ricco
-8. `src/pages/Index.tsx` — divisori SVG tra sezioni
-9. `src/components/motion/MotionWrappers.tsx` — nuovi wrapper (Counter, Parallax, KenBurns)
-
-## Priorità (se vuoi step incrementali)
-**Alta**: Hero (Ken Burns + counter), RoomsPreview carousel, Testimonials carousel, UrgencySection countdown
-**Media**: ProblemSection frecce, HowItWorks timeline, divisori SVG
-**Bassa**: cursor custom, ripple, floating CTA mobile
-
-Dimmi se vuoi tutto in un colpo o partiamo dalla **priorità alta** (4 sezioni, impatto massimo, modifiche contenute).
+1. **`src/components/home/UrgencySection.tsx`** — background image + overlay brand
+2. **`src/components/home/CommunitySection.tsx`** — nuovo file
+3. **`src/pages/Index.tsx`** — import e inserimento `<CommunitySection />` dopo `<TestimonialsSection />`
 
