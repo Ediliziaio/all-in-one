@@ -82,7 +82,7 @@ const Vantaggi = () => (
   <Layout>
     <PageTransition>
       {/* Hero */}
-      <section className="relative py-24 overflow-hidden">
+      <section className="relative py-12 md:py-24 overflow-hidden">
         <div className="absolute inset-0">
           <img
             src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=1600&h=700&fit=crop"
@@ -97,23 +97,23 @@ const Vantaggi = () => (
               <Sparkles className="h-3.5 w-3.5" />
               Vantaggi reali, numeri reali
             </div>
-            <h1 className="font-heading text-4xl md:text-6xl font-bold text-foreground max-w-2xl leading-tight">
+            <h1 className="font-heading text-3xl sm:text-4xl md:text-6xl font-bold text-foreground max-w-2xl leading-tight">
               Più di un posto letto.<br />
               <span className="text-accent">La base</span> della tua vita universitaria.
             </h1>
-            <p className="text-muted-foreground mt-4 text-lg max-w-xl">
+            <p className="text-muted-foreground mt-4 text-base md:text-lg max-w-xl">
               Risparmi, comodità, community. Ecco cosa cambia davvero scegliendo Studentato Napoleone.
             </p>
           </FadeIn>
 
           <FadeIn delay={0.2}>
-            <div className="mt-10 grid grid-cols-3 gap-4 max-w-2xl">
+            <div className="mt-8 md:mt-10 grid grid-cols-3 gap-2 sm:gap-4 max-w-2xl">
               {heroStats.map((s) => (
-                <div key={s.label} className="rounded-xl border border-border/60 bg-card/80 backdrop-blur-sm p-4">
-                  <div className="font-heading text-2xl md:text-3xl font-bold text-accent">
+                <div key={s.label} className="rounded-xl border border-border/60 bg-card/80 backdrop-blur-sm p-3 sm:p-4">
+                  <div className="font-heading text-xl sm:text-2xl md:text-3xl font-bold text-accent">
                     <CountUp to={s.value} prefix={s.prefix ?? ""} suffix={s.suffix} />
                   </div>
-                  <div className="text-xs md:text-sm text-muted-foreground mt-1">{s.label}</div>
+                  <div className="text-[11px] sm:text-xs md:text-sm text-muted-foreground mt-1 leading-tight">{s.label}</div>
                 </div>
               ))}
             </div>
@@ -250,7 +250,7 @@ const Vantaggi = () => (
             </div>
           </FadeIn>
           <FadeIn delay={0.1}>
-            <div className="rounded-2xl border-2 border-border bg-card overflow-hidden">
+            <div className="rounded-2xl border-2 border-border bg-card overflow-x-auto">
               <div className="grid grid-cols-12 text-sm font-heading font-semibold p-4 border-b bg-muted/40">
                 <span className="col-span-5 text-foreground">Caratteristica</span>
                 <span className="col-span-3 text-center text-accent">Napoleone</span>

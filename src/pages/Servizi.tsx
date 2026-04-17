@@ -120,7 +120,7 @@ const Servizi = () => (
   <Layout>
     <PageTransition>
       {/* Hero */}
-      <section className="relative py-24 overflow-hidden">
+      <section className="relative py-12 md:py-24 overflow-hidden">
         <div className="absolute inset-0">
           <img
             src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=1600&h=700&fit=crop"
@@ -135,23 +135,23 @@ const Servizi = () => (
               <Sparkles className="h-3.5 w-3.5" />
               Tutto incluso, sempre
             </div>
-            <h1 className="font-heading text-4xl md:text-6xl font-bold text-foreground max-w-2xl leading-tight">
+            <h1 className="font-heading text-3xl sm:text-4xl md:text-6xl font-bold text-foreground max-w-2xl leading-tight">
               I servizi che servono.<br />
               <span className="text-accent">Niente</span> di superfluo.
             </h1>
-            <p className="text-muted-foreground mt-4 text-lg max-w-xl">
+            <p className="text-muted-foreground mt-4 text-base md:text-lg max-w-xl">
               12+ servizi pensati per la vita universitaria. Un canone, zero sorprese.
             </p>
           </FadeIn>
 
           <FadeIn delay={0.2}>
-            <div className="mt-10 grid grid-cols-3 gap-4 max-w-2xl">
+            <div className="mt-8 md:mt-10 grid grid-cols-3 gap-2 sm:gap-4 max-w-2xl">
               {heroStats.map((s) => (
-                <div key={s.label} className="rounded-xl border border-border/60 bg-card/80 backdrop-blur-sm p-4">
-                  <div className="font-heading text-2xl md:text-3xl font-bold text-accent">
+                <div key={s.label} className="rounded-xl border border-border/60 bg-card/80 backdrop-blur-sm p-3 sm:p-4">
+                  <div className="font-heading text-xl sm:text-2xl md:text-3xl font-bold text-accent">
                     <CountUp to={s.value} prefix={s.prefix ?? ""} suffix={s.suffix} />
                   </div>
-                  <div className="text-xs md:text-sm text-muted-foreground mt-1">{s.label}</div>
+                  <div className="text-[11px] sm:text-xs md:text-sm text-muted-foreground mt-1 leading-tight">{s.label}</div>
                 </div>
               ))}
             </div>
@@ -160,7 +160,7 @@ const Servizi = () => (
       </section>
 
       {/* Highlights bar */}
-      <section className="py-6 border-y border-border bg-card sticky top-20 z-30 backdrop-blur-md bg-card/90">
+      <section className="py-4 md:py-6 border-y border-border bg-card sticky top-16 md:top-20 z-30 backdrop-blur-md bg-card/90">
         <div className="container">
           <div className="flex items-center gap-6 md:gap-10 overflow-x-auto scrollbar-none justify-start md:justify-center">
             {highlights.map((h) => (
