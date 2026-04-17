@@ -49,7 +49,12 @@ import {
   CheckCircle2,
   Clock,
   XCircle,
+  Download,
+  Sparkles,
+  UserPlus,
+  Activity,
 } from "lucide-react";
+import { toast } from "sonner";
 
 type ViewMode = "grid" | "list";
 type FilterMode = "all" | "assigned" | "unassigned";
