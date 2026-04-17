@@ -49,6 +49,14 @@ export default function AdminContratti() {
   const [tab, setTab] = useState("tutti");
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<"recenti" | "scadenza" | "canone">("recenti");
+  const [bulkSelected, setBulkSelected] = useState<Set<string>>(new Set());
+
+  // MRR trend (mock 6 months)
+  const mrrTrend = useMemo(() => {
+    const months = ["Nov", "Dic", "Gen", "Feb", "Mar", "Apr"];
+    const factors = [0.78, 0.83, 0.87, 0.91, 0.95, 1];
+    return months.map((m, i) => ({ mese: m, mrr: 0 }));
+  }, []);
 
   // KPIs
   const kpi = useMemo(() => {
