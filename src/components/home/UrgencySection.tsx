@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { ArrowRight, MessageCircle, AlertTriangle, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import padovaBg from "@/assets/padova-twilight.jpg";
 
 const availability = [
   { type: "Camere Singole", remaining: 7, total: 24, color: "bg-accent" },
