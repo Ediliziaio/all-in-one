@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
 import { ArrowRight, MessageCircle, AlertTriangle, Clock, Flame } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { CountUp } from "@/components/motion/MotionWrappers";
+import { CountUp, Parallax } from "@/components/motion/MotionWrappers";
 import padovaBg from "@/assets/padova-twilight.jpg";
 
 const availability = [
@@ -61,15 +61,17 @@ export function UrgencySection() {
 
   return (
     <section className="relative py-16 md:py-24 text-background overflow-hidden">
-      <img
-        src={padovaBg}
-        alt=""
-        aria-hidden="true"
-        loading="lazy"
-        width={1920}
-        height={1080}
-        className="absolute inset-0 h-full w-full object-cover opacity-60"
-      />
+      <Parallax offset={60} className="absolute inset-0">
+        <img
+          src={padovaBg}
+          alt=""
+          aria-hidden="true"
+          loading="lazy"
+          width={1920}
+          height={1080}
+          className="absolute inset-x-0 -top-[10%] h-[120%] w-full object-cover opacity-60"
+        />
+      </Parallax>
       <div className="absolute inset-0 bg-gradient-to-br from-primary/95 via-primary/85 to-[hsl(var(--google-blue))]/80" />
       <div aria-hidden className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-primary/60 to-transparent" />
 
