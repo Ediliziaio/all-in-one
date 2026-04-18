@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
 import { ArrowRight, MessageCircle, AlertTriangle, Clock, Flame } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { CountUp } from "@/components/motion/MotionWrappers";
+import { CountUp, Parallax } from "@/components/motion/MotionWrappers";
 import padovaBg from "@/assets/padova-twilight.jpg";
 
 const availability = [
