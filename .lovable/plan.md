@@ -1,55 +1,39 @@
 
 
-## Problemi identificati nella sezione Urgency
+## Obiettivo
+Sostituire il rosso dominante della sezione Urgency con una palette più sobria basata sui colori brand (navy/primary), mantenendo l'immagine di sfondo come elemento visivo forte.
 
-Dallo screenshot:
-1. **Zigzag bianco sopra** crea un "effetto denti" troppo aggressivo sul rosso pieno → sembra rotto
-2. **Countdown a 00:00:00:00** perché la data target è `2025-09-01` (passata) → sembra bug
-3. **Background rosso piatto** troppo saturo, le card si confondono
-4. **Card disponibilità** poco contrastate, il dato (7, 3, 2) non spicca
-5. **Progress bar gradient** verde→blu→rosso visivamente caotico su sfondo rosso
-6. **Nessuna gerarchia visiva** chiara: countdown, %, card competono tutti
+## Analisi
+La sezione attuale usa `bg-gradient-to-tr from-google-red via-destructive to-primary` → troppo aggressivo. L'utente vuole comunque urgenza ma senza il rosso saturo. L'immagine `padova-twilight.jpg` è già lì ma con `opacity-30` → coperta dal gradient rosso.
 
 ## Soluzione
 
-### 1. Fix data target (bug)
-Calcolo dinamico del prossimo settembre: se oggi > 1 settembre dell'anno corrente → target 1 settembre prossimo anno. Così il countdown ha sempre numeri reali.
+### 1. Background ridisegnato
+- **Immagine in primo piano**: porto `padova-twilight.jpg` a `opacity-60` (più visibile, atmosfera serale Padova = perfetta per "ultimi posti")
+- **Overlay scuro elegante**: sostituisco il gradient rosso con `bg-gradient-to-br from-primary/95 via-primary/85 to-[hsl(var(--google-blue))]/80` → navy profondo brand → blu Google. Sobrio, premium.
+- **Vignette**: aggiungo `bg-gradient-to-t from-primary/60 to-transparent` in basso per leggibilità CTA
+- Blob decorativi: cambio da `bg-white/5` + `google-yellow/10` a `bg-[hsl(var(--google-blue))]/15` + `bg-[hsl(var(--google-yellow))]/8` (giallo resta come accento caldo che spicca su navy)
 
-### 2. Sostituisco il divider zigzag prima di Urgency
-In `Index.tsx` cambio il divider `Community → Urgency` da `zigzag fill: red pieno` a **`wave fill: red pieno`** → transizione fluida invece che "denti".
+### 2. Accenti caldi mantenuti (urgenza senza rosso)
+- Badge "Disponibilità limitata" → da rosso a **giallo Google** (`bg-[hsl(var(--google-yellow))]/20 border-yellow`)
+- Pallino animato ping → resta giallo
+- Icona `AlertTriangle` → giallo
+- Badge "Ultimi posti" sulle card → resta giallo Google (perfetto contrasto su navy)
+- Numeri countdown e remaining: bianchi puri con drop-shadow
 
-### 3. Ridisegno background sezione
-- Da `gradient red 95→90→primary 85` (piatto) a **gradient più ricco**: `from-[hsl(var(--google-red))] via-[hsl(var(--destructive))]/90 to-primary` con angolo diverso (`bg-gradient-to-tr`)
-- Aggiungo **noise/blob decorativi** soft (2 blob bianchi sfocati `bg-white/5 blur-3xl`) per rompere la piattezza
-- Riduco opacity immagine sfondo per vederla meglio (`opacity-30` sull'img)
+### 3. CTA aggiornata
+- Bottone primario "Blocca il Tuo Posto": da `bg-white text-google-red` a **`bg-[hsl(var(--google-yellow))] text-primary hover:bg-yellow/90`** → giallo brand su navy = massimo contrasto + warm urgency senza rosso
+- Bottone WhatsApp: resta outline bianco trasparente
 
-### 4. Migliorie countdown
-- Box più grandi e "premium": `bg-white/15 → bg-white/10 border-white/25`, `rounded-2xl`, padding maggiore
-- Numeri `text-4xl md:text-5xl font-black` (oggi 2xl/3xl, troppo piccoli)
-- Separatori `:` tra i box su desktop
-- Etichette `text-[10px]` più discrete
+### 4. Divider sopra
+In `Index.tsx`: il divider Community→Urgency oggi è `wave fill: hsl(var(--google-red))`. Lo cambio a **`wave fill: hsl(var(--primary))`** così matcha il nuovo navy della sezione.
 
-### 5. Card disponibilità più leggibili
-- Sfondo card `bg-white/15 backdrop-blur-md` (più opaco)
-- Numero principale `text-5xl font-black text-white` con drop-shadow leggera
-- Aggiungo **badge "ultimi posti"** in giallo Google quando `remaining <= 3` per attirare l'occhio
-- Progress bar interna mono-colore bianca (no più rosso/blu/verde caotico)
-
-### 6. Progress bar globale
-- Sostituisco gradient caotico `accent→primary→destructive` con **gradient pulito bianco → giallo Google** (più leggibile su rosso)
-- Aggiungo `animate-pulse` sottile sull'ultimo 10%
-
-### 7. CTA finale rinforzato
-- Bottone primario `bg-white text-[hsl(var(--google-red))] hover:bg-white/90` invece di accent verde (più contrasto, più "click me")
-- Bottone WhatsApp resta outline ma con icona verde Google
-
-### 8. Micro-elementi
-- Badge "Disponibilità limitata" con `animate-pulse` sottile sul punto rosso
-- Aggiungo riga "🔴 Aggiornato oggi" sotto progress bar per credibilità
+### 5. Progress bar
+Gradient da `background → google-yellow` → invariato (funziona benissimo su navy, anzi meglio che su rosso).
 
 ## File modificati (2)
-- `src/components/home/UrgencySection.tsx` → fix countdown, ridesign visivo completo
-- `src/pages/Index.tsx` → cambio divider Community→Urgency da zigzag a wave
+- `src/components/home/UrgencySection.tsx` → background navy/blue + immagine più visibile, accenti gialli, CTA gialla
+- `src/pages/Index.tsx` → divider Community→Urgency da red a primary
 
 Nessuna nuova dipendenza, solo token HSL esistenti.
 
