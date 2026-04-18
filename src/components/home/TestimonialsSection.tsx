@@ -22,14 +22,21 @@ function StarRating({ rating, animate = false }: { rating: number; animate?: boo
           animate={animate ? { opacity: 1, scale: 1 } : undefined}
           transition={animate ? { delay: 0.2 + i * 0.08, type: "spring", stiffness: 300 } : undefined}
         >
-          <Star className={`h-4 w-4 ${i < rating ? "text-accent fill-accent" : "text-muted"}`} />
+          <Star className={`h-4 w-4 ${i < rating ? "text-[hsl(var(--google-yellow))] fill-[hsl(var(--google-yellow))]" : "text-muted"}`} />
         </motion.div>
       ))}
     </div>
   );
 }
 
-function TestimonialCard({ t, animateStars = false }: { t: typeof testimonials[0]; animateStars?: boolean }) {
+const avatarRingColors = [
+  "ring-[hsl(var(--google-blue))]",
+  "ring-[hsl(var(--google-red))]",
+  "ring-[hsl(var(--google-yellow))]",
+  "ring-[hsl(var(--google-green))]",
+];
+
+function TestimonialCard({ t, animateStars = false, ringIndex = 0 }: { t: typeof testimonials[0]; animateStars?: boolean; ringIndex?: number }) {
   return (
     <div className="rounded-xl border bg-card p-6 h-full flex flex-col">
       <div className="mb-3">
@@ -37,7 +44,7 @@ function TestimonialCard({ t, animateStars = false }: { t: typeof testimonials[0
       </div>
       <p className="text-foreground text-sm leading-relaxed flex-1">"{t.text}"</p>
       <div className="flex items-center gap-3 mt-4 pt-4 border-t">
-        <img src={t.avatar} alt={t.name} className="h-10 w-10 rounded-full object-cover" />
+        <img src={t.avatar} alt={t.name} className={`h-10 w-10 rounded-full object-cover ring-2 ring-offset-2 ring-offset-card ${avatarRingColors[ringIndex % 4]}`} />
         <div>
           <p className="font-semibold text-sm text-card-foreground">{t.name}</p>
           <p className="text-xs text-muted-foreground">{t.course}</p>
@@ -95,7 +102,7 @@ export function TestimonialsSection() {
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.5, delay: i * 0.08 }}
               >
-                <TestimonialCard t={t} animateStars />
+                <TestimonialCard t={t} animateStars ringIndex={(idx + i) % 4} />
               </motion.div>
             ))}
           </AnimatePresence>
@@ -111,7 +118,7 @@ export function TestimonialsSection() {
               exit={{ opacity: 0, x: -30 }}
               transition={{ duration: 0.3 }}
             >
-              <TestimonialCard t={testimonials[idx]} animateStars />
+              <TestimonialCard t={testimonials[idx]} animateStars ringIndex={idx % 4} />
             </motion.div>
           </AnimatePresence>
 

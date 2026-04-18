@@ -11,7 +11,7 @@ const problems = [
 
 export function ProblemSection() {
   return (
-    <section className="py-12 md:py-20 bg-destructive/5">
+    <section className="py-12 md:py-20 bg-[hsl(var(--google-red))]/5">
       <div className="container max-w-4xl">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

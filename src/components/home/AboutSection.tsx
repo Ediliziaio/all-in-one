@@ -2,10 +2,10 @@ import { motion } from "framer-motion";
 import { FadeIn } from "@/components/motion/MotionWrappers";
 
 const stats = [
-  { value: "7+", label: "Anni di esperienza" },
-  { value: "500+", label: "Studenti ospitati" },
-  { value: "98%", label: "Rinnova il contratto" },
-  { value: "4.9★", label: "Media Google Reviews" },
+  { value: "7+", label: "Anni di esperienza", color: "text-[hsl(var(--google-blue))]" },
+  { value: "500+", label: "Studenti ospitati", color: "text-[hsl(var(--google-red))]" },
+  { value: "98%", label: "Rinnova il contratto", color: "text-[hsl(var(--google-yellow))]" },
+  { value: "4.9★", label: "Media Google Reviews", color: "text-[hsl(var(--google-green))]" },
 ];
 
 export function AboutSection() {
@@ -33,7 +33,7 @@ export function AboutSection() {
               transition={{ delay: i * 0.1 }}
               className="text-center rounded-xl border bg-card p-6"
             >
-              <p className="text-3xl md:text-4xl font-bold text-accent">{s.value}</p>
+              <p className={`text-3xl md:text-4xl font-bold ${s.color}`}>{s.value}</p>
               <p className="text-sm text-muted-foreground mt-1">{s.label}</p>
             </motion.div>
           ))}

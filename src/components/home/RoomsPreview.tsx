@@ -81,7 +81,7 @@ export function RoomsPreview() {
                         loading="lazy"
                       />
                       {badge && (
-                        <Badge className="absolute top-3 left-3 bg-primary text-primary-foreground shadow-md">
+                        <Badge className="absolute top-3 left-3 bg-[hsl(var(--google-blue))] text-white shadow-md">
                           ⭐ {badge}
                         </Badge>
                       )}
