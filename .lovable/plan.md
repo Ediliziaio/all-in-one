@@ -1,68 +1,56 @@
 
 
 ## Obiettivo
-Aggiungere micro-divider SVG (onde) tra le sezioni della home per rendere fluidi i passaggi tra background colorati diversi.
+Aggiungere 2 nuove varianti di divider SVG (triangoli/zigzag e diagonali) e alternarle con le onde esistenti tra le sezioni della home per dare più ritmo visivo.
 
-## Analisi
-Già esiste `WaveDivider` in `src/components/motion/MotionWrappers.tsx` — perfetto, lo riuso. Accetta `fill` (colore) e `flip` (orientamento).
+## Esplorazione fatta
+- `WaveDivider` esiste in `src/components/motion/MotionWrappers.tsx` → SVG `viewBox="0 0 1440 80"`, accetta `fill` + `flip`
+- `Index.tsx` ha 11 divider, tutti `WaveDivider` con `fill` = colore sezione successiva → diventa monotono
 
-Logica: ogni divider riempie con il colore della sezione **successiva**, posizionato in fondo alla sezione **precedente**. Così la sezione che arriva "emerge" con un'onda dal background della precedente.
+## Soluzione
 
-## Mappa transizioni (Index.tsx)
+### 1. Estendo `MotionWrappers.tsx` con 2 nuovi componenti
 
-```
-Hero (bianco/gradient)
- ↓ wave fill: red/5    → ProblemSection (red/5)
-ProblemSection
- ↓ wave fill: blue/5   → ServicesSection (blue/5)
-ServicesSection
- ↓ wave fill: white    → RoomsPreview (bianco)
-RoomsPreview
- ↓ wave fill: yellow/7 → HowItWorksSection (yellow/[0.07])
-HowItWorks
- ↓ wave fill: green/8  → GuaranteeSection
-Guarantee
- ↓ wave fill: muted/30 → TestimonialsSection
-Testimonials
- ↓ wave gradient blue→red → CommunitySection
-Community
- ↓ wave fill: red (pieno) → UrgencySection (red gradient)
-Urgency
- ↓ wave fill: muted/30 → AboutSection
-About
- ↓ wave fill: white   → MapSection
-```
-
-## Implementazione
-
-**1 solo file modificato**: `src/pages/Index.tsx`
-
-Tra ogni coppia di sezioni inserisco un `<WaveDivider>` con:
-- `fill` = colore di sfondo della sezione successiva (in formato `hsl(var(--token) / 0.05)`)
-- Un wrapper `div` con `-mt-12 md:-mt-20` e `relative z-10` per sovrapporre l'onda al fondo della sezione precedente senza creare gap
-- `aria-hidden` sul wrapper
-
-Per rendere i divider più "vivi", alterno:
-- onde normali (fill solido tinta sezione successiva)
-- onde flippate (fill = sezione precedente, attaccato all'inizio della successiva) → 2-3 punti chiave dove voglio enfasi
-
-Esempio markup:
+**`ZigzagDivider`** — onde a triangoli (sharp peaks):
 ```tsx
-<HeroSection />
-<WaveDivider fill="hsl(var(--google-red) / 0.05)" className="-mt-1" />
-<ProblemSection />
-<WaveDivider fill="hsl(var(--google-blue) / 0.05)" className="-mt-1" />
-<ServicesSection />
-...
+<path d="M0,40 L120,8 L240,40 L360,8 L480,40 L600,8 L720,40 L840,8 L960,40 L1080,8 L1200,40 L1320,8 L1440,40 L1440,80 L0,80 Z" />
 ```
+Stesso `viewBox`, stesso `h-12 md:h-20`, stesse props (`fill`, `flip`, `className`).
+
+**`DiagonalDivider`** — taglio diagonale netto:
+```tsx
+<path d="M0,80 L1440,0 L1440,80 Z" />
+```
+Variante elegante, minimale. Accetta anche `direction: "left" | "right"` per invertire la pendenza (right = `M0,0 L1440,80 L1440,80 L0,80 Z`).
+
+Tutti e 3 i componenti hanno API identica → drop-in interchangeable.
+
+### 2. Aggiorno `Index.tsx`
+
+Sostituisco l'helper `Divider` con uno che accetta `variant: "wave" | "zigzag" | "diagonal"` e alterno le 11 transizioni così (pattern ritmico, non casuale):
+
+```
+Hero → ProblemSection           → wave (red/5)
+Problem → Services              → diagonal (blue/5)
+Services → RoomsPreview         → wave (white)
+Rooms → HowItWorks              → zigzag (yellow/7)   ← ritmo
+HowItWorks → Guarantee          → wave flip (green/8)
+Guarantee → Testimonials        → diagonal (muted/30)
+Testimonials → Community        → wave (blue/8)
+Community → Urgency             → zigzag (red pieno)  ← enfasi prima del rosso forte
+Urgency → About                 → wave flip (muted/30)
+About → MapSection              → diagonal (muted/50)
+```
+
+Pattern: `wave → diagonal → wave → zigzag → wave → diagonal → wave → zigzag → wave → diagonal`. Le onde restano la maggioranza (5/10), zigzag e diagonal entrano come accenti ritmici.
 
 ## Note tecniche
-- `WaveDivider` esiste già → no nuovi file, no nuove dipendenze
-- Solo token HSL (no hex hardcoded) come da memoria progetto
-- I divider sono `aria-hidden` (decorativi) → no impatto a11y
-- Altezza wave: `h-12 md:h-20` (già definita nel componente) → micro, non invasiva
-- Z-index gestito perché alcune sezioni hanno blob decorativi: il wave sta sopra il bordo della sezione precedente, sotto il contenuto della successiva
+- Solo `fill` via token HSL (no hex)
+- `aria-hidden` mantenuto, decorativi
+- Stesso `h-12 md:h-20` per coerenza altezza
+- No nuove dipendenze, no nuovi file
 
-## File modificato
-- `src/pages/Index.tsx` (aggiunta 11 `WaveDivider` tra le sezioni)
+## File modificati (2)
+- `src/components/motion/MotionWrappers.tsx` → +2 componenti (`ZigzagDivider`, `DiagonalDivider`)
+- `src/pages/Index.tsx` → helper `Divider` accetta `variant`, alternanza nelle 11 transizioni
 
