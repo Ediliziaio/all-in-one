@@ -1,67 +1,48 @@
 
 
-# Editor markdown + Grafici KPI + Bulk actions
+## Obiettivo
+Dare più colore ad alcune sezioni della home prendendo ispirazione dai 4 colori del logo Google-style già definiti come token: `--google-blue`, `--google-red`, `--google-yellow`, `--google-green` (oltre al navy primary e al verde accent del brand).
 
-## 1. Editor markdown reale (`/admin/guide`)
+## Esplorazione fatta
+Ho controllato:
+- `src/index.css` → token `--google-*` già pronti (blu/rosso/giallo/verde) + `--primary` navy + `--accent` verde
+- `src/pages/Index.tsx` → ordine sezioni home
+- Sezioni attuali: la maggior parte sono bianche o `bg-muted/30`, molto neutre. Solo `Hero` e `Urgency` hanno carattere cromatico.
 
-Sostituisco la `Textarea` del dialog con un mini-editor custom (no nuove dipendenze):
+## Cosa cambio (sezione per sezione)
 
-**Toolbar** sopra la textarea con bottoni:
-- **B** Bold (`**testo**`)
-- **I** Italic (`*testo*`)
-- **H2** Heading (`## `)
-- **• List** Lista puntata (`- `)
-- **1. List** Lista numerata (`1. `)
-- **🔗 Link** (`[testo](url)`) — prompt per URL
-- **`<>`** Inline code
-- **"** Quote (`> `)
+Alterno background colorati in modo armonico, evitando muri di colore: uso tinte morbide del logo + accenti pieni dove serve enfasi.
 
-Ogni bottone wrappa la selezione corrente nella textarea (uso `selectionStart/End` + `setRangeText`). Shortcut tastiera: Ctrl+B, Ctrl+I, Ctrl+K (link).
+1. **ProblemSection** → background `bg-[hsl(var(--google-red))]/5` con bordo/icone in rosso Google. Comunica "problema/dolore".
+2. **ServicesSection** → background `bg-[hsl(var(--google-blue))]/5`, icone servizi colorate ciclicamente con i 4 colori del logo (blu, rosso, giallo, verde) per richiamare il branding.
+3. **RoomsPreview** → resta bianca (le foto camere parlano da sole), ma badge prezzo/CTA in `--google-blue`.
+4. **HowItWorksSection** → background `bg-[hsl(var(--google-yellow))]/8` con i numeri step colorati a rotazione (blu→rosso→giallo→verde).
+5. **GuaranteeSection** → background `bg-[hsl(var(--google-green))]/8` (verde = fiducia/garanzia), icone scudo in verde Google.
+6. **TestimonialsSection** → resta neutra `bg-muted/30`, ma stelle in `--google-yellow` piene e avatar con bordo colorato a rotazione.
+7. **CommunitySection** → gradient morbido `from-[hsl(var(--google-blue))]/8 to-[hsl(var(--google-red))]/8` per dare energia "social".
+8. **UrgencySection** → mantengo enfasi forte ma sposto verso `--google-red` pieno con testo bianco (oggi è generica).
+9. **AboutSection** → numeri stat colorati a rotazione coi 4 colori del logo invece che tutti accent.
+10. **MapSection** → resta pulita, header con underline `--google-blue`.
 
-**Preview a destra**: parser markdown leggero (~40 righe regex) che rende: `**bold**`, `*italic*`, `## H2`, `### H3`, liste `-`/`1.`, `[link](url)`, ``code``, `> quote`, paragrafi. Output via `dangerouslySetInnerHTML` con escape HTML iniziale per sicurezza. Stile prose-like con classi Tailwind.
+**Hero, ProblemSection (struttura), Footer** → invariati nella struttura.
 
-## 2. Grafici KPI (4 pagine)
+## Regole
+- Uso SOLO token semantici/hsl var (no hex hardcoded), come da memoria progetto.
+- Tinte sfondo sempre `/5` `/8` `/10` per restare leggibili.
+- Niente testo colorato su sfondo colorato della stessa famiglia (contrasto AA).
+- Dark mode: i token sono già definiti, restano coerenti.
 
-Uso `ChartContainer` + `recharts` (già nel progetto). Tutti i dati derivano deterministicamente dai mock esistenti (no nuove dipendenze, no modifiche a `mockData.ts`).
+## File modificati
+- `src/components/home/ProblemSection.tsx`
+- `src/components/home/ServicesSection.tsx`
+- `src/components/home/HowItWorksSection.tsx`
+- `src/components/home/GuaranteeSection.tsx`
+- `src/components/home/TestimonialsSection.tsx`
+- `src/components/home/CommunitySection.tsx`
+- `src/components/home/UrgencySection.tsx`
+- `src/components/home/AboutSection.tsx`
+- `src/components/home/MapSection.tsx`
+- `src/components/home/RoomsPreview.tsx`
 
-- **`/admin/contratti`** — Card "Trend MRR (6 mesi)" sotto la riga KPI: `AreaChart` con MRR mese per mese (calcolato simulando crescita: ultimo mese = MRR attuale, mesi precedenti scalati al 80%–95% via seed).
-- **`/admin/camere`** — Card "Occupazione storica (6 mesi)": `LineChart` % occupazione mese per mese (scala leggermente l'attuale `kpi.tasso`).
-- **`/admin/buoni`** — Card "Top 5 buoni più utilizzati": `BarChart` orizzontale con top 5 by `usiCount(id)` decrescente.
-- **`/admin/guide`** — Card "Top 5 guide più lette": `BarChart` orizzontale con top 5 by `letture(id)` decrescente.
-
-Ogni grafico vive in un `Card` separato sotto la griglia KPI, height ~200px, responsive.
-
-## 3. Bulk actions
-
-### `/admin/buoni` & `/admin/guide`
-- `Checkbox` in alto a sinistra di ogni card/riga
-- Stato `selected: Set<string>` per pagina
-- Quando `selected.size > 0`, **barra azioni sticky** sopra la lista:
-  - "X selezionati" + bottone "Deseleziona tutti"
-  - **Disattiva selezionati** (set `attivo/attiva = false`)
-  - **Elimina selezionati** (con `AlertDialog` di conferma)
-- Checkbox "Seleziona tutti i visibili" nella toolbar
-
-### `/admin/contratti`
-- `Checkbox` come prima colonna nella tabella
-- Quando selezionati > 0, barra azioni:
-  - **Invia promemoria scadenza** → toast `Promemoria inviato a N studenti`
-  - "Deseleziona tutti"
-
-## 4. Test E2E — note
-
-Dopo l'implementazione richiamerò la pagina via browser per smoke-test rapido, ma le verifiche manuali (esporta CSV scaricato, dialog 4 tab Contratti, preview live) restano a carico utente — i tool browser non possono ispezionare file scaricati né fare interazioni profonde affidabili in dialog complessi.
-
-## File modificati (4)
-- `src/pages/admin/AdminGuide.tsx` — editor MD + toolbar + parser preview + bulk + grafico top letture
-- `src/pages/admin/AdminBuoni.tsx` — bulk + grafico top usi
-- `src/pages/admin/AdminContratti.tsx` — bulk reminder + grafico MRR trend
-- `src/pages/admin/AdminCamere.tsx` — grafico occupazione storica
-
-## Tecnica
-- **No nuove dipendenze**: editor MD in ~80 righe, parser MD ~40 righe regex
-- Riuso `ChartContainer` (`@/components/ui/chart`), `Checkbox`, `AlertDialog`, icone lucide (`Bold`, `Italic`, `Heading2`, `List`, `ListOrdered`, `Link2`, `Code`, `Quote`, `BellRing`, `Trash2`, `EyeOff`)
-- `useRef<HTMLTextAreaElement>` per manipolare selezione
-- Helper `parseMarkdown(s: string): string` puro testabile, escape HTML prima di applicare regex
-- Stato selezione locale (`Set<string>`) per ogni pagina, reset su filter change
+Nessuna modifica a `index.css` (token già pronti), nessuna nuova dipendenza.
 
