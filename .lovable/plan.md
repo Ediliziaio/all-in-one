@@ -1,44 +1,44 @@
 
 
 ## Obiettivo
-1. Animare i numeri "remaining" delle 3 card disponibilità con count-up da 0 al valore finale al primo entering in viewport.
-2. Aggiungere vignettatura laterale scura sull'immagine di Padova per profondità cinematografica.
+Effetto parallax leggero sull'immagine `padova-twilight.jpg` di sfondo nella sezione Urgency: l'immagine si muove più lentamente dello scroll del contenuto → percezione di profondità.
 
 ## Analisi
-- `CountUp` esiste già in `src/components/motion/MotionWrappers.tsx` → supporta modalità numerica con `to`, `from`, `duration`, `decimals`. Trigger via `useInView({ once: true })`. Drop-in perfetto.
-- Sezione Urgency oggi ha solo overlay top-bottom (vignette inferiore + gradient). Mancano i bordi laterali scuri.
+- `Parallax` esiste già in `src/components/motion/MotionWrappers.tsx` → usa `useScroll` + `useTransform` su `y`. Default `offset=40px`.
+- L'immagine attuale è `<img>` con `absolute inset-0 h-full w-full object-cover opacity-60`. Wrappata in `<section relative overflow-hidden>`.
+- Problema: `Parallax` applica `transform: translateY` al wrapper. Se wrappo solo l'`<img>`, il wrapper deve mantenere `absolute inset-0`. Devo anche dare un'altezza extra all'immagine (es. `h-[120%] -top-[10%]`) così il movimento parallax non rivela bordi vuoti.
 
 ## Soluzione
 
-### 1. Count-up sui numeri rimanenti
-In `UrgencySection.tsx`, dentro il `.map(availability)`, sostituisco:
-```tsx
-<p className="text-5xl md:text-6xl font-black ...">{item.remaining}</p>
-```
-con:
-```tsx
-<CountUp to={item.remaining} duration={1.4} className="text-5xl md:text-6xl font-black drop-shadow-md leading-none block" />
-```
-- Import `CountUp` da `@/components/motion/MotionWrappers`
-- `to` = valore finale, parte da 0 (default `from`)
-- `duration={1.4}` coerente con altre animazioni della sezione (progress bar usa 1.4)
-- `block` per mantenere layout (era `<p>`, ora `<span>` da CountUp)
+In `src/components/home/UrgencySection.tsx`:
 
-Faccio lo stesso anche per il numero "takenSpots" della progress bar globale: sostituisco `<strong>{takenSpots}</strong>` con `<CountUp to={takenSpots} duration={1.6} className="font-bold" />` e `{Math.round(fillPct)}%` con `<CountUp to={Math.round(fillPct)} duration={1.6} suffix="%" className="font-bold" />`. Bonus coerenza.
+1. **Import** `Parallax` da `@/components/motion/MotionWrappers`.
 
-### 2. Vignettatura laterale cinematografica
-Aggiungo un nuovo overlay `aria-hidden` subito dopo gli overlay esistenti:
+2. **Wrappo l'immagine** con `Parallax`:
 ```tsx
-<div aria-hidden className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_transparent_40%,_hsl(var(--primary)/0.7)_100%)]" />
+<Parallax offset={60} className="absolute inset-0">
+  <img
+    src={padovaBg}
+    alt=""
+    aria-hidden="true"
+    loading="lazy"
+    width={1920}
+    height={1080}
+    className="absolute inset-x-0 -top-[10%] h-[120%] w-full object-cover opacity-60"
+  />
+</Parallax>
 ```
-- Radial gradient ellittico: trasparente al centro (mostra l'immagine), navy scuro ai bordi (vignettatura).
-- Usa `--primary` (navy brand) per coerenza con il resto della sezione.
-- Posizionato sopra l'immagine ma sotto il container `container max-w-4xl relative` (che è già `relative` quindi passa sopra).
 
-Z-index gestito dall'ordine DOM: img → gradient diagonale → vignette top → blob → **vignette radiale (NEW)** → container content.
+- `offset={60}` = movimento totale ±60px (leggero, non aggressivo)
+- `h-[120%] -top-[10%]` = immagine 20% più alta della sezione, centrata verticalmente → copre i bordi durante lo scroll
+- Wrapper `absolute inset-0` mantiene il posizionamento originale
+
+3. **Z-index check**: Parallax (img) → gradient diagonale → vignette top → blob → vignette radiale → container. Ordine DOM invariato, funziona.
+
+4. **Performance**: `useScroll` con `target` su ref locale → calcolo solo quando la sezione è in viewport. `Parallax` esistente usa già questo pattern correttamente.
 
 ## File modificato (1)
-- `src/components/home/UrgencySection.tsx` → import `CountUp`, animazione 3 numeri card + 2 numeri progress bar, +1 div radial vignette
+- `src/components/home/UrgencySection.tsx` → import `Parallax`, wrap dell'`<img>` di sfondo, classi immagine adattate per evitare bordi vuoti
 
 Nessuna nuova dipendenza, nessun nuovo file.
 
