@@ -1,44 +1,22 @@
 
 
 ## Obiettivo
-Effetto parallax leggero sull'immagine `padova-twilight.jpg` di sfondo nella sezione Urgency: l'immagine si muove più lentamente dello scroll del contenuto → percezione di profondità.
+Verificare nel preview che il parallax sull'immagine di sfondo della sezione Urgency funzioni correttamente.
 
-## Analisi
-- `Parallax` esiste già in `src/components/motion/MotionWrappers.tsx` → usa `useScroll` + `useTransform` su `y`. Default `offset=40px`.
-- L'immagine attuale è `<img>` con `absolute inset-0 h-full w-full object-cover opacity-60`. Wrappata in `<section relative overflow-hidden>`.
-- Problema: `Parallax` applica `transform: translateY` al wrapper. Se wrappo solo l'`<img>`, il wrapper deve mantenere `absolute inset-0`. Devo anche dare un'altezza extra all'immagine (es. `h-[120%] -top-[10%]`) così il movimento parallax non rivela bordi vuoti.
+## Piano di verifica
+1. `navigate_to_sandbox` su `/` → carica home
+2. `screenshot` iniziale prima dello scroll
+3. Scroll fino alla sezione Urgency con `act` (scroll into view del countdown)
+4. `screenshot` posizione 1 sulla sezione
+5. Scroll ulteriore di ~300px dentro la sezione
+6. `screenshot` posizione 2
+7. Confronto: l'immagine di Padova deve essersi spostata MENO del contenuto (countdown, card). Se il contenuto sale di X px, l'immagine deve salire di meno (effetto parallax con `offset={60}` → ±60px totali su tutta la durata di scroll).
 
-## Soluzione
+## Cosa cerco
+- Immagine visibile e ben posizionata in entrambi gli screenshot (no bordi vuoti grazie a `h-[120%] -top-[10%]`)
+- Differenza di velocità tra immagine e contenuto percepibile
+- Nessun glitch o flash durante lo scroll
 
-In `src/components/home/UrgencySection.tsx`:
-
-1. **Import** `Parallax` da `@/components/motion/MotionWrappers`.
-
-2. **Wrappo l'immagine** con `Parallax`:
-```tsx
-<Parallax offset={60} className="absolute inset-0">
-  <img
-    src={padovaBg}
-    alt=""
-    aria-hidden="true"
-    loading="lazy"
-    width={1920}
-    height={1080}
-    className="absolute inset-x-0 -top-[10%] h-[120%] w-full object-cover opacity-60"
-  />
-</Parallax>
-```
-
-- `offset={60}` = movimento totale ±60px (leggero, non aggressivo)
-- `h-[120%] -top-[10%]` = immagine 20% più alta della sezione, centrata verticalmente → copre i bordi durante lo scroll
-- Wrapper `absolute inset-0` mantiene il posizionamento originale
-
-3. **Z-index check**: Parallax (img) → gradient diagonale → vignette top → blob → vignette radiale → container. Ordine DOM invariato, funziona.
-
-4. **Performance**: `useScroll` con `target` su ref locale → calcolo solo quando la sezione è in viewport. `Parallax` esistente usa già questo pattern correttamente.
-
-## File modificato (1)
-- `src/components/home/UrgencySection.tsx` → import `Parallax`, wrap dell'`<img>` di sfondo, classi immagine adattate per evitare bordi vuoti
-
-Nessuna nuova dipendenza, nessun nuovo file.
+## Output
+Riporto i risultati con screenshot e conferma se l'effetto è visibile o se serve aumentare `offset`.
 
