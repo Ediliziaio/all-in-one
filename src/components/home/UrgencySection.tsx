@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
 import { ArrowRight, MessageCircle, AlertTriangle, Clock, Flame } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { CountUp } from "@/components/motion/MotionWrappers";
 import padovaBg from "@/assets/padova-twilight.jpg";
 
 const availability = [
@@ -72,6 +73,9 @@ export function UrgencySection() {
       <div className="absolute inset-0 bg-gradient-to-br from-primary/95 via-primary/85 to-[hsl(var(--google-blue))]/80" />
       <div aria-hidden className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-primary/60 to-transparent" />
 
+      {/* Cinematic radial vignette */}
+      <div aria-hidden className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_transparent_40%,_hsl(var(--primary)/0.75)_100%)]" />
+
       {/* Decorative blobs */}
       <div aria-hidden className="absolute -top-24 -left-24 h-80 w-80 rounded-full bg-[hsl(var(--google-blue))]/15 blur-3xl" />
       <div aria-hidden className="absolute -bottom-32 -right-20 h-96 w-96 rounded-full bg-[hsl(var(--google-yellow))]/10 blur-3xl" />
@@ -127,8 +131,8 @@ export function UrgencySection() {
           className="mb-12 max-w-xl mx-auto"
         >
           <div className="flex items-center justify-between text-sm mb-2 opacity-90">
-            <span><strong>{takenSpots}</strong> posti su {totalSpots} già assegnati</span>
-            <span className="font-bold">{Math.round(fillPct)}%</span>
+            <span><CountUp to={takenSpots} duration={1.6} className="font-bold" /> posti su {totalSpots} già assegnati</span>
+            <CountUp to={Math.round(fillPct)} duration={1.6} suffix="%" className="font-bold" />
           </div>
           <div className="h-3 rounded-full bg-background/15 overflow-hidden border border-background/20">
             <motion.div
@@ -167,7 +171,7 @@ export function UrgencySection() {
                   </span>
                 )}
                 <p className="text-sm font-medium opacity-80 mb-2">{item.type}</p>
-                <p className="text-5xl md:text-6xl font-black drop-shadow-md leading-none">{item.remaining}</p>
+                <CountUp to={item.remaining} duration={1.4} className="text-5xl md:text-6xl font-black drop-shadow-md leading-none block" />
                 <p className="text-xs opacity-70 mt-2">rimaste su {item.total}</p>
                 <div className="mt-4 h-1.5 rounded-full bg-background/20 overflow-hidden">
                   <motion.div
