@@ -189,7 +189,7 @@ export function UrgencySection() {
           viewport={{ once: true }}
           className="flex flex-col sm:flex-row items-center justify-center gap-4"
         >
-          <Button asChild size="lg" className="text-base bg-background text-[hsl(var(--google-red))] hover:bg-background/90 shadow-xl shadow-black/20 font-bold">
+          <Button asChild size="lg" className="text-base bg-[hsl(var(--google-yellow))] text-primary hover:bg-[hsl(var(--google-yellow))]/90 shadow-xl shadow-black/20 font-bold">
             <Link to="/camere">
               Blocca il Tuo Posto <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
