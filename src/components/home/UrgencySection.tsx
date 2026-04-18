@@ -83,7 +83,7 @@ export function UrgencySection() {
           viewport={{ once: true }}
           className="text-center mb-12"
         >
-          <span className="inline-flex items-center gap-2 rounded-full bg-background/15 backdrop-blur-md border border-background/25 px-4 py-1.5 text-sm font-bold mb-5">
+          <span className="inline-flex items-center gap-2 rounded-full bg-[hsl(var(--google-yellow))]/20 backdrop-blur-md border border-[hsl(var(--google-yellow))]/40 px-4 py-1.5 text-sm font-bold mb-5 text-[hsl(var(--google-yellow))]">
             <span className="relative flex h-2 w-2">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[hsl(var(--google-yellow))] opacity-75" />
               <span className="relative inline-flex h-2 w-2 rounded-full bg-[hsl(var(--google-yellow))]" />
