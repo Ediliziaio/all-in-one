@@ -1,48 +1,68 @@
 
 
 ## Obiettivo
-Dare più colore ad alcune sezioni della home prendendo ispirazione dai 4 colori del logo Google-style già definiti come token: `--google-blue`, `--google-red`, `--google-yellow`, `--google-green` (oltre al navy primary e al verde accent del brand).
+Aggiungere micro-divider SVG (onde) tra le sezioni della home per rendere fluidi i passaggi tra background colorati diversi.
 
-## Esplorazione fatta
-Ho controllato:
-- `src/index.css` → token `--google-*` già pronti (blu/rosso/giallo/verde) + `--primary` navy + `--accent` verde
-- `src/pages/Index.tsx` → ordine sezioni home
-- Sezioni attuali: la maggior parte sono bianche o `bg-muted/30`, molto neutre. Solo `Hero` e `Urgency` hanno carattere cromatico.
+## Analisi
+Già esiste `WaveDivider` in `src/components/motion/MotionWrappers.tsx` — perfetto, lo riuso. Accetta `fill` (colore) e `flip` (orientamento).
 
-## Cosa cambio (sezione per sezione)
+Logica: ogni divider riempie con il colore della sezione **successiva**, posizionato in fondo alla sezione **precedente**. Così la sezione che arriva "emerge" con un'onda dal background della precedente.
 
-Alterno background colorati in modo armonico, evitando muri di colore: uso tinte morbide del logo + accenti pieni dove serve enfasi.
+## Mappa transizioni (Index.tsx)
 
-1. **ProblemSection** → background `bg-[hsl(var(--google-red))]/5` con bordo/icone in rosso Google. Comunica "problema/dolore".
-2. **ServicesSection** → background `bg-[hsl(var(--google-blue))]/5`, icone servizi colorate ciclicamente con i 4 colori del logo (blu, rosso, giallo, verde) per richiamare il branding.
-3. **RoomsPreview** → resta bianca (le foto camere parlano da sole), ma badge prezzo/CTA in `--google-blue`.
-4. **HowItWorksSection** → background `bg-[hsl(var(--google-yellow))]/8` con i numeri step colorati a rotazione (blu→rosso→giallo→verde).
-5. **GuaranteeSection** → background `bg-[hsl(var(--google-green))]/8` (verde = fiducia/garanzia), icone scudo in verde Google.
-6. **TestimonialsSection** → resta neutra `bg-muted/30`, ma stelle in `--google-yellow` piene e avatar con bordo colorato a rotazione.
-7. **CommunitySection** → gradient morbido `from-[hsl(var(--google-blue))]/8 to-[hsl(var(--google-red))]/8` per dare energia "social".
-8. **UrgencySection** → mantengo enfasi forte ma sposto verso `--google-red` pieno con testo bianco (oggi è generica).
-9. **AboutSection** → numeri stat colorati a rotazione coi 4 colori del logo invece che tutti accent.
-10. **MapSection** → resta pulita, header con underline `--google-blue`.
+```
+Hero (bianco/gradient)
+ ↓ wave fill: red/5    → ProblemSection (red/5)
+ProblemSection
+ ↓ wave fill: blue/5   → ServicesSection (blue/5)
+ServicesSection
+ ↓ wave fill: white    → RoomsPreview (bianco)
+RoomsPreview
+ ↓ wave fill: yellow/7 → HowItWorksSection (yellow/[0.07])
+HowItWorks
+ ↓ wave fill: green/8  → GuaranteeSection
+Guarantee
+ ↓ wave fill: muted/30 → TestimonialsSection
+Testimonials
+ ↓ wave gradient blue→red → CommunitySection
+Community
+ ↓ wave fill: red (pieno) → UrgencySection (red gradient)
+Urgency
+ ↓ wave fill: muted/30 → AboutSection
+About
+ ↓ wave fill: white   → MapSection
+```
 
-**Hero, ProblemSection (struttura), Footer** → invariati nella struttura.
+## Implementazione
 
-## Regole
-- Uso SOLO token semantici/hsl var (no hex hardcoded), come da memoria progetto.
-- Tinte sfondo sempre `/5` `/8` `/10` per restare leggibili.
-- Niente testo colorato su sfondo colorato della stessa famiglia (contrasto AA).
-- Dark mode: i token sono già definiti, restano coerenti.
+**1 solo file modificato**: `src/pages/Index.tsx`
 
-## File modificati
-- `src/components/home/ProblemSection.tsx`
-- `src/components/home/ServicesSection.tsx`
-- `src/components/home/HowItWorksSection.tsx`
-- `src/components/home/GuaranteeSection.tsx`
-- `src/components/home/TestimonialsSection.tsx`
-- `src/components/home/CommunitySection.tsx`
-- `src/components/home/UrgencySection.tsx`
-- `src/components/home/AboutSection.tsx`
-- `src/components/home/MapSection.tsx`
-- `src/components/home/RoomsPreview.tsx`
+Tra ogni coppia di sezioni inserisco un `<WaveDivider>` con:
+- `fill` = colore di sfondo della sezione successiva (in formato `hsl(var(--token) / 0.05)`)
+- Un wrapper `div` con `-mt-12 md:-mt-20` e `relative z-10` per sovrapporre l'onda al fondo della sezione precedente senza creare gap
+- `aria-hidden` sul wrapper
 
-Nessuna modifica a `index.css` (token già pronti), nessuna nuova dipendenza.
+Per rendere i divider più "vivi", alterno:
+- onde normali (fill solido tinta sezione successiva)
+- onde flippate (fill = sezione precedente, attaccato all'inizio della successiva) → 2-3 punti chiave dove voglio enfasi
+
+Esempio markup:
+```tsx
+<HeroSection />
+<WaveDivider fill="hsl(var(--google-red) / 0.05)" className="-mt-1" />
+<ProblemSection />
+<WaveDivider fill="hsl(var(--google-blue) / 0.05)" className="-mt-1" />
+<ServicesSection />
+...
+```
+
+## Note tecniche
+- `WaveDivider` esiste già → no nuovi file, no nuove dipendenze
+- Solo token HSL (no hex hardcoded) come da memoria progetto
+- I divider sono `aria-hidden` (decorativi) → no impatto a11y
+- Altezza wave: `h-12 md:h-20` (già definita nel componente) → micro, non invasiva
+- Z-index gestito perché alcune sezioni hanno blob decorativi: il wave sta sopra il bordo della sezione precedente, sotto il contenuto della successiva
+
+## File modificato
+- `src/pages/Index.tsx` (aggiunta 11 `WaveDivider` tra le sezioni)
 
