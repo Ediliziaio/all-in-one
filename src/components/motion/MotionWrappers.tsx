@@ -254,3 +254,50 @@ export function WaveDivider({
     </div>
   );
 }
+
+// SVG zigzag (triangoli) divider — sharp peaks for rhythmic accent
+export function ZigzagDivider({
+  fill = "hsl(var(--background))",
+  flip = false,
+  className,
+}: {
+  fill?: string;
+  flip?: boolean;
+  className?: string;
+}) {
+  return (
+    <div className={`relative w-full leading-[0] ${flip ? "rotate-180" : ""} ${className ?? ""}`}>
+      <svg viewBox="0 0 1440 80" preserveAspectRatio="none" className="block w-full h-12 md:h-20">
+        <path
+          d="M0,40 L120,8 L240,40 L360,8 L480,40 L600,8 L720,40 L840,8 L960,40 L1080,8 L1200,40 L1320,8 L1440,40 L1440,80 L0,80 Z"
+          fill={fill}
+        />
+      </svg>
+    </div>
+  );
+}
+
+// SVG diagonal divider — clean angled cut
+export function DiagonalDivider({
+  fill = "hsl(var(--background))",
+  flip = false,
+  direction = "left",
+  className,
+}: {
+  fill?: string;
+  flip?: boolean;
+  direction?: "left" | "right";
+  className?: string;
+}) {
+  const d =
+    direction === "left"
+      ? "M0,80 L1440,0 L1440,80 Z"
+      : "M0,0 L1440,80 L0,80 Z";
+  return (
+    <div className={`relative w-full leading-[0] ${flip ? "rotate-180" : ""} ${className ?? ""}`}>
+      <svg viewBox="0 0 1440 80" preserveAspectRatio="none" className="block w-full h-12 md:h-20">
+        <path d={d} fill={fill} />
+      </svg>
+    </div>
+  );
+}
