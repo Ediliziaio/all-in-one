@@ -1,22 +1,70 @@
 
 
+## Problema attuale (mobile)
+- Il collage immagini è `hidden lg:block` → su mobile NESSUNA foto, solo testo
+- Hero su mobile = muro di testo statico, perde impatto
+- Stats e trust badges affollati, poco respiro
+- Badge "Settembre 2025" hardcoded (anche se siamo nel 2026)
+
 ## Obiettivo
-Verificare nel preview che il parallax sull'immagine di sfondo della sezione Urgency funzioni correttamente.
+Rendere la HeroSection mobile visivamente ricca quanto desktop, con foto, gerarchia chiara e migliore respiro. Migliorare anche la versione desktop con qualche dettaglio.
 
-## Piano di verifica
-1. `navigate_to_sandbox` su `/` → carica home
-2. `screenshot` iniziale prima dello scroll
-3. Scroll fino alla sezione Urgency con `act` (scroll into view del countdown)
-4. `screenshot` posizione 1 sulla sezione
-5. Scroll ulteriore di ~300px dentro la sezione
-6. `screenshot` posizione 2
-7. Confronto: l'immagine di Padova deve essersi spostata MENO del contenuto (countdown, card). Se il contenuto sale di X px, l'immagine deve salire di meno (effetto parallax con `offset={60}` → ±60px totali su tutta la durata di scroll).
+## Soluzione
 
-## Cosa cerco
-- Immagine visibile e ben posizionata in entrambi gli screenshot (no bordi vuoti grazie a `h-[120%] -top-[10%]`)
-- Differenza di velocità tra immagine e contenuto percepibile
-- Nessun glitch o flash durante lo scroll
+### 1. Hero immagine mobile (NUOVO)
+Su mobile/tablet aggiungo un'immagine **sopra** il contenuto testuale con effetto Ken Burns:
+- Visibile solo `<lg`, nascosta su desktop (dove c'è già il collage a destra)
+- Layout: immagine full-width con altezza `h-56 sm:h-72`, rounded-2xl, ombra
+- Sopra l'immagine: badge floating "4.9★ 127 recensioni" (chip glassmorphism) per credibilità immediata
+- Sotto-overlay gradient dal basso per leggibilità badge
 
-## Output
-Riporto i risultati con screenshot e conferma se l'effetto è visibile o se serve aumentare `offset`.
+### 2. Riorganizzazione contenuto mobile
+- Badge "Posti limitati" → centrato su mobile, allineato a sx su desktop
+- H1 → centrato su mobile (`text-center lg:text-left`)
+- Paragrafo → centrato su mobile
+- CTA → full-width verticali su mobile (già fatto, ok)
+- Stats: invece di 3 in fila stretti, **grid 3 colonne** con card piccole (bg-card/50, rounded-xl, padding) → più respiro e leggibilità
+- Trust badges: chip pill con bg leggero invece di solo testo+icona, più visibili
+
+### 3. Fix dinamico badge "Settembre 2025"
+Calcolo dinamico: se siamo dopo settembre dell'anno corrente, mostra anno+1. Stesso pattern di `UrgencySection`.
+
+### 4. Miglioramenti desktop (bonus)
+- Aggiungo terza foto floating piccola in alto a destra per equilibrare il collage
+- Padding hero aumentato (`py-16 md:py-28`) per più presenza
+- Gradient mesh sfondo già c'è, aggiungo un blob colorato decorativo dietro al testo
+
+### 5. Performance
+- `loading="eager"` solo sull'immagine LCP mobile (la prima visibile), `loading="lazy"` su tutte le altre
+- Aggiungo `width`/`height` per evitare CLS
+
+## Layout mobile finale (ASCII)
+```text
+┌─────────────────────┐
+│  [IMG hero KenBurns]│  ← NUOVO
+│   ★4.9 chip overlay │
+├─────────────────────┤
+│   • Posti limitati  │  ← centered
+│                     │
+│   La Tua Casa a     │
+│   Padova, Senza...  │  ← centered
+│                     │
+│   Camera privata... │
+│                     │
+│  [Scopri Camere ▶]  │  ← full width
+│  [Prenota visita]   │
+│                     │
+│  ┌───┬───┬───┐      │
+│  │4.9│98%│€0 │      │  ← grid card stats
+│  └───┴───┴───┘      │
+│                     │
+│ ✓Contratto ⏱24/7    │  ← chip pills
+│ ✓Tutto incluso      │
+└─────────────────────┘
+```
+
+## File modificati (1)
+- `src/components/home/HeroSection.tsx` → aggiungo immagine hero mobile, riorganizzo allineamenti, ridisegno stats come grid card, trust badges come pill, anno dinamico, +1 foto floating desktop
+
+Nessun nuovo file, nessuna nuova dipendenza.
 
