@@ -55,7 +55,7 @@ const Index = () => (
     <TestimonialsSection />
     <Divider fill="hsl(var(--google-blue) / 0.08)" variant="wave" />
     <CommunitySection />
-    <Divider fill="hsl(var(--google-red))" variant="wave" flip />
+    <Divider fill="hsl(var(--primary))" variant="wave" flip />
     <UrgencySection />
     <Divider fill="hsl(var(--muted) / 0.3)" variant="wave" flip />
     <AboutSection />

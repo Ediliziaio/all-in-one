@@ -67,12 +67,13 @@ export function UrgencySection() {
         loading="lazy"
         width={1920}
         height={1080}
-        className="absolute inset-0 h-full w-full object-cover opacity-30"
+        className="absolute inset-0 h-full w-full object-cover opacity-60"
       />
-      <div className="absolute inset-0 bg-gradient-to-tr from-[hsl(var(--google-red))] via-[hsl(var(--destructive))]/90 to-primary" />
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/95 via-primary/85 to-[hsl(var(--google-blue))]/80" />
+      <div aria-hidden className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-primary/60 to-transparent" />
 
       {/* Decorative blobs */}
-      <div aria-hidden className="absolute -top-24 -left-24 h-80 w-80 rounded-full bg-background/5 blur-3xl" />
+      <div aria-hidden className="absolute -top-24 -left-24 h-80 w-80 rounded-full bg-[hsl(var(--google-blue))]/15 blur-3xl" />
       <div aria-hidden className="absolute -bottom-32 -right-20 h-96 w-96 rounded-full bg-[hsl(var(--google-yellow))]/10 blur-3xl" />
 
       <div className="container max-w-4xl relative">
@@ -82,7 +83,7 @@ export function UrgencySection() {
           viewport={{ once: true }}
           className="text-center mb-12"
         >
-          <span className="inline-flex items-center gap-2 rounded-full bg-background/15 backdrop-blur-md border border-background/25 px-4 py-1.5 text-sm font-bold mb-5">
+          <span className="inline-flex items-center gap-2 rounded-full bg-[hsl(var(--google-yellow))]/20 backdrop-blur-md border border-[hsl(var(--google-yellow))]/40 px-4 py-1.5 text-sm font-bold mb-5 text-[hsl(var(--google-yellow))]">
             <span className="relative flex h-2 w-2">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[hsl(var(--google-yellow))] opacity-75" />
               <span className="relative inline-flex h-2 w-2 rounded-full bg-[hsl(var(--google-yellow))]" />
@@ -188,7 +189,7 @@ export function UrgencySection() {
           viewport={{ once: true }}
           className="flex flex-col sm:flex-row items-center justify-center gap-4"
         >
-          <Button asChild size="lg" className="text-base bg-background text-[hsl(var(--google-red))] hover:bg-background/90 shadow-xl shadow-black/20 font-bold">
+          <Button asChild size="lg" className="text-base bg-[hsl(var(--google-yellow))] text-primary hover:bg-[hsl(var(--google-yellow))]/90 shadow-xl shadow-black/20 font-bold">
             <Link to="/camere">
               Blocca il Tuo Posto <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
