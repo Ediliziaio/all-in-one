@@ -67,12 +67,13 @@ export function UrgencySection() {
         loading="lazy"
         width={1920}
         height={1080}
-        className="absolute inset-0 h-full w-full object-cover opacity-30"
+        className="absolute inset-0 h-full w-full object-cover opacity-60"
       />
-      <div className="absolute inset-0 bg-gradient-to-tr from-[hsl(var(--google-red))] via-[hsl(var(--destructive))]/90 to-primary" />
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/95 via-primary/85 to-[hsl(var(--google-blue))]/80" />
+      <div aria-hidden className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-primary/60 to-transparent" />
 
       {/* Decorative blobs */}
-      <div aria-hidden className="absolute -top-24 -left-24 h-80 w-80 rounded-full bg-background/5 blur-3xl" />
+      <div aria-hidden className="absolute -top-24 -left-24 h-80 w-80 rounded-full bg-[hsl(var(--google-blue))]/15 blur-3xl" />
       <div aria-hidden className="absolute -bottom-32 -right-20 h-96 w-96 rounded-full bg-[hsl(var(--google-yellow))]/10 blur-3xl" />
 
       <div className="container max-w-4xl relative">
