@@ -61,7 +61,7 @@ export function UrgencySection() {
         height={1080}
         className="absolute inset-0 h-full w-full object-cover"
       />
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/95 via-primary/90 to-accent/80" />
+      <div className="absolute inset-0 bg-gradient-to-br from-[hsl(var(--google-red))]/95 via-[hsl(var(--google-red))]/90 to-primary/85" />
       <div className="container max-w-4xl relative">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

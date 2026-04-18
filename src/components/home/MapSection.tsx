@@ -18,7 +18,7 @@ export function MapSection() {
           viewport={{ once: true }}
           className="text-center mb-12"
         >
-          <h2 className="font-heading text-3xl md:text-4xl font-bold text-foreground">Posizione strategica</h2>
+          <h2 className="font-heading text-3xl md:text-4xl font-bold text-foreground inline-block border-b-4 border-[hsl(var(--google-blue))] pb-2">Posizione strategica</h2>
           <p className="text-muted-foreground mt-3">Nel cuore di Padova, a due passi da tutto.</p>
         </motion.div>
 
@@ -32,8 +32,8 @@ export function MapSection() {
           >
             {distances.map((d) => (
               <div key={d.label} className="flex items-center gap-4 rounded-xl border bg-card p-4">
-                <div className="h-10 w-10 rounded-lg bg-accent/10 flex items-center justify-center shrink-0">
-                  <d.icon className="h-5 w-5 text-accent" />
+                <div className="h-10 w-10 rounded-lg bg-[hsl(var(--google-blue))]/10 flex items-center justify-center shrink-0">
+                  <d.icon className="h-5 w-5 text-[hsl(var(--google-blue))]" />
                 </div>
                 <div className="flex-1">
                   <p className="font-medium text-card-foreground">{d.label}</p>

@@ -15,9 +15,16 @@ const fadeUp = {
   visible: (i: number) => ({ opacity: 1, y: 0, transition: { delay: i * 0.08, duration: 0.5 } }),
 };
 
+const iconColors = [
+  { bg: "bg-[hsl(var(--google-blue))]/10 group-hover:bg-[hsl(var(--google-blue))]/20", text: "text-[hsl(var(--google-blue))]" },
+  { bg: "bg-[hsl(var(--google-red))]/10 group-hover:bg-[hsl(var(--google-red))]/20", text: "text-[hsl(var(--google-red))]" },
+  { bg: "bg-[hsl(var(--google-yellow))]/15 group-hover:bg-[hsl(var(--google-yellow))]/25", text: "text-[hsl(var(--google-yellow))]" },
+  { bg: "bg-[hsl(var(--google-green))]/10 group-hover:bg-[hsl(var(--google-green))]/20", text: "text-[hsl(var(--google-green))]" },
+];
+
 export function ServicesSection() {
   return (
-    <section className="py-12 md:py-20 bg-background">
+    <section className="py-12 md:py-20 bg-[hsl(var(--google-blue))]/5">
       <div className="container">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -52,9 +59,9 @@ export function ServicesSection() {
                 <motion.div
                   whileHover={{ rotate: [0, -10, 10, 0] }}
                   transition={{ duration: 0.5 }}
-                  className="h-12 w-12 rounded-lg bg-accent/10 flex items-center justify-center group-hover:bg-accent/20 transition-colors"
+                  className={`h-12 w-12 rounded-lg flex items-center justify-center transition-colors ${iconColors[i % 4].bg}`}
                 >
-                  <s.icon className="h-6 w-6 text-accent" />
+                  <s.icon className={`h-6 w-6 ${iconColors[i % 4].text}`} />
                 </motion.div>
               </div>
               <h3 className="relative font-heading font-semibold text-lg text-card-foreground">{s.title}</h3>

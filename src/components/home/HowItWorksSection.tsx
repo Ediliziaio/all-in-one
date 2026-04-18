@@ -25,6 +25,12 @@ const steps = [
   },
 ];
 
+const stepColors = [
+  { bg: "bg-[hsl(var(--google-blue))]/10", icon: "text-[hsl(var(--google-blue))]", badge: "bg-[hsl(var(--google-blue))] text-white" },
+  { bg: "bg-[hsl(var(--google-red))]/10", icon: "text-[hsl(var(--google-red))]", badge: "bg-[hsl(var(--google-red))] text-white" },
+  { bg: "bg-[hsl(var(--google-green))]/10", icon: "text-[hsl(var(--google-green))]", badge: "bg-[hsl(var(--google-green))] text-white" },
+];
+
 export function HowItWorksSection() {
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
@@ -34,7 +40,7 @@ export function HowItWorksSection() {
   const lineWidth = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
 
   return (
-    <section className="py-12 md:py-20 bg-muted/30">
+    <section className="py-12 md:py-20 bg-[hsl(var(--google-yellow))]/[0.07]">
       <div className="container">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -71,10 +77,10 @@ export function HowItWorksSection() {
               <motion.div
                 whileHover={{ scale: 1.08, rotate: 5 }}
                 transition={{ type: "spring", stiffness: 300 }}
-                className="relative mx-auto mb-4 h-20 w-20 rounded-full bg-accent/10 flex items-center justify-center"
+                className={`relative mx-auto mb-4 h-20 w-20 rounded-full flex items-center justify-center ${stepColors[i % 3].bg}`}
               >
-                <step.icon className="h-8 w-8 text-accent" />
-                <span className="absolute -top-1 -right-1 h-7 w-7 rounded-full bg-accent text-accent-foreground text-sm font-bold flex items-center justify-center shadow-md">
+                <step.icon className={`h-8 w-8 ${stepColors[i % 3].icon}`} />
+                <span className={`absolute -top-1 -right-1 h-7 w-7 rounded-full text-sm font-bold flex items-center justify-center shadow-md ${stepColors[i % 3].badge}`}>
                   {step.number}
                 </span>
               </motion.div>
