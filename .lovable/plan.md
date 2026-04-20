@@ -1,70 +1,62 @@
 
 
-## Problema attuale (mobile)
-- Il collage immagini è `hidden lg:block` → su mobile NESSUNA foto, solo testo
-- Hero su mobile = muro di testo statico, perde impatto
-- Stats e trust badges affollati, poco respiro
-- Badge "Settembre 2025" hardcoded (anche se siamo nel 2026)
-
 ## Obiettivo
-Rendere la HeroSection mobile visivamente ricca quanto desktop, con foto, gerarchia chiara e migliore respiro. Migliorare anche la versione desktop con qualche dettaglio.
+Aggiungere un'immagine di background (Padova o studenti) sfumata e trasparente alla HeroSection, in modo che si fonda visivamente con la navbar in alto, eliminando lo stacco netto tra header e hero.
+
+## Analisi stato attuale
+- `Navbar` è `sticky top-0` con classe `glass` (background semi-trasparente con blur) → già pronta a "vedere attraverso"
+- `HeroSection` ha sfondo `bg-gradient-to-br from-muted via-background to-muted` + `GradientMesh` con blob animati → sfondo chiaro/neutro
+- L'immagine di Padova esiste già: `padova-twilight.jpg` usata in `UrgencySection`
+- Nessuna immagine di background nella hero, solo gradient + blob
 
 ## Soluzione
 
-### 1. Hero immagine mobile (NUOVO)
-Su mobile/tablet aggiungo un'immagine **sopra** il contenuto testuale con effetto Ken Burns:
-- Visibile solo `<lg`, nascosta su desktop (dove c'è già il collage a destra)
-- Layout: immagine full-width con altezza `h-56 sm:h-72`, rounded-2xl, ombra
-- Sopra l'immagine: badge floating "4.9★ 127 recensioni" (chip glassmorphism) per credibilità immediata
-- Sotto-overlay gradient dal basso per leggibilità badge
+### 1. Immagine background full-section nella Hero
+Aggiungo un layer immagine `absolute inset-0` come primo figlio della `<section>`, **dietro** al `GradientMesh` e al contenuto:
+- Sorgente: `padova-twilight.jpg` (riuso esistente, no nuovo asset)
+- `object-cover`, `w-full h-full`
+- Opacità bassa: `opacity-20` (sfumata, non invasiva)
+- `loading="eager"` perché LCP
 
-### 2. Riorganizzazione contenuto mobile
-- Badge "Posti limitati" → centrato su mobile, allineato a sx su desktop
-- H1 → centrato su mobile (`text-center lg:text-left`)
-- Paragrafo → centrato su mobile
-- CTA → full-width verticali su mobile (già fatto, ok)
-- Stats: invece di 3 in fila stretti, **grid 3 colonne** con card piccole (bg-card/50, rounded-xl, padding) → più respiro e leggibilità
-- Trust badges: chip pill con bg leggero invece di solo testo+icona, più visibili
+### 2. Sfumature per fondersi con navbar e contenuto sotto
+Tre overlay gradient sopra l'immagine:
+- **Top fade** (fonde con navbar): `bg-gradient-to-b from-background via-background/80 to-transparent` alto `h-32` → la navbar `glass` si appoggia su questo, transizione invisibile
+- **Bottom fade** (fonde con sezione successiva): `bg-gradient-to-t from-background to-transparent` alto `h-40`
+- **Side fade desktop**: gradient laterale leggero per non distrarre dal testo
 
-### 3. Fix dinamico badge "Settembre 2025"
-Calcolo dinamico: se siamo dopo settembre dell'anno corrente, mostra anno+1. Stesso pattern di `UrgencySection`.
+### 3. Aggiustamento background sezione
+- Cambio `bg-gradient-to-br from-muted via-background to-muted` → `bg-background` (l'immagine fa il lavoro visivo)
+- Mantengo `GradientMesh` ma con opacità ridotta (`opacity-60`) per non competere con la foto
+- Mantengo blob decorativo dietro testo
 
-### 4. Miglioramenti desktop (bonus)
-- Aggiungo terza foto floating piccola in alto a destra per equilibrare il collage
-- Padding hero aumentato (`py-16 md:py-28`) per più presenza
-- Gradient mesh sfondo già c'è, aggiungo un blob colorato decorativo dietro al testo
+### 4. Leggibilità testo
+Su desktop il testo è a sinistra → l'immagine sfumata al 20% non disturba.
+Su mobile l'immagine hero esistente (KenBurns) resta intatta e separata; l'immagine background si vede principalmente nello spazio sopra/sotto.
 
-### 5. Performance
-- `loading="eager"` solo sull'immagine LCP mobile (la prima visibile), `loading="lazy"` su tutte le altre
-- Aggiungo `width`/`height` per evitare CLS
+### 5. Z-index layering (dal basso verso l'alto)
+1. `<img>` background (opacity-20)
+2. Top fade gradient (fonde con navbar)
+3. Bottom fade gradient
+4. `GradientMesh` (blob colorati, opacity ridotta)
+5. Blob decorativo dietro testo
+6. `container` con contenuto (testo + collage)
 
-## Layout mobile finale (ASCII)
+## Esempio struttura
 ```text
-┌─────────────────────┐
-│  [IMG hero KenBurns]│  ← NUOVO
-│   ★4.9 chip overlay │
-├─────────────────────┤
-│   • Posti limitati  │  ← centered
-│                     │
-│   La Tua Casa a     │
-│   Padova, Senza...  │  ← centered
-│                     │
-│   Camera privata... │
-│                     │
-│  [Scopri Camere ▶]  │  ← full width
-│  [Prenota visita]   │
-│                     │
-│  ┌───┬───┬───┐      │
-│  │4.9│98%│€0 │      │  ← grid card stats
-│  └───┴───┴───┘      │
-│                     │
-│ ✓Contratto ⏱24/7    │  ← chip pills
-│ ✓Tutto incluso      │
-└─────────────────────┘
+<section relative overflow-hidden bg-background>
+  <img padova absolute inset-0 opacity-20 />
+  <div top-fade bg-gradient-to-b from-bg to-transparent h-32 />
+  <div bottom-fade bg-gradient-to-t from-bg to-transparent h-40 />
+  <GradientMesh opacity-60 />
+  <div blob-text />
+  <div container relative z-10>
+    {contenuto esistente}
+  </div>
+</section>
 ```
 
 ## File modificati (1)
-- `src/components/home/HeroSection.tsx` → aggiungo immagine hero mobile, riorganizzo allineamenti, ridisegno stats come grid card, trust badges come pill, anno dinamico, +1 foto floating desktop
+- `src/components/home/HeroSection.tsx` → import `padovaBg` da `@/assets/padova-twilight.jpg`, aggiungo layer immagine + 2 overlay gradient, riduco opacità GradientMesh, cambio background sezione a `bg-background`
 
-Nessun nuovo file, nessuna nuova dipendenza.
+Nessun nuovo asset, nessuna nuova dipendenza.
 
