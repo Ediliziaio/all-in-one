@@ -19,6 +19,8 @@ export function Navbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
+  const isHome = location.pathname === "/";
+  const overlayMode = isHome && !scrolled;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 50);
@@ -30,10 +32,10 @@ export function Navbar() {
   return (
     <header
       className={cn(
-        "sticky top-0 z-50 transition-all duration-300",
-        scrolled
-          ? "bg-background/85 backdrop-blur-lg shadow-sm"
-          : "bg-transparent"
+        "z-50 transition-all duration-300",
+        overlayMode
+          ? "absolute top-0 inset-x-0 bg-transparent"
+          : "sticky top-0 bg-background/90 backdrop-blur-lg shadow-sm"
       )}
     >
       <div className="container flex h-16 md:h-20 items-center justify-between">
