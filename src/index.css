@@ -70,6 +70,6 @@
 
 @layer utilities {
   .glass {
-    @apply bg-background/80 backdrop-blur-lg border-b border-border/50;
+    @apply bg-background/60 backdrop-blur-lg;
   }
 }

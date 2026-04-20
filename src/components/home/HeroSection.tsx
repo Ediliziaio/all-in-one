@@ -35,10 +35,12 @@ export function HeroSection() {
         alt=""
         aria-hidden
         loading="eager"
-        className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-20"
+        className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-25"
+        style={{
+          maskImage: "linear-gradient(to bottom, hsl(0 0% 0% / 1) 0%, hsl(0 0% 0% / 0.8) 40%, hsl(0 0% 0% / 0.4) 80%, transparent 100%)",
+          WebkitMaskImage: "linear-gradient(to bottom, hsl(0 0% 0% / 1) 0%, hsl(0 0% 0% / 0.8) 40%, hsl(0 0% 0% / 0.4) 80%, transparent 100%)",
+        }}
       />
-      {/* Top fade — fonde con la navbar sticky glass */}
-      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-background via-background/80 to-transparent" />
       {/* Bottom fade — transizione verso la sezione successiva */}
       <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-background to-transparent" />
       {/* Side fade desktop — riduce distrazione laterale dietro al testo */}
