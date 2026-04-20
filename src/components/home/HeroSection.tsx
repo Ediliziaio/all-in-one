@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { ArrowRight, Star, Users, MapPin, CheckCircle, Clock, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CountUp, KenBurns, GradientMesh } from "@/components/motion/MotionWrappers";
+import padovaBg from "@/assets/padova-twilight.jpg";
 
 const containerVariants = {
   hidden: { opacity: 0 },
