@@ -28,12 +28,27 @@ const displayYear = now.getMonth() > 8 ? now.getFullYear() + 1 : now.getFullYear
 
 export function HeroSection() {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-muted via-background to-muted">
-      <GradientMesh />
+    <section className="relative overflow-hidden bg-background">
+      {/* Background image — Padova sfumata che si fonde con la navbar glass */}
+      <img
+        src={padovaBg}
+        alt=""
+        aria-hidden
+        loading="eager"
+        className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-20"
+      />
+      {/* Top fade — fonde con la navbar sticky glass */}
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-background via-background/80 to-transparent" />
+      {/* Bottom fade — transizione verso la sezione successiva */}
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-background to-transparent" />
+      {/* Side fade desktop — riduce distrazione laterale dietro al testo */}
+      <div aria-hidden className="pointer-events-none absolute inset-y-0 left-0 hidden w-1/3 bg-gradient-to-r from-background/70 to-transparent lg:block" />
+
+      <GradientMesh className="opacity-60" />
       {/* Decorative blob behind text on desktop */}
       <div aria-hidden className="pointer-events-none absolute left-0 top-1/3 hidden h-96 w-96 rounded-full bg-primary/5 blur-3xl lg:block" />
 
-      <div className="container relative py-12 md:py-20 lg:py-28">
+      <div className="container relative z-10 py-12 md:py-20 lg:py-28">
         <motion.div
           variants={containerVariants}
           initial="hidden"
