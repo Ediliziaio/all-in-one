@@ -50,7 +50,7 @@ export function HeroSection() {
       {/* Decorative blob behind text on desktop */}
       <div aria-hidden className="pointer-events-none absolute left-0 top-1/3 hidden h-96 w-96 rounded-full bg-primary/5 blur-3xl lg:block" />
 
-      <div className="container relative z-10 py-12 md:py-20 lg:py-28">
+      <div className="container relative z-10 pt-28 pb-12 md:pt-32 md:pb-20 lg:pt-36 lg:pb-28">
         <motion.div
           variants={containerVariants}
           initial="hidden"
