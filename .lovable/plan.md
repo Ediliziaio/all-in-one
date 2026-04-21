@@ -1,50 +1,31 @@
 
 
-## Obiettivo
-Integrare le 6 foto reali dello Studentato Napoleone per sostituire le immagini stock (Unsplash) attualmente sparse nel sito, dando autenticità visiva al brand.
+## Problema
+Nella sezione "Chi Siamo" appare l'interno della cucina/sala comune invece della facciata esterna dell'immobile. Il codice importa correttamente `studentato-esterno.jpg`, ma il file salvato in `src/assets/studentato-esterno.jpg` contiene la foto sbagliata (interno invece dell'esterno).
 
-## Foto disponibili e contenuto
-1. **Esterno** — Facciata gialla con archi caratteristici (segno distintivo del palazzo)
-2. **Corridoio porte colorate** — Porte stile Google (blu, verde, bianco, giallo, rosso) — molto iconico
-3. **Sala lounge rustica** — Camino in pietra, poltrone verdi, ambiente accogliente
-4. **Sala comune + cucina secondaria** — Tavoli rotondi, sedie, kitchenette
-5. **Cucina principale** — Doppia cucina condivisa, ampio spazio comune
-6. **Terrazzo** — Vista cielo, parete gialla, decorazioni piante
+## Causa
+Quando ho salvato le 6 foto caricate in precedenza, ho associato male i contenuti ai nomi file: la foto della **facciata gialla con archi** (esterno) è finita su un altro filename, mentre `studentato-esterno.jpg` ha ricevuto la foto della sala comune.
 
-## Dove integrare ogni foto
+## Soluzione
+Risalvare i 6 asset con l'associazione corretta foto → nome semantico:
 
-### 1. HeroSection (`HeroSection.tsx`)
-Sostituire le 4 immagini Unsplash con foto reali:
-- **Mobile hero image** → foto **esterno con archi** (impatto immediato, riconoscibilità)
-- **Desktop main image (collage centrale)** → foto **corridoio porte colorate** (unico, memorabile, on-brand con palette Google)
-- **Floating left** → foto **sala lounge** (vibe community)
-- **Floating right** → foto **cucina principale** (spazi condivisi)
-- **Floating top-right** → foto **terrazzo** (outdoor)
+| Filename | Contenuto corretto |
+|---|---|
+| `studentato-esterno.jpg` | **Facciata gialla con archi** (esterno palazzo) ← FIX PRINCIPALE |
+| `studentato-corridoio.jpg` | Corridoio porte colorate Google |
+| `studentato-lounge.jpg` | Sala lounge con camino |
+| `studentato-sala-comune.jpg` | Sala comune con tavoli rotondi (la foto attualmente sbagliata in About) |
+| `studentato-cucina.jpg` | Cucina principale |
+| `studentato-terrazzo.jpg` | Terrazzo |
 
-### 2. AboutSection (`AboutSection.tsx`)
-Sostituire `padova-twilight.jpg` (generica) con la foto **esterno facciata** — è LA foto identitaria dello Studentato Napoleone, perfetta per "La nostra storia". Mantenere badge "Dal 2018" sovrapposto.
+## File modificati
+- **`src/assets/studentato-esterno.jpg`** → sostituito con la foto reale della facciata esterna
+- Eventuale rishuffle degli altri 5 asset se anche loro sono mappati male (verifica visiva durante il fix)
 
-### 3. LoginPage (`LoginPage.tsx`)
-Pannello brand a sinistra: sostituire `padova-twilight.jpg` con foto **corridoio porte colorate** o **esterno** — molto più on-brand del generico "Padova al tramonto". Mantenere overlay navy.
+## Risultato atteso
+- **AboutSection** mostrerà la facciata gialla con archi sotto il badge "Dal 2018" → coerente con caption "Facciata storica · Padova"
+- **LoginPage** continuerà a mostrare il corridoio porte colorate (già corretto)
+- **HeroSection** continuerà a mostrare il collage corretto
 
-## Strategia asset
-- Copiare tutte e 6 le foto in `src/assets/` con nomi semantici:
-  - `studentato-esterno.jpg`
-  - `studentato-corridoio.jpg`
-  - `studentato-lounge.jpg`
-  - `studentato-sala-comune.jpg`
-  - `studentato-cucina.jpg`
-  - `studentato-terrazzo.jpg`
-- Importare via ES6 (`import esterno from "@/assets/studentato-esterno.jpg"`) per ottimizzazione Vite
-
-## File modificati (3)
-1. **`src/components/home/HeroSection.tsx`** → rimpiazzo 4 src Unsplash con import asset reali, alt text aggiornati ("Studentato Napoleone — corridoio camere", ecc.)
-2. **`src/components/home/AboutSection.tsx`** → cambio src immagine da `padova-twilight.jpg` a `studentato-esterno.jpg` + aggiorno caption "Padova · Centro" → "Studentato Napoleone · Facciata storica"
-3. **`src/pages/auth/LoginPage.tsx`** → cambio src brand panel da `padova-twilight.jpg` a `studentato-corridoio.jpg` (più memorabile) + alt text aggiornato
-
-## Note tecniche
-- Nessuna modifica a layout/styling — solo swap immagini + alt text
-- Tutte le foto già ottimizzate dal lato utente, Vite gestisce hashing/lazy loading
-- `padova-twilight.jpg` resta nel progetto (può servire per altre sezioni future)
-- Performance: invariata o migliore (asset locali vs CDN Unsplash esterno)
+Nessuna modifica al codice TSX — solo swap dei file binari in `src/assets/`.
 
