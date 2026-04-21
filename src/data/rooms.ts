@@ -1,3 +1,7 @@
+import cameraMatrimonialeRossa from "@/assets/camera-matrimoniale-rossa.jpg";
+import cameraDoppiaTurchese from "@/assets/camera-doppia-turchese.jpg";
+import cameraMansardaTravi from "@/assets/camera-mansarda-travi.jpg";
+
 export interface Room {
   id: string;
   name: string;
@@ -24,13 +28,7 @@ export const rooms: Room[] = [
     availableFrom: "2025-09-01",
     description: "Camera singola luminosa con scrivania ampia, armadio a muro e bagno privato. Ideale per chi cerca tranquillità e concentrazione.",
     features: ["Bagno privato", "Scrivania", "Armadio", "WiFi Fibra", "Aria condizionata"],
-    images: [
-      "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=800&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1586105251261-72a756497a11?w=800&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=800&h=600&fit=crop",
-    ],
+    images: [cameraMatrimonialeRossa, cameraMansardaTravi, cameraDoppiaTurchese],
   },
   {
     id: "singola-205",
@@ -43,13 +41,7 @@ export const rooms: Room[] = [
     availableFrom: "2025-09-01",
     description: "Camera singola al secondo piano con vista sul cortile interno. Ambiente sereno, perfetto per lo studio.",
     features: ["Bagno privato", "Scrivania", "Armadio", "WiFi Fibra", "Vista cortile"],
-    images: [
-      "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=800&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1586105251261-72a756497a11?w=800&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=800&h=600&fit=crop",
-    ],
+    images: [cameraMatrimonialeRossa, cameraDoppiaTurchese, cameraMansardaTravi],
   },
   {
     id: "singola-plus-102",
@@ -62,13 +54,7 @@ export const rooms: Room[] = [
     availableFrom: "2025-09-01",
     description: "Camera singola premium con zona living separata, angolo cottura e bagno privato con doccia a pioggia.",
     features: ["Bagno privato", "Angolo cottura", "Zona living", "WiFi Fibra", "Smart TV", "Aria condizionata"],
-    images: [
-      "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=800&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=800&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1586105251261-72a756497a11?w=800&h=600&fit=crop",
-    ],
+    images: [cameraMansardaTravi, cameraMatrimonialeRossa, cameraDoppiaTurchese],
   },
   {
     id: "singola-plus-301",
@@ -81,13 +67,7 @@ export const rooms: Room[] = [
     availableFrom: "2026-01-01",
     description: "La nostra camera più spaziosa al terzo piano. Vista panoramica, zona studio dedicata e tutti i comfort.",
     features: ["Bagno privato", "Angolo cottura", "Zona studio", "WiFi Fibra", "Smart TV", "Balcone"],
-    images: [
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=800&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=800&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1586105251261-72a756497a11?w=800&h=600&fit=crop",
-    ],
+    images: [cameraMansardaTravi, cameraMatrimonialeRossa, cameraDoppiaTurchese],
   },
   {
     id: "doppia-103",
@@ -100,13 +80,7 @@ export const rooms: Room[] = [
     availableFrom: "2025-09-01",
     description: "Camera doppia spaziosa con due letti singoli, due scrivanie e bagno condiviso. Perfetta per chi ama la compagnia.",
     features: ["Bagno condiviso", "2 Scrivanie", "2 Armadi", "WiFi Fibra", "Aria condizionata"],
-    images: [
-      "https://images.unsplash.com/photo-1586105251261-72a756497a11?w=800&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=800&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=800&h=600&fit=crop",
-    ],
+    images: [cameraDoppiaTurchese, cameraMatrimonialeRossa, cameraMansardaTravi],
   },
   {
     id: "doppia-204",
@@ -119,13 +93,7 @@ export const rooms: Room[] = [
     availableFrom: "2025-10-01",
     description: "Camera doppia al secondo piano, ampia e luminosa con finestre su due lati. Arredata con gusto moderno.",
     features: ["Bagno condiviso", "2 Scrivanie", "2 Armadi", "WiFi Fibra", "Vista giardino"],
-    images: [
-      "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=800&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=800&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1586105251261-72a756497a11?w=800&h=600&fit=crop",
-    ],
+    images: [cameraDoppiaTurchese, cameraMansardaTravi, cameraMatrimonialeRossa],
   },
 ];
 
