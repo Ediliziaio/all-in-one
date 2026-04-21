@@ -1,69 +1,94 @@
 
 
 ## Obiettivo
-Trasformare la sezione "Chi Siamo" in una vera presentazione di **Studentato Napoleone**: storia, identità, valori e numeri — con layout più ricco, immagine reale e gerarchia visiva forte.
+Trasformare la pagina `/login` da un form anonimo su sfondo blu in un'esperienza brandizzata **Studentato Napoleone**, con layout split moderno, branding riconoscibile e UX ottimizzata.
 
 ## Problemi attuali
-- Testo generico "Non siamo un'agenzia" → non comunica il brand **Napoleone**
-- Layout tutto centrato e piatto: titolo + paragrafo + 4 card, zero immagine, zero personalità
-- Anno "Dal 2018" incoerente con "7+ anni di esperienza" (siamo nel 2026 → 8 anni)
-- Nessun riferimento al nome "Napoleone", alla location specifica, al perché del nome
-- Card stats identiche a quelle dell'Hero → ridondanza
+- Layout single-card su sfondo gradient blu generico → zero brand identity
+- Logo placeholder "SP" testuale invece del vero logo Napoleone
+- Copy generico ("StudentatoPD", "Accedi") senza personalità
+- Demo accounts visivamente pesanti, occupano metà card
+- Nessuna gerarchia visiva: tutti i blocchi hanno stesso peso
+- Mancano: "Password dimenticata?", indicatore caps lock, validazione email inline, "Ricordami"
+- Nessun valore comunicato → l'utente non sa cosa lo aspetta dopo il login
 
 ## Soluzione
 
-### 1. Nuovo layout split (immagine + contenuto)
-Due colonne su desktop, stack su mobile:
-- **Sinistra**: foto (esterno palazzo / interno studentato / studenti insieme) con badge sovrapposto "Dal 2018" e piccola firma "Studentato Napoleone · Padova"
-- **Destra**: contenuto testuale strutturato
-
-### 2. Contenuto testuale potenziato
-- **Eyebrow**: "La nostra storia" (small caps, accent color)
-- **Titolo**: "Studentato Napoleone" + sottotitolo "La casa degli studenti a Padova"
-- **Paragrafo principale**: storia del brand — chi siamo, da dove veniamo, cosa ci differenzia. Esempio:
-  > "Studentato Napoleone nasce nel 2018 dall'idea di chi ha vissuto in prima persona la difficoltà di trovare casa a Padova. Non un'agenzia, ma una community: contratti chiari, spazi curati, persone vere che ti accompagnano dal primo giorno."
-- **3 valori chiave** con icone (lista verticale, non card):
-  - 🏛 Trasparenza · contratti regolari, zero sorprese
-  - 🤝 Community · eventi, supporto tra studenti
-  - ⚡ Risposta rapida · assistenza 24/7
-
-### 3. Stats riprogettati come strip orizzontale
-Sotto il blocco split, una **strip pulita** (no card pesanti) con i 4 numeri separati da divider verticali sottili — diversa dall'Hero per evitare ridondanza:
-- 8+ Anni di attività · 500+ Studenti ospitati · 98% Rinnovi contratto · 4.9★ Google Reviews
-- Stile: numeri grandi colorati Google palette, label sotto piccola, separatori `border-l` tra colonne
-
-### 4. CTA finale
-Riga conclusiva con pulsante "Scopri la nostra storia" → link a pagina Vantaggi (o stessa pagina ancorata)
-
-### 5. Background più caratterizzato
-Da `bg-muted/30` flat a un background con leggero pattern/gradient sottile (es. `bg-gradient-to-br from-muted/40 via-background to-muted/20`) per dare profondità senza distrarre.
-
-## Diagramma layout desktop
+### 1. Layout split desktop (50/50), single column mobile
 ```text
-┌─────────────────────────────────────────────────────┐
-│           LA NOSTRA STORIA                          │
-│                                                     │
-│ ┌──────────────┐  ┌──────────────────────────────┐ │
-│ │              │  │ Studentato Napoleone         │ │
-│ │   [FOTO]     │  │ La casa degli studenti       │ │
-│ │              │  │                              │ │
-│ │ Dal 2018 ●   │  │ Studentato Napoleone nasce…  │ │
-│ │              │  │                              │ │
-│ └──────────────┘  │ 🏛 Trasparenza · …           │ │
-│                   │ 🤝 Community · …             │ │
-│                   │ ⚡ Risposta rapida · …       │ │
-│                   │                              │ │
-│                   │ [Scopri di più →]            │ │
-│                   └──────────────────────────────┘ │
-│                                                     │
-│ ─────────────────────────────────────────────────── │
-│   8+      │   500+     │   98%      │   4.9★       │
-│   Anni    │   Studenti │   Rinnovi  │   Reviews    │
-└─────────────────────────────────────────────────────┘
+┌──────────────────────┬──────────────────────┐
+│                      │                      │
+│  PANNELLO BRAND      │  PANNELLO LOGIN      │
+│  (immagine Padova    │  (form pulito        │
+│   + overlay navy     │   su sfondo bianco)  │
+│   + logo + claim     │                      │
+│   + 3 benefit)       │  Bentornato 👋       │
+│                      │  [Email] [Password]  │
+│  Studentato          │  [Ricordami] [Pwd?]  │
+│  Napoleone           │  [Accedi]            │
+│                      │  ─── oppure ───      │
+│  La tua casa a       │  [Google]            │
+│  Padova              │                      │
+│                      │  Demo: 👤 Studente   │
+│  ✓ Camere curate     │        🛡 Admin       │
+│  ✓ Community attiva  │                      │
+│  ✓ Supporto 24/7     │  Non hai account?    │
+│                      │  Registrati          │
+└──────────────────────┴──────────────────────┘
 ```
+Su mobile: solo pannello login, brand collassa in header compatto con logo + nome.
+
+### 2. Pannello brand (sinistra desktop)
+- Background: foto `padova-twilight.jpg` con overlay `bg-primary/85` (navy brand)
+- Logo Napoleone in alto (PNG da `src/assets/logo-napoleone.png` se esiste, fallback testuale Plus Jakarta)
+- Headline grande: "Bentornato a casa." + sottotitolo "Studentato Napoleone · Padova"
+- Lista 3 benefit con icone Lucide (Home, Users, Headphones) — colore bianco
+- Footer piccolo: "Dal 2018 · 500+ studenti"
+
+### 3. Pannello login (destra)
+- Sfondo `bg-background` pulito
+- Heading "Accedi al tuo account" + sub "Inserisci le tue credenziali"
+- Form con micro-miglioramenti UX:
+  - **Email**: validazione visiva inline (border verde su email valida)
+  - **Password**: indicatore caps lock attivo (badge sopra il campo se rilevato)
+  - Toggle show/hide password (già presente, mantenuto)
+  - **Riga utility**: checkbox "Ricordami" a sinistra + link "Password dimenticata?" a destra
+- Pulsante "Accedi" full-width, accent green, con loader spinner inline (non solo testo)
+- Divider "oppure continua con" più discreto
+- Pulsante Google secondario, outline
+
+### 4. Demo accounts riprogettati (compatti)
+Da blocco prominente → **chip compatti** sotto il form:
+- Riga grigia muted: "Demo: " + 2 chip cliccabili `[👤 Studente]` `[🛡 Admin]`
+- Click compila E ESEGUE auto-login (one-click demo) → riduce friction
+- Tooltip al hover con credenziali per chi vuole vederle
+
+### 5. Micro-interazioni
+- Animazione entry: pannello brand slide-in da sx, pannello form fade-in con delay 100ms
+- Focus ring brand (accent) sui campi
+- Pulsante Accedi: hover scale 1.01, active scale 0.99
+- Spinner SVG nel pulsante quando `loading`
+
+### 6. Nuove feature funzionali
+- **Caps Lock detection**: `onKeyUp` su password rileva `getModifierState("CapsLock")`, mostra badge "⚠ Caps Lock attivo"
+- **Ricordami**: checkbox cosmetica (state locale, no persistenza per ora)
+- **Password dimenticata**: link a `/forgot-password` (route placeholder, toast "prossimamente" se non esiste)
+- **One-click demo**: i chip demo accounts compilano + submit automatico
+- **Validazione email**: regex semplice, classe border verde se valida
+
+### 7. Allineamento brand
+- Font: Plus Jakarta su titoli pannello brand, Inter su form
+- Colori: solo token semantici (`primary`, `accent`, `muted-foreground`) — niente hardcoded
+- Logo: usare `/src/assets/logo-napoleone.png` se esiste, altrimenti placeholder con iniziali "SN" (Studentato Napoleone, non "SP")
+
+## Note tecniche
+- **File modificato**: `src/pages/auth/LoginPage.tsx` (riscrittura layout, logica auth invariata)
+- **Nessuna nuova dipendenza**: framer-motion, lucide, shadcn/ui già presenti
+- **Asset**: verifico esistenza `logo-napoleone.png` (citato in memoria); se non c'è uso fallback testuale "SN"
+- **Background image**: riuso `padova-twilight.jpg` già nel progetto
+- **Responsive**: `lg:grid-cols-2` per split, `grid-cols-1` mobile con brand header compatto in alto
+- **Accessibilità**: label associate, focus visibile, aria-live su caps lock warning, contrasto AA garantito sul pannello navy
 
 ## File modificati (1)
-- **`src/components/home/AboutSection.tsx`** → riscrittura completa con layout split, copy Studentato Napoleone, valori con icone (Lucide: `Shield`, `Users`, `Zap`), stats strip, CTA. Uso immagine esistente `padova-twilight.jpg` o placeholder Unsplash temporaneo per la foto.
-
-Nessun nuovo asset richiesto. Nessuna nuova dipendenza.
+- `src/pages/auth/LoginPage.tsx` → riscrittura completa con layout split brandizzato, micro-UX (caps lock, ricordami, forgot pwd, one-click demo), logo Napoleone, copy on-brand
 
