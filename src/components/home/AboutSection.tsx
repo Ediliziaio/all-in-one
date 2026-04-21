@@ -3,7 +3,7 @@ import { Shield, Users, Zap, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { FadeIn } from "@/components/motion/MotionWrappers";
 import { Button } from "@/components/ui/button";
-import padovaImg from "@/assets/padova-twilight.jpg";
+import esternoImg from "@/assets/studentato-esterno.jpg";
 
 const values = [
   {
@@ -58,15 +58,15 @@ export function AboutSection() {
             <div className="relative">
               <div className="relative rounded-2xl overflow-hidden shadow-xl aspect-[4/5] md:aspect-[5/6]">
                 <img
-                  src={padovaImg}
-                  alt="Studentato Napoleone a Padova"
+                  src={esternoImg}
+                  alt="Studentato Napoleone — facciata storica con archi"
                   className="w-full h-full object-cover"
                   loading="lazy"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-primary/40 via-transparent to-transparent" />
                 <div className="absolute bottom-4 left-4 right-4 text-white">
-                  <p className="text-xs uppercase tracking-wider opacity-90">Padova · Centro</p>
-                  <p className="font-heading text-lg font-semibold">Studentato Napoleone</p>
+                  <p className="text-xs uppercase tracking-wider opacity-90">Studentato Napoleone</p>
+                  <p className="font-heading text-lg font-semibold">Facciata storica · Padova</p>
                 </div>
               </div>
               {/* Badge "Dal 2018" */}

@@ -4,6 +4,11 @@ import { ArrowRight, Star, Users, MapPin, CheckCircle, Clock, Info } from "lucid
 import { Button } from "@/components/ui/button";
 import { CountUp, KenBurns, GradientMesh } from "@/components/motion/MotionWrappers";
 import padovaBg from "@/assets/padova-twilight.jpg";
+import esternoImg from "@/assets/studentato-esterno.jpg";
+import corridoioImg from "@/assets/studentato-corridoio.jpg";
+import loungeImg from "@/assets/studentato-lounge.jpg";
+import cucinaImg from "@/assets/studentato-cucina.jpg";
+import terrazzoImg from "@/assets/studentato-terrazzo.jpg";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -64,8 +69,8 @@ export function HeroSection() {
           >
             <div className="relative overflow-hidden rounded-2xl shadow-xl">
               <KenBurns
-                src="https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=800&h=600&fit=crop"
-                alt="Camera studentato moderna a Padova"
+                src={esternoImg}
+                alt="Studentato Napoleone — facciata con archi a Padova"
                 className="h-56 w-full object-cover sm:h-72"
               />
               {/* Bottom gradient overlay for badge readability */}
@@ -179,8 +184,8 @@ export function HeroSection() {
 
             <div className="relative z-10 overflow-hidden rounded-2xl shadow-2xl">
               <KenBurns
-                src="https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=800&h=500&fit=crop"
-                alt="Camera studentato moderna"
+                src={corridoioImg}
+                alt="Studentato Napoleone — corridoio con porte colorate"
                 className="h-64 w-full object-cover"
               />
             </div>
@@ -191,8 +196,8 @@ export function HeroSection() {
               className="absolute -left-6 top-1/2 z-20 overflow-hidden rounded-xl shadow-xl"
             >
               <img
-                src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=400&h=300&fit=crop"
-                alt="Studenti in comune"
+                src={loungeImg}
+                alt="Studentato Napoleone — sala lounge con camino"
                 loading="lazy"
                 className="h-40 w-56 object-cover"
               />
@@ -205,8 +210,8 @@ export function HeroSection() {
               style={{ animationDelay: "1s" }}
             >
               <img
-                src="https://images.unsplash.com/photo-1543269865-cbf427effbad?w=400&h=300&fit=crop"
-                alt="Community studentesca"
+                src={cucinaImg}
+                alt="Studentato Napoleone — cucina condivisa"
                 loading="lazy"
                 className="h-36 w-48 object-cover"
               />
@@ -220,8 +225,8 @@ export function HeroSection() {
               style={{ animationDelay: "2s" }}
             >
               <img
-                src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=300&h=300&fit=crop"
-                alt="Spazio comune studentato"
+                src={terrazzoImg}
+                alt="Studentato Napoleone — terrazzo panoramico"
                 loading="lazy"
                 className="h-28 w-28 object-cover"
               />
