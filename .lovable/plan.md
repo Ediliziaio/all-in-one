@@ -1,49 +1,36 @@
 
 
 ## Obiettivo
-Sostituire le foto stock Unsplash delle camere con le 3 foto reali delle camere dello Studentato Napoleone, e aggiornare la foto del corridoio con la versione migliorata.
+Inserire le 3 foto reali delle **camere** (mansarda travi rosso, doppia turchese, mansarda quadro astratto) nella **prima sezione** della home (HeroSection), sostituendo alcune delle foto degli spazi comuni attualmente nel collage.
 
-## Foto caricate
-1. **Camera matrimoniale con quadro astratto** (parete bianca, letto rosso, parquet, terrazzo giallo) → camera tipo Singola Plus / matrimoniale
-2. **Camera doppia con testiere turchesi** (2 letti singoli, quadri colorati, accesso terrazzo) → camera tipo Doppia
-3. **Camera matrimoniale con travi a vista** (soffitto in legno, tappeto rigato, terrazzo) → camera tipo Singola Plus mansarda
-4. **Corridoio porte colorate (versione 2 angolazioni)** → upgrade del corridoio esistente
+## Situazione attuale HeroSection
+Il collage hero mostra 5 foto di spazi comuni:
+- Mobile hero → esterno
+- Desktop main (centrale grande) → corridoio porte colorate
+- Floating left → lounge
+- Floating right → cucina
+- Floating top-right → terrazzo
 
-## Mappatura asset
+Le **camere** (il prodotto vero che si vende) non compaiono nell'hero — solo più in basso in "Scegli la tua camera".
 
-| Filename in `src/assets/` | Contenuto |
-|---|---|
-| `camera-matrimoniale-rossa.jpg` | NUOVO — camera con copriletto rosso e quadro astratto |
-| `camera-doppia-turchese.jpg` | NUOVO — doppia con testiere blu turchese |
-| `camera-mansarda-travi.jpg` | NUOVO — matrimoniale con travi a vista in legno |
-| `studentato-corridoio.jpg` | SOSTITUITO — versione migliore con 2 angolazioni del corridoio Google |
+## Nuova mappatura HeroSection
+Sostituire 3 foto del collage con le camere, mantenendo varietà (1 esterno + 1 spazio comune + 3 camere):
 
-## Dove integrare le foto
+| Slot | Prima | Dopo |
+|---|---|---|
+| Mobile hero | esterno | **camera-mansarda-travi** (più calda, vendibile) |
+| Desktop main centrale | corridoio | **camera-mansarda-travi** (foto-eroe del prodotto) |
+| Floating left | lounge | **camera-doppia-turchese** (mostra varietà tipologia) |
+| Floating right | cucina | **camera-matrimoniale-rossa** (terza camera) |
+| Floating top-right | terrazzo | **studentato-corridoio** (mantiene 1 spazio comune iconico) |
 
-### 1. `src/data/rooms.ts` — sostituzione immagini camere
-Trasformare gli array `images` da URL Unsplash a import locali:
-- **Singole** (`singola-101`, `singola-205`) → prima foto: `camera-matrimoniale-rossa.jpg` (la più calda e accogliente)
-- **Singole Plus** (`singola-plus-102`, `singola-plus-301`) → prima foto: `camera-mansarda-travi.jpg` (travi a vista = premium feel)
-- **Doppie** (`doppia-103`, `doppia-204`) → prima foto: `camera-doppia-turchese.jpg` (mostra chiaramente i 2 letti)
-- Le altre slide della galleria mescolano le 3 foto camere disponibili (rotazione tra le reali, rimuovendo gli Unsplash residui)
+Risultato: hero centrato sulle **camere reali** (3 su 4 slot visibili) + 1 spazio comune iconico (corridoio Google).
 
-### 2. `src/assets/studentato-corridoio.jpg` — upgrade
-Sostituire il file binario con la nuova versione che mostra il corridoio da 2 angolazioni → migliora HeroSection e LoginPage automaticamente (nessuna modifica codice).
+## File modificati (1)
+- **`src/components/home/HeroSection.tsx`** → swap 4 import asset (rimpiazzo `studentato-esterno`, `studentato-corridoio` come main, `studentato-lounge`, `studentato-cucina`, `studentato-terrazzo` con i 3 import camere + corridoio in posizione secondaria), aggiornamento alt text ("Camera mansarda con travi a vista", "Camera doppia turchese", "Camera matrimoniale", "Corridoio porte colorate")
 
-### 3. Nessuna modifica a `RoomsPreview.tsx`
-Il componente legge già `room.images[0]` da `rooms.ts` → cambiando i dati, la sezione "Scegli la tua camera" sulla home mostrerà subito le foto reali. Stessa cosa per `/camere` e `/camere/:id`.
-
-## File modificati (4 asset + 1 dati)
-1. **`src/assets/camera-matrimoniale-rossa.jpg`** (NUOVO)
-2. **`src/assets/camera-doppia-turchese.jpg`** (NUOVO)
-3. **`src/assets/camera-mansarda-travi.jpg`** (NUOVO)
-4. **`src/assets/studentato-corridoio.jpg`** (SOSTITUITO con versione migliorata)
-5. **`src/data/rooms.ts`** → import dei 3 nuovi asset + sostituzione array `images` di tutte e 6 le camere con le foto reali
-
-## Risultato atteso
-- **Home → "Scegli la tua camera"**: 3 card mostrano camera rossa, mansarda travi, doppia turchese
-- **Pagina `/camere`**: griglia camere con foto reali e riconoscibili
-- **Dettaglio camera**: galleria con foto reali multiple
-- **Hero + Login**: corridoio in versione migliorata
-- Nessuna foto Unsplash residua nelle camere
+## Note
+- Nessuna modifica al layout/animazioni del collage
+- Le foto camere sono già presenti in `src/assets/` (caricate negli step precedenti)
+- Le foto spazi comuni rimosse dall'hero (lounge, cucina, terrazzo, esterno) restano disponibili e usate altrove (AboutSection per esterno; le altre possono servire in futuro per pagine dedicate "Spazi comuni")
 
