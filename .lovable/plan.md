@@ -1,79 +1,69 @@
 
-## Obiettivo
-Eliminare davvero lo stacco tra header e prima sezione: in cima alla home la navbar deve stare sopra la hero come overlay trasparente, e diventare bianca/opaca appena si scrolla.
 
-## Causa reale del problema
-Il problema non è solo il colore della navbar. La `Navbar` è ancora dentro il flusso layout come `sticky`, quindi occupa fisicamente altezza sopra la hero. Risultato: resta una fascia bianca separata prima che inizi l’immagine della prima sezione.
+## Obiettivo
+Trasformare la sezione "Chi Siamo" in una vera presentazione di **Studentato Napoleone**: storia, identità, valori e numeri — con layout più ricco, immagine reale e gerarchia visiva forte.
+
+## Problemi attuali
+- Testo generico "Non siamo un'agenzia" → non comunica il brand **Napoleone**
+- Layout tutto centrato e piatto: titolo + paragrafo + 4 card, zero immagine, zero personalità
+- Anno "Dal 2018" incoerente con "7+ anni di esperienza" (siamo nel 2026 → 8 anni)
+- Nessun riferimento al nome "Napoleone", alla location specifica, al perché del nome
+- Card stats identiche a quelle dell'Hero → ridondanza
 
 ## Soluzione
 
-### 1. Navbar overlay sulla home
-Aggiornare `Navbar.tsx` per distinguere due casi:
+### 1. Nuovo layout split (immagine + contenuto)
+Due colonne su desktop, stack su mobile:
+- **Sinistra**: foto (esterno palazzo / interno studentato / studenti insieme) con badge sovrapposto "Dal 2018" e piccola firma "Studentato Napoleone · Padova"
+- **Destra**: contenuto testuale strutturato
 
-- **Home + top pagina (`/` e `scrollY <= 50`)**
-  - navbar in overlay: `absolute top-0 inset-x-0 z-50`
-  - background trasparente
-  - nessuna ombra
-- **Home dopo scroll**
-  - navbar torna `sticky top-0`
-  - `bg-background/90 backdrop-blur-lg shadow-sm`
-- **Tutte le altre pagine**
-  - navbar sempre bianca/sticky come ora
+### 2. Contenuto testuale potenziato
+- **Eyebrow**: "La nostra storia" (small caps, accent color)
+- **Titolo**: "Studentato Napoleone" + sottotitolo "La casa degli studenti a Padova"
+- **Paragrafo principale**: storia del brand — chi siamo, da dove veniamo, cosa ci differenzia. Esempio:
+  > "Studentato Napoleone nasce nel 2018 dall'idea di chi ha vissuto in prima persona la difficoltà di trovare casa a Padova. Non un'agenzia, ma una community: contratti chiari, spazi curati, persone vere che ti accompagnano dal primo giorno."
+- **3 valori chiave** con icone (lista verticale, non card):
+  - 🏛 Trasparenza · contratti regolari, zero sorprese
+  - 🤝 Community · eventi, supporto tra studenti
+  - ⚡ Risposta rapida · assistenza 24/7
 
-Così l’header non crea più una banda separata sopra la hero.
+### 3. Stats riprogettati come strip orizzontale
+Sotto il blocco split, una **strip pulita** (no card pesanti) con i 4 numeri separati da divider verticali sottili — diversa dall'Hero per evitare ridondanza:
+- 8+ Anni di attività · 500+ Studenti ospitati · 98% Rinnovi contratto · 4.9★ Google Reviews
+- Stile: numeri grandi colorati Google palette, label sotto piccola, separatori `border-l` tra colonne
 
-### 2. Compensare l’altezza header dentro la Hero
-Dato che la navbar sulla home diventa overlay, il contenuto hero va abbassato con padding top dedicato:
-- mobile: più spazio sopra
-- tablet/desktop: ancora più spazio
-- obiettivo: il logo/menu restano sopra l’immagine, ma titolo e CTA non finiscono sotto l’header
+### 4. CTA finale
+Riga conclusiva con pulsante "Scopri la nostra storia" → link a pagina Vantaggi (o stessa pagina ancorata)
 
-In pratica la spaziatura superiore della hero diventa parte della sezione, non un blocco separato.
+### 5. Background più caratterizzato
+Da `bg-muted/30` flat a un background con leggero pattern/gradient sottile (es. `bg-gradient-to-br from-muted/40 via-background to-muted/20`) per dare profondità senza distrarre.
 
-### 3. Rendere la fusione visiva più pulita
-In `HeroSection.tsx` rifinire la parte alta:
-- mantenere l’immagine di Padova ben visibile anche sotto la navbar
-- evitare qualsiasi overlay chiaro pieno nella fascia superiore
-- se serve, alleggerire il fade laterale/top per non “lavare” troppo l’immagine proprio sotto il menu
-
-### 4. Migliorare leggibilità navbar quando è trasparente
-Quando la navbar è sopra l’immagine:
-- link/logo/menu con contrasto più deciso
-- eventuale leggerissimo text shadow o colore più scuro sui link non attivi
-- nessun fondo bianco in top state
-
-Quando scrolli:
-- torna la versione bianca standard per leggibilità sulle sezioni successive
-
-## Comportamento finale
+## Diagramma layout desktop
 ```text
-HOME - top pagina
-[ navbar overlay trasparente ]
-[ stessa immagine hero continua dietro ]
-[ titolo / CTA più in basso ]
-=> nessuno stacco
-
-HOME - dopo scroll
-[ navbar bianca sticky ]
-[ contenuto pagina sotto ]
-=> separazione voluta per leggibilità
-
-ALTRE PAGINE
-[ navbar bianca sticky da subito ]
-=> comportamento classico
+┌─────────────────────────────────────────────────────┐
+│           LA NOSTRA STORIA                          │
+│                                                     │
+│ ┌──────────────┐  ┌──────────────────────────────┐ │
+│ │              │  │ Studentato Napoleone         │ │
+│ │   [FOTO]     │  │ La casa degli studenti       │ │
+│ │              │  │                              │ │
+│ │ Dal 2018 ●   │  │ Studentato Napoleone nasce…  │ │
+│ │              │  │                              │ │
+│ └──────────────┘  │ 🏛 Trasparenza · …           │ │
+│                   │ 🤝 Community · …             │ │
+│                   │ ⚡ Risposta rapida · …       │ │
+│                   │                              │ │
+│                   │ [Scopri di più →]            │ │
+│                   └──────────────────────────────┘ │
+│                                                     │
+│ ─────────────────────────────────────────────────── │
+│   8+      │   500+     │   98%      │   4.9★       │
+│   Anni    │   Studenti │   Rinnovi  │   Reviews    │
+└─────────────────────────────────────────────────────┘
 ```
 
-## File da modificare
-1. `src/components/Navbar.tsx`
-   - usare `useLocation()` già presente per rilevare homepage
-   - combinare `isHome` + `scrolled`
-   - passare da `sticky sempre` a `absolute in top-state home` / `sticky negli altri casi`
+## File modificati (1)
+- **`src/components/home/AboutSection.tsx`** → riscrittura completa con layout split, copy Studentato Napoleone, valori con icone (Lucide: `Shield`, `Users`, `Zap`), stats strip, CTA. Uso immagine esistente `padova-twilight.jpg` o placeholder Unsplash temporaneo per la foto.
 
-2. `src/components/home/HeroSection.tsx`
-   - aumentare `padding-top` del container hero per compensare l’overlay header
-   - rifinire eventuali overlay/fade superiori per mostrare bene l’immagine sotto la navbar
+Nessun nuovo asset richiesto. Nessuna nuova dipendenza.
 
-## Note tecniche
-- Non serve toccare `Layout.tsx`: il fix può restare localizzato tra navbar e hero
-- La transizione resta fluida con `transition-all duration-300`
-- Mobile incluso: anche lì la prima sezione sarà unita all’header invece di iniziare sotto una fascia bianca
