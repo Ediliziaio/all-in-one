@@ -4,11 +4,10 @@ import { ArrowRight, Star, Users, MapPin, CheckCircle, Clock, Info } from "lucid
 import { Button } from "@/components/ui/button";
 import { CountUp, KenBurns, GradientMesh } from "@/components/motion/MotionWrappers";
 import padovaBg from "@/assets/padova-twilight.jpg";
-import esternoImg from "@/assets/studentato-esterno.jpg";
+import cameraMansardaTravi from "@/assets/camera-mansarda-travi.jpg";
+import cameraDoppiaTurchese from "@/assets/camera-doppia-turchese.jpg";
+import cameraMatrimonialeRossa from "@/assets/camera-matrimoniale-rossa.jpg";
 import corridoioImg from "@/assets/studentato-corridoio.jpg";
-import loungeImg from "@/assets/studentato-lounge.jpg";
-import cucinaImg from "@/assets/studentato-cucina.jpg";
-import terrazzoImg from "@/assets/studentato-terrazzo.jpg";
 
 const containerVariants = {
   hidden: { opacity: 0 },
