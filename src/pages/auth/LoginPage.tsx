@@ -23,7 +23,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import logoNapoleone from "@/assets/logo-napoleone.png";
-import padovaImage from "@/assets/padova-twilight.jpg";
+import brandImage from "@/assets/studentato-corridoio.jpg";
 
 const DEMO_ACCOUNTS = [
   {
@@ -110,8 +110,8 @@ export default function LoginPage() {
         className="relative hidden lg:flex flex-col justify-between p-12 overflow-hidden"
       >
         <img
-          src={padovaImage}
-          alt="Padova al tramonto"
+          src={brandImage}
+          alt="Studentato Napoleone — corridoio con porte colorate"
           className="absolute inset-0 w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-primary/85" />
