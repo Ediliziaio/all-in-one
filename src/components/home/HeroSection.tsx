@@ -4,11 +4,10 @@ import { ArrowRight, Star, Users, MapPin, CheckCircle, Clock, Info } from "lucid
 import { Button } from "@/components/ui/button";
 import { CountUp, KenBurns, GradientMesh } from "@/components/motion/MotionWrappers";
 import padovaBg from "@/assets/padova-twilight.jpg";
-import esternoImg from "@/assets/studentato-esterno.jpg";
+import cameraMansardaTravi from "@/assets/camera-mansarda-travi.jpg";
+import cameraDoppiaTurchese from "@/assets/camera-doppia-turchese.jpg";
+import cameraMatrimonialeRossa from "@/assets/camera-matrimoniale-rossa.jpg";
 import corridoioImg from "@/assets/studentato-corridoio.jpg";
-import loungeImg from "@/assets/studentato-lounge.jpg";
-import cucinaImg from "@/assets/studentato-cucina.jpg";
-import terrazzoImg from "@/assets/studentato-terrazzo.jpg";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -69,8 +68,8 @@ export function HeroSection() {
           >
             <div className="relative overflow-hidden rounded-2xl shadow-xl">
               <KenBurns
-                src={esternoImg}
-                alt="Studentato Napoleone — facciata con archi a Padova"
+                src={cameraMansardaTravi}
+                alt="Studentato Napoleone — camera mansarda con travi a vista"
                 className="h-56 w-full object-cover sm:h-72"
               />
               {/* Bottom gradient overlay for badge readability */}
@@ -184,8 +183,8 @@ export function HeroSection() {
 
             <div className="relative z-10 overflow-hidden rounded-2xl shadow-2xl">
               <KenBurns
-                src={corridoioImg}
-                alt="Studentato Napoleone — corridoio con porte colorate"
+                src={cameraMansardaTravi}
+                alt="Studentato Napoleone — camera mansarda con travi a vista"
                 className="h-64 w-full object-cover"
               />
             </div>
@@ -196,8 +195,8 @@ export function HeroSection() {
               className="absolute -left-6 top-1/2 z-20 overflow-hidden rounded-xl shadow-xl"
             >
               <img
-                src={loungeImg}
-                alt="Studentato Napoleone — sala lounge con camino"
+                src={cameraDoppiaTurchese}
+                alt="Studentato Napoleone — camera doppia con testiere turchesi"
                 loading="lazy"
                 className="h-40 w-56 object-cover"
               />
@@ -210,8 +209,8 @@ export function HeroSection() {
               style={{ animationDelay: "1s" }}
             >
               <img
-                src={cucinaImg}
-                alt="Studentato Napoleone — cucina condivisa"
+                src={cameraMatrimonialeRossa}
+                alt="Studentato Napoleone — camera matrimoniale con copriletto rosso"
                 loading="lazy"
                 className="h-36 w-48 object-cover"
               />
@@ -225,8 +224,8 @@ export function HeroSection() {
               style={{ animationDelay: "2s" }}
             >
               <img
-                src={terrazzoImg}
-                alt="Studentato Napoleone — terrazzo panoramico"
+                src={corridoioImg}
+                alt="Studentato Napoleone — corridoio con porte colorate"
                 loading="lazy"
                 className="h-28 w-28 object-cover"
               />
