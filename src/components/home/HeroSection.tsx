@@ -68,8 +68,8 @@ export function HeroSection() {
           >
             <div className="relative overflow-hidden rounded-2xl shadow-xl">
               <KenBurns
-                src={esternoImg}
-                alt="Studentato Napoleone — facciata con archi a Padova"
+                src={cameraMansardaTravi}
+                alt="Studentato Napoleone — camera mansarda con travi a vista"
                 className="h-56 w-full object-cover sm:h-72"
               />
               {/* Bottom gradient overlay for badge readability */}
