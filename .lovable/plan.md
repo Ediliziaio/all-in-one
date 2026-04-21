@@ -1,94 +1,50 @@
 
 
 ## Obiettivo
-Trasformare la pagina `/login` da un form anonimo su sfondo blu in un'esperienza brandizzata **Studentato Napoleone**, con layout split moderno, branding riconoscibile e UX ottimizzata.
+Integrare le 6 foto reali dello Studentato Napoleone per sostituire le immagini stock (Unsplash) attualmente sparse nel sito, dando autenticità visiva al brand.
 
-## Problemi attuali
-- Layout single-card su sfondo gradient blu generico → zero brand identity
-- Logo placeholder "SP" testuale invece del vero logo Napoleone
-- Copy generico ("StudentatoPD", "Accedi") senza personalità
-- Demo accounts visivamente pesanti, occupano metà card
-- Nessuna gerarchia visiva: tutti i blocchi hanno stesso peso
-- Mancano: "Password dimenticata?", indicatore caps lock, validazione email inline, "Ricordami"
-- Nessun valore comunicato → l'utente non sa cosa lo aspetta dopo il login
+## Foto disponibili e contenuto
+1. **Esterno** — Facciata gialla con archi caratteristici (segno distintivo del palazzo)
+2. **Corridoio porte colorate** — Porte stile Google (blu, verde, bianco, giallo, rosso) — molto iconico
+3. **Sala lounge rustica** — Camino in pietra, poltrone verdi, ambiente accogliente
+4. **Sala comune + cucina secondaria** — Tavoli rotondi, sedie, kitchenette
+5. **Cucina principale** — Doppia cucina condivisa, ampio spazio comune
+6. **Terrazzo** — Vista cielo, parete gialla, decorazioni piante
 
-## Soluzione
+## Dove integrare ogni foto
 
-### 1. Layout split desktop (50/50), single column mobile
-```text
-┌──────────────────────┬──────────────────────┐
-│                      │                      │
-│  PANNELLO BRAND      │  PANNELLO LOGIN      │
-│  (immagine Padova    │  (form pulito        │
-│   + overlay navy     │   su sfondo bianco)  │
-│   + logo + claim     │                      │
-│   + 3 benefit)       │  Bentornato 👋       │
-│                      │  [Email] [Password]  │
-│  Studentato          │  [Ricordami] [Pwd?]  │
-│  Napoleone           │  [Accedi]            │
-│                      │  ─── oppure ───      │
-│  La tua casa a       │  [Google]            │
-│  Padova              │                      │
-│                      │  Demo: 👤 Studente   │
-│  ✓ Camere curate     │        🛡 Admin       │
-│  ✓ Community attiva  │                      │
-│  ✓ Supporto 24/7     │  Non hai account?    │
-│                      │  Registrati          │
-└──────────────────────┴──────────────────────┘
-```
-Su mobile: solo pannello login, brand collassa in header compatto con logo + nome.
+### 1. HeroSection (`HeroSection.tsx`)
+Sostituire le 4 immagini Unsplash con foto reali:
+- **Mobile hero image** → foto **esterno con archi** (impatto immediato, riconoscibilità)
+- **Desktop main image (collage centrale)** → foto **corridoio porte colorate** (unico, memorabile, on-brand con palette Google)
+- **Floating left** → foto **sala lounge** (vibe community)
+- **Floating right** → foto **cucina principale** (spazi condivisi)
+- **Floating top-right** → foto **terrazzo** (outdoor)
 
-### 2. Pannello brand (sinistra desktop)
-- Background: foto `padova-twilight.jpg` con overlay `bg-primary/85` (navy brand)
-- Logo Napoleone in alto (PNG da `src/assets/logo-napoleone.png` se esiste, fallback testuale Plus Jakarta)
-- Headline grande: "Bentornato a casa." + sottotitolo "Studentato Napoleone · Padova"
-- Lista 3 benefit con icone Lucide (Home, Users, Headphones) — colore bianco
-- Footer piccolo: "Dal 2018 · 500+ studenti"
+### 2. AboutSection (`AboutSection.tsx`)
+Sostituire `padova-twilight.jpg` (generica) con la foto **esterno facciata** — è LA foto identitaria dello Studentato Napoleone, perfetta per "La nostra storia". Mantenere badge "Dal 2018" sovrapposto.
 
-### 3. Pannello login (destra)
-- Sfondo `bg-background` pulito
-- Heading "Accedi al tuo account" + sub "Inserisci le tue credenziali"
-- Form con micro-miglioramenti UX:
-  - **Email**: validazione visiva inline (border verde su email valida)
-  - **Password**: indicatore caps lock attivo (badge sopra il campo se rilevato)
-  - Toggle show/hide password (già presente, mantenuto)
-  - **Riga utility**: checkbox "Ricordami" a sinistra + link "Password dimenticata?" a destra
-- Pulsante "Accedi" full-width, accent green, con loader spinner inline (non solo testo)
-- Divider "oppure continua con" più discreto
-- Pulsante Google secondario, outline
+### 3. LoginPage (`LoginPage.tsx`)
+Pannello brand a sinistra: sostituire `padova-twilight.jpg` con foto **corridoio porte colorate** o **esterno** — molto più on-brand del generico "Padova al tramonto". Mantenere overlay navy.
 
-### 4. Demo accounts riprogettati (compatti)
-Da blocco prominente → **chip compatti** sotto il form:
-- Riga grigia muted: "Demo: " + 2 chip cliccabili `[👤 Studente]` `[🛡 Admin]`
-- Click compila E ESEGUE auto-login (one-click demo) → riduce friction
-- Tooltip al hover con credenziali per chi vuole vederle
+## Strategia asset
+- Copiare tutte e 6 le foto in `src/assets/` con nomi semantici:
+  - `studentato-esterno.jpg`
+  - `studentato-corridoio.jpg`
+  - `studentato-lounge.jpg`
+  - `studentato-sala-comune.jpg`
+  - `studentato-cucina.jpg`
+  - `studentato-terrazzo.jpg`
+- Importare via ES6 (`import esterno from "@/assets/studentato-esterno.jpg"`) per ottimizzazione Vite
 
-### 5. Micro-interazioni
-- Animazione entry: pannello brand slide-in da sx, pannello form fade-in con delay 100ms
-- Focus ring brand (accent) sui campi
-- Pulsante Accedi: hover scale 1.01, active scale 0.99
-- Spinner SVG nel pulsante quando `loading`
-
-### 6. Nuove feature funzionali
-- **Caps Lock detection**: `onKeyUp` su password rileva `getModifierState("CapsLock")`, mostra badge "⚠ Caps Lock attivo"
-- **Ricordami**: checkbox cosmetica (state locale, no persistenza per ora)
-- **Password dimenticata**: link a `/forgot-password` (route placeholder, toast "prossimamente" se non esiste)
-- **One-click demo**: i chip demo accounts compilano + submit automatico
-- **Validazione email**: regex semplice, classe border verde se valida
-
-### 7. Allineamento brand
-- Font: Plus Jakarta su titoli pannello brand, Inter su form
-- Colori: solo token semantici (`primary`, `accent`, `muted-foreground`) — niente hardcoded
-- Logo: usare `/src/assets/logo-napoleone.png` se esiste, altrimenti placeholder con iniziali "SN" (Studentato Napoleone, non "SP")
+## File modificati (3)
+1. **`src/components/home/HeroSection.tsx`** → rimpiazzo 4 src Unsplash con import asset reali, alt text aggiornati ("Studentato Napoleone — corridoio camere", ecc.)
+2. **`src/components/home/AboutSection.tsx`** → cambio src immagine da `padova-twilight.jpg` a `studentato-esterno.jpg` + aggiorno caption "Padova · Centro" → "Studentato Napoleone · Facciata storica"
+3. **`src/pages/auth/LoginPage.tsx`** → cambio src brand panel da `padova-twilight.jpg` a `studentato-corridoio.jpg` (più memorabile) + alt text aggiornato
 
 ## Note tecniche
-- **File modificato**: `src/pages/auth/LoginPage.tsx` (riscrittura layout, logica auth invariata)
-- **Nessuna nuova dipendenza**: framer-motion, lucide, shadcn/ui già presenti
-- **Asset**: verifico esistenza `logo-napoleone.png` (citato in memoria); se non c'è uso fallback testuale "SN"
-- **Background image**: riuso `padova-twilight.jpg` già nel progetto
-- **Responsive**: `lg:grid-cols-2` per split, `grid-cols-1` mobile con brand header compatto in alto
-- **Accessibilità**: label associate, focus visibile, aria-live su caps lock warning, contrasto AA garantito sul pannello navy
-
-## File modificati (1)
-- `src/pages/auth/LoginPage.tsx` → riscrittura completa con layout split brandizzato, micro-UX (caps lock, ricordami, forgot pwd, one-click demo), logo Napoleone, copy on-brand
+- Nessuna modifica a layout/styling — solo swap immagini + alt text
+- Tutte le foto già ottimizzate dal lato utente, Vite gestisce hashing/lazy loading
+- `padova-twilight.jpg` resta nel progetto (può servire per altre sezioni future)
+- Performance: invariata o migliore (asset locali vs CDN Unsplash esterno)
 
