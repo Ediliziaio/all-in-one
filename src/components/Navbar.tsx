@@ -38,8 +38,6 @@ export function Navbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
-  const isHome = location.pathname === "/";
-  const overlayMode = isHome && !scrolled;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 50);
@@ -51,10 +49,10 @@ export function Navbar() {
   return (
     <header
       className={cn(
-        "z-50 transition-all duration-300",
-        overlayMode
-          ? "absolute top-0 inset-x-0 bg-background/30 backdrop-blur-md border-b border-white/10"
-          : "sticky top-0 bg-background/85 backdrop-blur-lg shadow-[0_1px_0_0_hsl(var(--border))]"
+        "sticky top-0 z-50 transition-all duration-300",
+        scrolled
+          ? "bg-background/95 backdrop-blur-lg shadow-md"
+          : "bg-background border-b border-border"
       )}
     >
       {/* Top utility bar — desktop only, fades out on scroll */}
@@ -101,29 +99,20 @@ export function Navbar() {
       {/* Main navbar row */}
       <div className="container flex h-16 md:h-20 items-center justify-between gap-4">
         {/* Logo + wordmark */}
-        <Link to="/" className="flex items-center gap-3 shrink-0 group">
-          <div className="bg-white rounded-lg p-1 shadow-sm group-hover:shadow-md transition-shadow">
-            <img
-              src={logoNapoleone}
-              alt="Studentato Napoleone Padova"
-              className="h-9 md:h-12 w-auto"
-            />
-          </div>
+        <Link
+          to="/"
+          className="flex items-center gap-3 shrink-0 group transition-transform hover:scale-[1.02]"
+        >
+          <img
+            src={logoNapoleone}
+            alt="Studentato Napoleone Padova"
+            className="h-10 md:h-14 w-auto"
+          />
           <div className="hidden md:flex flex-col leading-tight">
-            <span
-              className={cn(
-                "font-display font-bold text-lg tracking-tight transition-colors",
-                overlayMode ? "text-white" : "text-foreground"
-              )}
-            >
+            <span className="font-display font-bold text-lg tracking-tight text-primary">
               Napoleone
             </span>
-            <span
-              className={cn(
-                "text-[11px] uppercase tracking-[0.15em] font-medium transition-colors",
-                overlayMode ? "text-white/80" : "text-muted-foreground"
-              )}
-            >
+            <span className="text-[11px] uppercase tracking-[0.15em] font-medium text-muted-foreground">
               Studentato · Padova
             </span>
           </div>
@@ -139,11 +128,7 @@ export function Navbar() {
                 to={l.href}
                 className={cn(
                   "relative text-sm font-medium px-3 py-2 rounded-full transition-colors",
-                  overlayMode
-                    ? isActive
-                      ? "text-white"
-                      : "text-white/80 hover:text-white hover:bg-white/10"
-                    : isActive
+                  isActive
                     ? "text-primary"
                     : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
                 )}
@@ -152,10 +137,7 @@ export function Navbar() {
                 {isActive && (
                   <motion.div
                     layoutId="navbar-underline"
-                    className={cn(
-                      "absolute -bottom-0.5 left-3 right-3 h-0.5 rounded-full",
-                      overlayMode ? "bg-accent" : "bg-primary"
-                    )}
+                    className="absolute -bottom-0.5 left-3 right-3 h-0.5 rounded-full bg-accent"
                     transition={{ type: "spring", stiffness: 350, damping: 30 }}
                   />
                 )}
@@ -166,14 +148,7 @@ export function Navbar() {
 
         {/* Desktop CTAs */}
         <div className="hidden md:flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            asChild
-            className={cn(
-              overlayMode && "text-white hover:bg-white/10 hover:text-white"
-            )}
-          >
+          <Button variant="ghost" size="sm" asChild>
             <Link to="/login">
               <User className="h-4 w-4" />
               Accedi
@@ -196,12 +171,7 @@ export function Navbar() {
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
               <button
-                className={cn(
-                  "p-2 rounded-lg border transition-colors",
-                  overlayMode
-                    ? "border-white/20 bg-white/10 text-white backdrop-blur-sm"
-                    : "border-border bg-background text-foreground"
-                )}
+                className="p-2 rounded-lg border border-border bg-background text-foreground"
                 aria-label="Apri menu"
               >
                 <Menu className="h-5 w-5" />
