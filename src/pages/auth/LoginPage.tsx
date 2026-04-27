@@ -1,5 +1,7 @@
-import { useState, useRef } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState, useRef, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/contexts/AuthContext";
 import { motion } from "framer-motion";
 import {
   Mail,
@@ -28,17 +30,15 @@ import brandImage from "@/assets/studentato-corridoio.jpg";
 const DEMO_ACCOUNTS = [
   {
     label: "Studente",
-    email: "studente@demo.it",
-    password: "demo1234",
+    email: "studente@studentatonapoleone.com",
+    password: "Demo1234!",
     icon: UserRound,
-    redirect: "/studente",
   },
   {
     label: "Admin",
-    email: "admin@demo.it",
-    password: "demo1234",
+    email: "admin@studentatonapoleone.com",
+    password: "Demo1234!",
     icon: ShieldCheck,
-    redirect: "/admin",
   },
 ];
 
@@ -58,31 +58,38 @@ export default function LoginPage() {
   const [remember, setRemember] = useState(false);
   const [capsLock, setCapsLock] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
+  const { session, profile } = useAuth();
+
+  // Se già loggato, redirect in base al ruolo
+  useEffect(() => {
+    if (session && profile) {
+      const from = (location.state as { from?: { pathname: string } })?.from?.pathname;
+      navigate(from ?? (profile.role === "admin" ? "/admin" : "/studente"), { replace: true });
+    }
+  }, [session, profile, navigate, location]);
 
   const emailValid = email.length > 0 && isValidEmail(email);
 
-  const performLogin = (loginEmail: string, loginPassword: string) => {
+  const performLogin = async (loginEmail: string, loginPassword: string) => {
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      const account = DEMO_ACCOUNTS.find(
-        (a) => a.email === loginEmail && a.password === loginPassword,
-      );
-      if (account) {
-        toast({
-          title: account.label === "Admin" ? "Benvenuto Admin!" : "Bentornato a casa!",
-        });
-        navigate(account.redirect);
-      } else {
-        toast({
-          title: "Credenziali non valide",
-          description: "Prova uno degli account demo qui sotto.",
-          variant: "destructive",
-        });
-      }
-    }, 600);
+    const { error } = await supabase.auth.signInWithPassword({
+      email: loginEmail,
+      password: loginPassword,
+    });
+    setLoading(false);
+    if (error) {
+      toast({
+        title: "Accesso non riuscito",
+        description: error.message === "Invalid login credentials"
+          ? "Email o password errati."
+          : error.message,
+        variant: "destructive",
+      });
+    }
+    // Il redirect avviene automaticamente via useEffect quando session cambia
   };
 
   const handleLogin = (e: React.FormEvent) => {
@@ -94,6 +101,28 @@ export default function LoginPage() {
     setEmail(account.email);
     setPassword(account.password);
     performLogin(account.email, account.password);
+  };
+
+  const handleForgotPassword = async () => {
+    if (!isValidEmail(email)) {
+      toast({ title: "Inserisci la tua email", description: "Digita prima l'email nel campo sopra." });
+      return;
+    }
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    if (error) {
+      toast({ title: "Errore", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Email inviata!", description: "Controlla la tua casella di posta per il link di reset." });
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: `${window.location.origin}/auth/callback` },
+    });
   };
 
   const handlePwKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -264,7 +293,7 @@ export default function LoginPage() {
               </label>
               <button
                 type="button"
-                onClick={() => toast({ title: "Recupero password", description: "Funzionalità in arrivo." })}
+                onClick={handleForgotPassword}
                 className="text-sm font-medium text-accent hover:underline"
               >
                 Password dimenticata?
@@ -301,7 +330,7 @@ export default function LoginPage() {
           <Button
             variant="outline"
             className="w-full"
-            onClick={() => toast({ title: "Google OAuth", description: "Funzionalità in arrivo." })}
+            onClick={handleGoogleLogin}
           >
             <svg className="h-4 w-4" viewBox="0 0 24 24">
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>

@@ -4,6 +4,8 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ScrollToTop } from "@/components/ScrollToTop";
+import { AuthProvider } from "@/contexts/AuthContext";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 
 // Public
 import Index from "./pages/Index";
@@ -54,52 +56,58 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <ScrollToTop />
-        <Routes>
-          {/* Public */}
-          <Route path="/" element={<Index />} />
-          <Route path="/camere" element={<Camere />} />
-          <Route path="/camere/:id" element={<CameraDettaglio />} />
-          <Route path="/servizi" element={<Servizi />} />
-          <Route path="/vantaggi" element={<Vantaggi />} />
-          <Route path="/community" element={<CommunityPublic />} />
-          <Route path="/contatti" element={<Contatti />} />
+        <AuthProvider>
+          <ScrollToTop />
+          <Routes>
+            {/* Public */}
+            <Route path="/" element={<Index />} />
+            <Route path="/camere" element={<Camere />} />
+            <Route path="/camere/:id" element={<CameraDettaglio />} />
+            <Route path="/servizi" element={<Servizi />} />
+            <Route path="/vantaggi" element={<Vantaggi />} />
+            <Route path="/community" element={<CommunityPublic />} />
+            <Route path="/contatti" element={<Contatti />} />
 
-          {/* Auth */}
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
+            {/* Auth */}
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
 
-          {/* Admin */}
-          <Route path="/admin" element={<AdminLayout />}>
-            <Route index element={<AdminDashboard />} />
-            <Route path="camere" element={<AdminCamere />} />
-            <Route path="richieste" element={<AdminPrenotazioni />} />
-            <Route path="contratti" element={<AdminContratti />} />
-            <Route path="studenti" element={<AdminStudenti />} />
-            <Route path="supporto" element={<AdminSupporto />} />
-            <Route path="buoni" element={<AdminBuoni />} />
-            <Route path="guide" element={<AdminGuide />} />
-            <Route path="impostazioni" element={<AdminImpostazioni />} />
-          </Route>
+            {/* Admin — richiede login + ruolo admin */}
+            <Route element={<ProtectedRoute requiredRole="admin" />}>
+              <Route path="/admin" element={<AdminLayout />}>
+                <Route index element={<AdminDashboard />} />
+                <Route path="camere" element={<AdminCamere />} />
+                <Route path="richieste" element={<AdminPrenotazioni />} />
+                <Route path="contratti" element={<AdminContratti />} />
+                <Route path="studenti" element={<AdminStudenti />} />
+                <Route path="supporto" element={<AdminSupporto />} />
+                <Route path="buoni" element={<AdminBuoni />} />
+                <Route path="guide" element={<AdminGuide />} />
+                <Route path="impostazioni" element={<AdminImpostazioni />} />
+              </Route>
+            </Route>
 
-          {/* Studente */}
-          <Route path="/studente" element={<StudenteLayout />}>
-            <Route index element={<StudenteHome />} />
-            <Route path="camera" element={<MiaCamera />} />
-            <Route path="prenota" element={<PrenotaCamera />} />
-            <Route path="community" element={<Community />} />
-            <Route path="community/profili" element={<Profili />} />
-            <Route path="community/profilo/:id" element={<ProfiloStudente />} />
-            <Route path="profilo" element={<MioProfilo />} />
-            <Route path="guide" element={<Guide />} />
-            <Route path="buoni" element={<Buoni />} />
-            <Route path="pagamenti" element={<Pagamenti />} />
-            <Route path="documenti" element={<Documenti />} />
-            <Route path="supporto" element={<Supporto />} />
-          </Route>
+            {/* Studente — richiede login + ruolo student */}
+            <Route element={<ProtectedRoute requiredRole="student" />}>
+              <Route path="/studente" element={<StudenteLayout />}>
+                <Route index element={<StudenteHome />} />
+                <Route path="camera" element={<MiaCamera />} />
+                <Route path="prenota" element={<PrenotaCamera />} />
+                <Route path="community" element={<Community />} />
+                <Route path="community/profili" element={<Profili />} />
+                <Route path="community/profilo/:id" element={<ProfiloStudente />} />
+                <Route path="profilo" element={<MioProfilo />} />
+                <Route path="guide" element={<Guide />} />
+                <Route path="buoni" element={<Buoni />} />
+                <Route path="pagamenti" element={<Pagamenti />} />
+                <Route path="documenti" element={<Documenti />} />
+                <Route path="supporto" element={<Supporto />} />
+              </Route>
+            </Route>
 
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

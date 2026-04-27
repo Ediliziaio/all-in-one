@@ -7,9 +7,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/lib/supabase";
 
 export default function RegisterPage() {
   const [nome, setNome] = useState("");
+  const [cognome, setCognome] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [corso, setCorso] = useState("");
@@ -18,14 +20,39 @@ export default function RegisterPage() {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      toast({ title: "Registrazione completata!", description: "Controlla la tua email per confermare l'account." });
+
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          nome,
+          cognome,
+          corso,
+          anno: anno ? parseInt(anno) : null,
+          role: "student",
+        },
+      },
+    });
+
+    setLoading(false);
+
+    if (error) {
+      toast({
+        title: "Errore nella registrazione",
+        description: error.message,
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Account creato!",
+        description: "Controlla la tua email per confermare l'account prima di accedere.",
+      });
       navigate("/login");
-    }, 800);
+    }
   };
 
   return (
@@ -44,11 +71,17 @@ export default function RegisterPage() {
         </div>
 
         <form onSubmit={handleRegister} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="nome">Nome completo</Label>
-            <div className="relative">
-              <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input id="nome" placeholder="Mario Rossi" className="pl-10" value={nome} onChange={(e) => setNome(e.target.value)} required />
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-2">
+              <Label htmlFor="nome">Nome</Label>
+              <div className="relative">
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input id="nome" placeholder="Mario" className="pl-10" value={nome} onChange={(e) => setNome(e.target.value)} required />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="cognome">Cognome</Label>
+              <Input id="cognome" placeholder="Rossi" value={cognome} onChange={(e) => setCognome(e.target.value)} required />
             </div>
           </div>
 
