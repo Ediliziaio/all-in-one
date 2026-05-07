@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Link, Outlet, useLocation } from "react-router-dom";
-import { Home, BedDouble, Users, BookOpen, Gift, Headphones, UserCircle, FileText, CreditCard, CalendarPlus, LogOut, MoreHorizontal } from "lucide-react";
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { Home, BedDouble, BookOpen, Gift, Headphones, UserCircle, FileText, CreditCard, CalendarPlus, LogOut, MoreHorizontal, Users } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { currentUser } from "@/data/mockData";
@@ -11,7 +12,6 @@ const sidebarItems = [
   { label: "Home", href: "/studente", icon: Home },
   { label: "La Mia Camera", href: "/studente/camera", icon: BedDouble },
   { label: "Richiedi Camera", href: "/studente/prenota", icon: CalendarPlus },
-  { label: "Community", href: "/studente/community", icon: Users },
   { label: "Guide", href: "/studente/guide", icon: BookOpen },
   { label: "Buoni", href: "/studente/buoni", icon: Gift },
   { label: "Pagamenti", href: "/studente/pagamenti", icon: CreditCard },
@@ -21,24 +21,31 @@ const sidebarItems = [
 ];
 
 const bottomNavItems = [
-  { label: "Home", href: "/studente", icon: Home },
-  { label: "Camera", href: "/studente/camera", icon: BedDouble },
-  { label: "Community", href: "/studente/community", icon: Users },
-  { label: "Profilo", href: "/studente/profilo", icon: UserCircle },
+  { label: "Home",       href: "/studente",           icon: Home },
+  { label: "Pagamenti",  href: "/studente/pagamenti",  icon: CreditCard },
+  { label: "Supporto",   href: "/studente/supporto",   icon: Headphones },
+  { label: "Profilo",    href: "/studente/profilo",    icon: UserCircle },
 ];
 
 const moreMenuItems = [
-  { label: "Richiedi Camera", href: "/studente/prenota", icon: CalendarPlus },
-  { label: "Pagamenti", href: "/studente/pagamenti", icon: CreditCard },
-  { label: "Documenti", href: "/studente/documenti", icon: FileText },
-  { label: "Supporto", href: "/studente/supporto", icon: Headphones },
-  { label: "Buoni", href: "/studente/buoni", icon: Gift },
-  { label: "Guide", href: "/studente/guide", icon: BookOpen },
+  { label: "La Mia Camera",  href: "/studente/camera",    icon: BedDouble },
+  { label: "Richiedi Camera",href: "/studente/prenota",   icon: CalendarPlus },
+  { label: "Documenti",      href: "/studente/documenti", icon: FileText },
+  { label: "Buoni",          href: "/studente/buoni",     icon: Gift },
+  { label: "Guide",          href: "/studente/guide",     icon: BookOpen },
+  { label: "Community",      href: "/studente/community", icon: Users },
 ];
 
 export default function StudenteLayout() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { signOut } = useAuth();
   const [moreOpen, setMoreOpen] = useState(false);
+
+  const handleLogout = async () => {
+    try { await signOut(); } catch (_) {}
+    navigate("/");
+  };
 
   return (
     <div className="flex min-h-screen bg-muted/30">
@@ -75,9 +82,9 @@ export default function StudenteLayout() {
           })}
         </nav>
         <div className="p-3 border-t">
-          <Link to="/" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground">
+          <button onClick={handleLogout} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground">
             <LogOut className="h-4 w-4" /> Esci
-          </Link>
+          </button>
         </div>
       </aside>
 
@@ -116,13 +123,12 @@ export default function StudenteLayout() {
                 </Link>
               ))}
             </div>
-            <Link
-              to="/"
-              onClick={() => setMoreOpen(false)}
+            <button
+              onClick={() => { setMoreOpen(false); handleLogout(); }}
               className="flex items-center justify-center gap-2 w-full p-3 rounded-xl border text-sm font-medium text-muted-foreground hover:bg-muted"
             >
               <LogOut className="h-4 w-4" /> Esci
-            </Link>
+            </button>
           </SheetContent>
         </Sheet>
       </div>

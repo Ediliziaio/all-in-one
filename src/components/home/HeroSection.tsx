@@ -100,7 +100,7 @@ export function HeroSection() {
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
                   <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
                 </span>
-                <Info className="h-3.5 w-3.5" /> Posti limitati per Settembre {displayYear}
+                <Info className="h-3.5 w-3.5" /> Camere disponibili a Padova · A.A. {displayYear}/{displayYear + 1}
               </span>
             </motion.div>
 
@@ -108,16 +108,16 @@ export function HeroSection() {
               variants={itemVariants}
               className="font-heading text-3xl sm:text-4xl font-extrabold leading-tight md:text-5xl lg:text-6xl text-foreground"
             >
-              La Tua Casa a Padova,{" "}
-              <span className="text-primary">Senza Pensieri.</span>
+              Alloggio Studenti a Padova,{" "}
+              <span className="text-primary">Tutto Incluso.</span>
             </motion.h1>
 
             <motion.p
               variants={itemVariants}
               className="mx-auto max-w-lg text-base sm:text-lg text-muted-foreground lg:mx-0"
             >
-              Camera privata con tutto incluso — WiFi, palestra, bollette —
-              <strong className="text-foreground"> a partire da €480/mese</strong>. A pochi minuti dall'università.
+              Camera singola o posto letto in doppia — WiFi fibra, utenze e cucina incluse —
+              <strong className="text-foreground"> da €390/mese</strong>. A 5 minuti dall'Università di Padova.
             </motion.p>
 
             <motion.div variants={itemVariants} className="flex flex-col sm:flex-row sm:justify-center lg:justify-start flex-wrap gap-3">
@@ -127,7 +127,7 @@ export function HeroSection() {
                 </Link>
               </Button>
               <Button asChild variant="outline" size="lg" className="text-base w-full sm:w-auto">
-                <Link to="/contatti">Prenota una visita</Link>
+                <Link to="/contatti">Prenota una visita gratuita</Link>
               </Button>
             </motion.div>
 
@@ -163,7 +163,7 @@ export function HeroSection() {
             <motion.div variants={itemVariants} className="flex flex-wrap justify-center lg:justify-start gap-2 pt-1">
               {[
                 { icon: <CheckCircle className="h-3.5 w-3.5 text-success" />, text: "Contratto regolare" },
-                { icon: <Clock className="h-3.5 w-3.5 text-primary" />, text: "Assistenza 24/7" },
+                { icon: <Clock className="h-3.5 w-3.5 text-primary" />, text: "Vicino a UniPD" },
                 { icon: <CheckCircle className="h-3.5 w-3.5 text-success" />, text: "Tutto incluso" },
               ].map((badge) => (
                 <span

@@ -181,8 +181,6 @@ export default function LoginPage() {
 
         {/* Bottom: stats */}
         <div className="relative z-10 flex items-center gap-6 text-primary-foreground/70 text-xs">
-          <span>Dal 2018</span>
-          <span className="h-1 w-1 rounded-full bg-primary-foreground/40" />
           <span>500+ studenti ospitati</span>
           <span className="h-1 w-1 rounded-full bg-primary-foreground/40" />
           <span>4.9★ su Google</span>
@@ -360,7 +358,7 @@ export default function LoginPage() {
                   </TooltipTrigger>
                   <TooltipContent side="top" className="text-xs">
                     <div className="font-mono">{acc.email}</div>
-                    <div className="font-mono text-muted-foreground">{acc.password}</div>
+                    <div className="text-muted-foreground">Click per accedere automaticamente</div>
                   </TooltipContent>
                 </Tooltip>
               ))}

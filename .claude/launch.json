@@ -1,0 +1,14 @@
+{
+  "version": "0.0.1",
+  "autoPort": true,
+  "configurations": [
+    {
+      "name": "studentato-dev",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "env": {
+        "VITE_IS_APP": "true"
+      }
+    }
+  ]
+}

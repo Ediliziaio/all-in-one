@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -52,7 +53,7 @@ const emptyForm: FormState = {
 
 export default function AdminBuoni() {
   const { toast } = useToast();
-  const [buoni, setBuoni] = useState<Buono[]>(mockBuoni);
+  const [buoni, setBuoni] = useLocalStorage<Buono[]>("sn_buoni_v1", mockBuoni);
   const [search, setSearch] = useState("");
   const [cat, setCat] = useState<string>("tutti");
   const [stato, setStato] = useState<string>("tutti");

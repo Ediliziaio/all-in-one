@@ -3,20 +3,196 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Studentato Napoleone Padova — Alloggi per Studenti</title>
-    <meta name="description" content="Studentato Napoleone a Padova: camere singole e doppie, tutti i servizi inclusi, a pochi passi dall'università. Richiedi ora la tua stanza." />
+
+    <!-- Default fallback meta (overridden per-page by react-helmet-async) -->
+    <title>Studentato Napoleone Padova — Alloggio Studenti da €390/mese</title>
+    <meta name="description" content="Studentato Napoleone a Padova: camere singole e doppie per studenti universitari. WiFi, utenze e pulizie incluse. A pochi minuti dall'Università di Padova. Da €390/mese." />
+    <meta name="keywords" content="studentato Padova, alloggio studenti Padova, camere studenti Padova, affitto stanza Padova, posto letto Padova studenti, affitto camera singola Padova, stanze affitto Padova università, casa studenti Padova" />
     <meta name="author" content="Studentato Napoleone Padova" />
+    <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
+    <meta name="language" content="Italian" />
+
+    <!-- Local GEO signals -->
+    <meta name="geo.region" content="IT-PD" />
+    <meta name="geo.placename" content="Padova, Italia" />
+    <meta name="ICBM" content="45.4064, 11.8768" />
+
+    <!-- Icons & PWA -->
+    <link rel="icon" type="image/png" href="/logo-napoleone.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/logo-napoleone.png" />
+    <link rel="icon" type="image/png" sizes="512x512" href="/logo-napoleone.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/logo-napoleone.png" />
+    <meta name="theme-color" content="#1e3a5f" />
+    <link rel="manifest" href="/manifest.json" />
+
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Lato:wght@400;700&family=Merriweather:wght@400;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet" />
 
-    <meta property="og:title" content="Studentato Napoleone Padova — Alloggi per Studenti" />
-    <meta property="og:description" content="La tua casa a Padova. Senza stress. Camere moderne, servizi inclusi, vicino all'università." />
+    <!-- Open Graph (fallback) -->
+    <meta property="og:title" content="Studentato Napoleone Padova — Alloggio Studenti da €390/mese" />
+    <meta property="og:description" content="Camere singole e doppie per studenti universitari a Padova. WiFi, utenze, cucina e pulizie incluse. Vicino all'Università di Padova." />
     <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=1200&h=630&fit=crop" />
+    <meta property="og:url" content="https://studentatonapoleone.com/" />
+    <meta property="og:site_name" content="Studentato Napoleone Padova" />
+    <meta property="og:locale" content="it_IT" />
+    <meta property="og:image" content="https://studentatonapoleone.com/logo-napoleone.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
 
+    <!-- Twitter Card (fallback) -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:image" content="https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=1200&h=630&fit=crop" />
+    <meta name="twitter:title" content="Studentato Napoleone Padova — Alloggio Studenti da €390/mese" />
+    <meta name="twitter:description" content="Camere per studenti a Padova. WiFi, utenze e pulizie incluse. Da €390/mese." />
+    <meta name="twitter:image" content="https://studentatonapoleone.com/logo-napoleone.png" />
+
+    <!-- Canonical (fallback) -->
+    <link rel="canonical" href="https://studentatonapoleone.com/" />
+
+    <!-- JSON-LD: LodgingBusiness (Studentato) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "LodgingBusiness",
+      "@id": "https://studentatonapoleone.com/#lodging",
+      "name": "Studentato Napoleone Padova",
+      "description": "Studentato a Padova con camere singole e doppie per studenti universitari. WiFi fibra, utenze incluse, cucina comune, sala studio 24/7, pulizia aree comuni. Vicino all'Università di Padova.",
+      "url": "https://studentatonapoleone.com",
+      "telephone": "+39 392 3634188",
+      "email": "studentatonapoleone@gmail.com",
+      "image": "https://studentatonapoleone.com/logo-napoleone.png",
+      "logo": "https://studentatonapoleone.com/logo-napoleone.png",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Padova centro storico",
+        "addressLocality": "Padova",
+        "addressRegion": "PD",
+        "postalCode": "35122",
+        "addressCountry": "IT"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": 45.4064,
+        "longitude": 11.8768
+      },
+      "hasMap": "https://www.google.com/maps/search/Studentato+Napoleone+Padova",
+      "openingHoursSpecification": {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"],
+        "opens": "09:00",
+        "closes": "17:00"
+      },
+      "priceRange": "€390–€580/mese",
+      "currenciesAccepted": "EUR",
+      "paymentAccepted": "Bonifico bancario",
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "reviewCount": "47",
+        "bestRating": "5",
+        "worstRating": "1"
+      },
+      "amenityFeature": [
+        {"@type": "LocationFeatureSpecification", "name": "WiFi Fibra", "value": true},
+        {"@type": "LocationFeatureSpecification", "name": "Aria condizionata", "value": true},
+        {"@type": "LocationFeatureSpecification", "name": "Bagno privato (in alcune camere)", "value": true},
+        {"@type": "LocationFeatureSpecification", "name": "Lavanderia", "value": true},
+        {"@type": "LocationFeatureSpecification", "name": "Sala studio 24/7", "value": true},
+        {"@type": "LocationFeatureSpecification", "name": "Cucina comune", "value": true},
+        {"@type": "LocationFeatureSpecification", "name": "Videosorveglianza", "value": true},
+        {"@type": "LocationFeatureSpecification", "name": "Utenze incluse", "value": true}
+      ],
+      "sameAs": [
+        "https://www.instagram.com/studentatonapoleone",
+        "https://www.facebook.com/studentatonapoleone"
+      ],
+      "audience": {
+        "@type": "Audience",
+        "audienceType": "Studenti universitari",
+        "geographicArea": {
+          "@type": "City",
+          "name": "Padova"
+        }
+      }
+    }
+    </script>
+
+    <!-- JSON-LD: WebSite with SearchAction -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "@id": "https://studentatonapoleone.com/#website",
+      "name": "Studentato Napoleone Padova",
+      "url": "https://studentatonapoleone.com",
+      "inLanguage": "it-IT",
+      "description": "Alloggio per studenti universitari a Padova: camere singole e doppie, tutti i servizi inclusi",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "https://studentatonapoleone.com/camere?q={search_term_string}"
+        },
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
+
+    <!-- JSON-LD: Organization -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "@id": "https://studentatonapoleone.com/#organization",
+      "name": "Studentato Napoleone Padova",
+      "url": "https://studentatonapoleone.com",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://studentatonapoleone.com/logo-napoleone.png",
+        "width": 512,
+        "height": 512
+      },
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "telephone": "+39 392 3634188",
+        "email": "studentatonapoleone@gmail.com",
+        "contactType": "customer service",
+        "availableLanguage": "Italian",
+        "hoursAvailable": {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"],
+          "opens": "09:00",
+          "closes": "17:00"
+        }
+      },
+      "sameAs": [
+        "https://www.instagram.com/studentatonapoleone",
+        "https://www.facebook.com/studentatonapoleone"
+      ],
+      "areaServed": {
+        "@type": "City",
+        "name": "Padova",
+        "sameAs": "https://www.wikidata.org/wiki/Q617"
+      }
+    }
+    </script>
+
+    <!-- JSON-LD: BreadcrumbList fallback (homepage) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://studentatonapoleone.com/"
+        }
+      ]
+    }
+    </script>
   </head>
 
   <body>

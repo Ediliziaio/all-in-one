@@ -16,9 +16,10 @@ import {
   Phone, Mail, MessageCircle, Search, Filter, Plus, LayoutGrid, List as ListIcon,
   TrendingUp, Users, Euro, CalendarDays, MapPin, GraduationCap, User as UserIcon,
   StickyNote, PhoneCall, Send, CalendarCheck2, ArrowRight, X, Globe, Instagram,
-  MessageSquare, Building2, CalendarIcon, Flame, ChevronLeft, ChevronRight,
+  MessageSquare, Building2, CalendarIcon, Flame, ChevronLeft, ChevronRight, UserPlus,
 } from "lucide-react";
-import { mockRichieste, mockOperatori, type RichiestaAffitto, type LeadStato, type LeadFonte, type LeadPriorita, type Activity } from "@/data/mockData";
+import { Link } from "react-router-dom";
+import { mockRichieste, mockAdminUtenti, ADMIN_UTENTI_KEY, type RichiestaAffitto, type LeadStato, type LeadFonte, type LeadPriorita, type Activity } from "@/data/mockData";
 import { toast } from "sonner";
 import { PageTransition, FadeIn } from "@/components/motion/MotionWrappers";
 import { format, formatDistanceToNow } from "date-fns";
@@ -98,8 +99,21 @@ export default function AdminPrenotazioni() {
   const [newLeadOpen, setNewLeadOpen] = useState(false);
   const [draggedId, setDraggedId] = useState<string | null>(null);
   const [calMonth, setCalMonth] = useState<Date>(new Date());
+  const [convertDialogOpen, setConvertDialogOpen] = useState(false);
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
+
+  // Load operators from admin users settings (falls back to mock)
+  const operatori = useMemo<string[]>(() => {
+    try {
+      const saved = localStorage.getItem(ADMIN_UTENTI_KEY);
+      if (saved) {
+        const utenti = JSON.parse(saved);
+        return utenti.filter((u: { attivo: boolean; ruolo: string }) => u.attivo && u.ruolo !== "lettore").map((u: { nome: string }) => u.nome);
+      }
+    } catch {}
+    return mockAdminUtenti.map(u => u.nome);
+  }, []);
 
   const filtered = useMemo(() => {
     return leads.filter(l => {
@@ -236,7 +250,7 @@ export default function AdminPrenotazioni() {
           <SelectTrigger><SelectValue /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Tutti gli operatori</SelectItem>
-            {mockOperatori.map(op => <SelectItem key={op} value={op}>{op}</SelectItem>)}
+            {operatori.map(op => <SelectItem key={op} value={op}>{op}</SelectItem>)}
           </SelectContent>
         </Select>
       </div>
@@ -325,7 +339,7 @@ export default function AdminPrenotazioni() {
                 <SelectTrigger className="w-[160px]"><SelectValue placeholder="Operatore"/></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Tutti operatori</SelectItem>
-                  {mockOperatori.map(op => <SelectItem key={op} value={op}>{op}</SelectItem>)}
+                  {operatori.map(op => <SelectItem key={op} value={op}>{op}</SelectItem>)}
                 </SelectContent>
               </Select>
               <Select value={filterPriorita} onValueChange={setFilterPriorita}>
@@ -478,6 +492,20 @@ export default function AdminPrenotazioni() {
                     </div>
                   </div>
 
+                  {/* Converti in Studente — sempre visibile */}
+                  <Button
+                    className={cn(
+                      "w-full gap-2",
+                      selected.pipeline_stato === "contratto_firmato"
+                        ? "bg-green-600 hover:bg-green-700 text-white"
+                        : "bg-green-50 hover:bg-green-100 text-green-700 border border-green-200",
+                    )}
+                    variant="ghost"
+                    onClick={() => setConvertDialogOpen(true)}
+                  >
+                    <UserPlus className="h-4 w-4" /> Converti in Studente
+                  </Button>
+
                   {/* Quick contact */}
                   <div className="grid grid-cols-3 gap-2">
                     <Button size="sm" variant="outline" asChild><a href={`tel:${selected.telefono}`}><Phone className="h-3.5 w-3.5"/></a></Button>
@@ -515,7 +543,7 @@ export default function AdminPrenotazioni() {
                         <SelectTrigger className="h-8 text-xs"><SelectValue/></SelectTrigger>
                         <SelectContent>
                           <SelectItem value="none">Non assegnato</SelectItem>
-                          {mockOperatori.map(op => <SelectItem key={op} value={op}>{op}</SelectItem>)}
+                          {operatori.map(op => <SelectItem key={op} value={op}>{op}</SelectItem>)}
                         </SelectContent>
                       </Select>
                     </div>
@@ -658,6 +686,48 @@ export default function AdminPrenotazioni() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Converti in Studente dialog */}
+      {selected && (
+        <Dialog open={convertDialogOpen} onOpenChange={setConvertDialogOpen}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <UserPlus className="h-5 w-5 text-green-600" /> Converti in Studente
+              </DialogTitle>
+              <DialogDescription>
+                Stai per creare il profilo studente per <strong>{selected.student_nome}</strong>.
+                Verrà assegnata la camera <strong>{selected.camera_nome}</strong> e creato il contratto.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter className="flex-col gap-2 sm:flex-row">
+              <Button variant="outline" onClick={() => setConvertDialogOpen(false)}>
+                Annulla
+              </Button>
+              <Button
+                className="bg-green-600 hover:bg-green-700 text-white gap-2"
+                onClick={() => {
+                  updateLead(selected.id, { stato: "conclusa" });
+                  toast.success(`${selected.student_nome} è ora uno studente attivo! Profilo e contratto creati.`);
+                  setConvertDialogOpen(false);
+                  setSelected(null);
+                }}
+              >
+                <UserPlus className="h-4 w-4" /> Conferma e Converti
+              </Button>
+            </DialogFooter>
+            <div className="pt-1">
+              <Link
+                to="/admin/studenti"
+                className="text-xs text-primary hover:underline flex items-center gap-1"
+                onClick={() => setConvertDialogOpen(false)}
+              >
+                Vai a Studenti →
+              </Link>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
 
       {/* New lead dialog */}
       <NewLeadDialog open={newLeadOpen} onOpenChange={setNewLeadOpen} onCreate={(lead) => {

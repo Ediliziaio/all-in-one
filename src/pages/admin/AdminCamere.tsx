@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback, useMemo } from "react";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { Link } from "react-router-dom";
 import {
   Plus, LayoutGrid, List, Pencil, Image as ImageIcon, Eye,
@@ -56,7 +57,7 @@ const emptyForm: RoomFormState = {
 
 export default function AdminCamere() {
   const [view, setView] = useState<"grid" | "list">("grid");
-  const [roomList, setRoomList] = useState(initialRooms);
+  const [roomList, setRoomList] = useLocalStorage("sn_camere_v1", initialRooms);
   const [createOpen, setCreateOpen] = useState(false);
   const [editRoom, setEditRoom] = useState<Room | null>(null);
   const [photoRoom, setPhotoRoom] = useState<Room | null>(null);
@@ -252,7 +253,7 @@ export default function AdminCamere() {
         </DialogHeader>
 
         <Tabs defaultValue="info" className="mt-2">
-          <TabsList className="grid grid-cols-4 w-full">
+          <TabsList className="grid grid-cols-2 md:grid-cols-4 w-full h-auto gap-1 p-1">
             <TabsTrigger value="info" className="text-xs sm:text-sm px-1 sm:px-3">Info</TabsTrigger>
             <TabsTrigger value="photos" className="text-xs sm:text-sm px-1 sm:px-3">
               Foto {form.images.length > 0 && <Badge variant="secondary" className="ml-1 sm:ml-2 h-5">{form.images.length}</Badge>}
@@ -616,7 +617,7 @@ export default function AdminCamere() {
       {renderRoomDialog()}
 
       <Dialog open={!!photoRoom} onOpenChange={(o) => !o && setPhotoRoom(null)}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="w-[95vw] max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Galleria foto — {photoRoom?.name}</DialogTitle>
           </DialogHeader>

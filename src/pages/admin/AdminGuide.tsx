@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -51,7 +52,7 @@ const letture = (id: string) => (id.charCodeAt(id.length - 1) * 13) % 500 + 45;
 
 export default function AdminGuide() {
   const { toast } = useToast();
-  const [guide, setGuide] = useState<Guida[]>(mockGuide);
+  const [guide, setGuide] = useLocalStorage<Guida[]>("sn_guide_v1", mockGuide);
   const [view, setView] = useState<"list" | "grid">("list");
   const [search, setSearch] = useState("");
   const [cat, setCat] = useState("tutti");

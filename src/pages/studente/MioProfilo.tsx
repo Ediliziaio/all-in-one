@@ -7,21 +7,30 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
-import { Separator } from "@/components/ui/separator";
-import { Eye, EyeOff, Shield } from "lucide-react";
 import { currentUser } from "@/data/mockData";
 import { useToast } from "@/hooks/use-toast";
-import { usePrivacySettings, type PrivacySettings } from "@/hooks/usePrivacySettings";
 import { PageTransition, FadeIn } from "@/components/motion/MotionWrappers";
 
-export default function MioProfilo() {
-  const [nome, setNome] = useState(`${currentUser.nome} ${currentUser.cognome}`);
-  const [bio, setBio] = useState(currentUser.bio);
-  const [instagram, setInstagram] = useState(currentUser.instagram || "");
-  const { toast } = useToast();
-  const { settings, update, reset } = usePrivacySettings();
+const PROFILO_KEY = "sn_profilo_v1";
 
-  const privacyFields: { key: keyof PrivacySettings; label: string; description: string }[] = [
+interface ProfiloOverrides { nome: string; bio: string; instagram: string }
+
+function loadProfiloOverrides(): ProfiloOverrides | null {
+  try {
+    const s = localStorage.getItem(PROFILO_KEY);
+    if (s) return JSON.parse(s) as ProfiloOverrides;
+  } catch {}
+  return null;
+}
+
+export default function MioProfilo() {
+  const saved = loadProfiloOverrides();
+  const [nome, setNome] = useState(saved?.nome ?? `${currentUser.nome} ${currentUser.cognome}`);
+  const [bio, setBio] = useState(saved?.bio ?? currentUser.bio);
+  const [instagram, setInstagram] = useState(saved?.instagram ?? currentUser.instagram ?? "");
+  const { toast } = useToast();
+
+  const privacyFields: { key: string; label: string; description: string }[] = [
     { key: "showBio", label: "Bio", description: "La tua descrizione personale" },
     { key: "showCorso", label: "Corso di laurea", description: "Es: Ingegneria Informatica" },
     { key: "showAnno", label: "Anno di corso", description: "Es: 2° anno" },
@@ -61,64 +70,21 @@ export default function MioProfilo() {
                 <div className="flex flex-wrap gap-2">{currentUser.interessi.map((i) => (<Badge key={i} variant="outline">{i} ×</Badge>))}</div>
               </div>
             </div>
-            <Button className="w-full bg-accent text-accent-foreground hover:bg-accent/90" onClick={() => toast({ title: "Profilo aggiornato!" })}>Salva modifiche</Button>
+            <Button
+              className="w-full bg-accent text-accent-foreground hover:bg-accent/90"
+              onClick={() => {
+                try {
+                  localStorage.setItem(PROFILO_KEY, JSON.stringify({ nome, bio, instagram }));
+                } catch {}
+                toast({ title: "Profilo aggiornato!" });
+              }}
+            >
+              Salva modifiche
+            </Button>
           </CardContent>
         </Card>
       </FadeIn>
 
-      {/* Privacy community */}
-      <FadeIn delay={0.15}>
-        <Card>
-          <CardContent className="p-4 md:p-6 space-y-4">
-            <div className="flex items-start gap-3">
-              <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                <Shield className="h-5 w-5 text-primary" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <h2 className="font-heading font-semibold">Privacy in community</h2>
-                <p className="text-xs text-muted-foreground">Decidi cosa gli altri studenti possono vedere del tuo profilo.</p>
-              </div>
-            </div>
-
-            {/* Master switch */}
-            <div className={`flex items-center justify-between gap-3 p-3 rounded-lg border ${settings.visibleInCommunity ? "bg-primary/5 border-primary/30" : "bg-muted/40"}`}>
-              <div className="flex items-center gap-3 min-w-0">
-                {settings.visibleInCommunity ? <Eye className="h-4 w-4 text-primary shrink-0" /> : <EyeOff className="h-4 w-4 text-muted-foreground shrink-0" />}
-                <div className="min-w-0">
-                  <Label className="cursor-pointer">Profilo visibile nella community</Label>
-                  <p className="text-xs text-muted-foreground">{settings.visibleInCommunity ? "Sei visibile nella lista profili" : "Sei nascosto agli altri studenti"}</p>
-                </div>
-              </div>
-              <Switch checked={settings.visibleInCommunity} onCheckedChange={(v) => update("visibleInCommunity", v)} />
-            </div>
-
-            {settings.visibleInCommunity && (
-              <>
-                <Separator />
-                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Cosa mostrare</p>
-                <div className="space-y-3">
-                  {privacyFields.map((f) => (
-                    <div key={f.key} className="flex items-center justify-between gap-3">
-                      <div className="flex-1 min-w-0">
-                        <Label htmlFor={f.key} className="cursor-pointer">{f.label}</Label>
-                        <p className="text-xs text-muted-foreground">{f.description}</p>
-                      </div>
-                      <Switch
-                        id={f.key}
-                        checked={settings[f.key] as boolean}
-                        onCheckedChange={(v) => update(f.key, v)}
-                      />
-                    </div>
-                  ))}
-                </div>
-                <Button variant="ghost" size="sm" onClick={reset} className="w-full sm:w-auto">
-                  Ripristina impostazioni predefinite
-                </Button>
-              </>
-            )}
-          </CardContent>
-        </Card>
-      </FadeIn>
 
       {/* Notifiche */}
       <FadeIn delay={0.2}>
@@ -133,10 +99,6 @@ export default function MioProfilo() {
               <div className="flex items-center justify-between gap-3">
                 <div className="flex-1"><Label>Push</Label><p className="text-xs text-muted-foreground">Notifiche push sul browser</p></div>
                 <Switch defaultChecked />
-              </div>
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex-1"><Label>Eventi community</Label><p className="text-xs text-muted-foreground">Avvisi su nuovi eventi e post</p></div>
-                <Switch />
               </div>
               <div className="flex items-center justify-between gap-3">
                 <div className="flex-1"><Label>Scadenze pagamenti</Label><p className="text-xs text-muted-foreground">Reminder prima della scadenza</p></div>

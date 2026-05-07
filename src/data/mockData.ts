@@ -1,5 +1,19 @@
 // Mock data for admin & student areas (no backend)
 
+export type StudenteStato =
+  | "attivo"        // in residence attiva
+  | "in_uscita"     // contratto in scadenza entro 60gg
+  | "ex_studente"   // ha lasciato lo studentato
+  | "sospeso";      // sospeso temporaneamente
+
+export type MotivoUscita =
+  | "laurea"
+  | "trasferimento"
+  | "fine_anno"
+  | "disdetta_anticipata"
+  | "mancato_pagamento"
+  | "altro";
+
 export interface Profile {
   id: string;
   nome: string;
@@ -14,6 +28,12 @@ export interface Profile {
   role: "student" | "admin";
   piano?: number;
   camera_id?: string;
+  student_stato?: StudenteStato;
+  data_ingresso?: string;    // ISO date
+  data_uscita?: string;      // ISO date (quando ha lasciato)
+  motivo_uscita?: MotivoUscita;
+  note_interne?: string;
+  telefono?: string;
 }
 
 export type LeadStato =
@@ -67,13 +87,6 @@ export interface RichiestaAffitto {
   // Storico
   attivita: Activity[];
 }
-
-export const mockOperatori: string[] = [
-  "Giulia Marchetti",
-  "Federico Bianchi",
-  "Sara Lombardi",
-  "Matteo Rinaldi",
-];
 
 // Backward-compatible alias
 export type Prenotazione = RichiestaAffitto;
@@ -169,6 +182,7 @@ export interface Documento {
 
 export interface Pagamento {
   id: string;
+  contratto_id?: string;
   mese: string;
   importo: number;
   stato: "pagato" | "in_scadenza" | "scaduto";
@@ -193,6 +207,9 @@ export const mockProfiles: Profile[] = [
     role: "student",
     piano: 1,
     camera_id: "singola-101",
+    student_stato: "attivo",
+    data_ingresso: "2025-09-01",
+    telefono: "+39 333 1234567",
   },
   {
     id: "p2",
@@ -208,6 +225,9 @@ export const mockProfiles: Profile[] = [
     role: "student",
     piano: 2,
     camera_id: "singola-205",
+    student_stato: "attivo",
+    data_ingresso: "2025-09-01",
+    telefono: "+39 347 9876543",
   },
   {
     id: "p3",
@@ -222,6 +242,9 @@ export const mockProfiles: Profile[] = [
     role: "student",
     piano: 1,
     camera_id: "doppia-103",
+    student_stato: "in_uscita",
+    data_ingresso: "2025-09-01",
+    telefono: "+39 380 5551234",
   },
   {
     id: "p4",
@@ -236,6 +259,9 @@ export const mockProfiles: Profile[] = [
     role: "student",
     piano: 3,
     camera_id: "singola-plus-301",
+    student_stato: "attivo",
+    data_ingresso: "2024-10-01",
+    telefono: "+39 333 7778899",
   },
   {
     id: "admin1",
@@ -248,6 +274,40 @@ export const mockProfiles: Profile[] = [
     bio: "",
     interessi: [],
     role: "admin",
+  },
+  {
+    id: "p5",
+    nome: "Alessandro",
+    cognome: "Martini",
+    email: "ale.martini@studenti.unipd.it",
+    corso: "Fisica",
+    anno: 3,
+    avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop&crop=face",
+    bio: "",
+    interessi: ["Fisica", "Musica"],
+    role: "student" as const,
+    student_stato: "ex_studente" as const,
+    data_ingresso: "2024-09-01",
+    data_uscita: "2025-07-31",
+    motivo_uscita: "laurea" as const,
+    note_interne: "Studente modello, pagamenti sempre puntuali. Ha lasciato per laurea triennale.",
+  },
+  {
+    id: "p6",
+    nome: "Chiara",
+    cognome: "Romano",
+    email: "chiara.romano@studenti.unipd.it",
+    corso: "Psicologia",
+    anno: 2,
+    avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&h=200&fit=crop&crop=face",
+    bio: "",
+    interessi: ["Psicologia", "Arte"],
+    role: "student" as const,
+    student_stato: "ex_studente" as const,
+    data_ingresso: "2025-01-15",
+    data_uscita: "2025-06-30",
+    motivo_uscita: "trasferimento" as const,
+    note_interne: "Si è trasferita a Bologna per il corso magistrale.",
   },
 ];
 
@@ -753,7 +813,7 @@ export const mockBuoni: Buono[] = [
     sconto: "15%",
     categoria: "Cibo",
     logo_url: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=100&h=100&fit=crop",
-    scadenza: "2025-12-31",
+    scadenza: "2026-12-31",
     attivo: true,
     nuovo: true,
   },
@@ -765,7 +825,7 @@ export const mockBuoni: Buono[] = [
     sconto: "10%",
     categoria: "Libri",
     logo_url: "https://images.unsplash.com/photo-1524578271613-d550eacf6090?w=100&h=100&fit=crop",
-    scadenza: "2025-12-31",
+    scadenza: "2026-12-31",
     attivo: true,
   },
   {
@@ -776,7 +836,7 @@ export const mockBuoni: Buono[] = [
     sconto: "Gratis 1 sett.",
     categoria: "Sport",
     logo_url: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=100&h=100&fit=crop",
-    scadenza: "2025-09-30",
+    scadenza: "2026-09-30",
     attivo: true,
     nuovo: true,
   },
@@ -788,7 +848,7 @@ export const mockBuoni: Buono[] = [
     sconto: "5€",
     categoria: "Divertimento",
     logo_url: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=100&h=100&fit=crop",
-    scadenza: "2026-06-30",
+    scadenza: "2026-12-31",
     attivo: true,
   },
 ];
@@ -875,8 +935,10 @@ export const mockDocumenti: Documento[] = [
 
 // --- PAGAMENTI ---
 export const mockPagamenti: Pagamento[] = [
+  // Marco Rossi — contratto c1
   {
     id: "pay1",
+    contratto_id: "c1",
     mese: "Settembre 2025",
     importo: 480,
     stato: "pagato",
@@ -886,35 +948,70 @@ export const mockPagamenti: Pagamento[] = [
   },
   {
     id: "pay2",
-    mese: "Ottobre 2025",
+    contratto_id: "c1",
+    mese: "Gennaio 2026",
     importo: 480,
     stato: "pagato",
-    data_scadenza: "2025-10-05",
-    data_pagamento: "2025-10-04",
+    data_scadenza: "2026-01-05",
+    data_pagamento: "2026-01-04",
     metodo: "Bonifico bancario",
   },
   {
     id: "pay3",
-    mese: "Novembre 2025",
+    contratto_id: "c1",
+    mese: "Febbraio 2026",
     importo: 480,
     stato: "pagato",
-    data_scadenza: "2025-11-05",
-    data_pagamento: "2025-11-02",
+    data_scadenza: "2026-02-05",
+    data_pagamento: "2026-02-03",
     metodo: "Carta di credito",
   },
   {
     id: "pay4",
-    mese: "Dicembre 2025",
+    contratto_id: "c1",
+    mese: "Aprile 2026",
     importo: 480,
-    stato: "in_scadenza",
-    data_scadenza: "2025-12-05",
+    stato: "pagato",
+    data_scadenza: "2026-04-05",
+    data_pagamento: "2026-04-04",
+    metodo: "Bonifico bancario",
   },
   {
     id: "pay5",
-    mese: "Gennaio 2026",
+    contratto_id: "c1",
+    mese: "Maggio 2026",
+    importo: 480,
+    stato: "in_scadenza",
+    data_scadenza: "2026-05-10",
+  },
+  // Sara Bianchi — contratto c2
+  {
+    id: "pay6",
+    contratto_id: "c2",
+    mese: "Settembre 2025",
+    importo: 480,
+    stato: "pagato",
+    data_scadenza: "2025-09-05",
+    data_pagamento: "2025-09-05",
+    metodo: "Bonifico bancario",
+  },
+  {
+    id: "pay7",
+    contratto_id: "c2",
+    mese: "Marzo 2026",
+    importo: 480,
+    stato: "pagato",
+    data_scadenza: "2026-03-05",
+    data_pagamento: "2026-03-04",
+    metodo: "Bonifico bancario",
+  },
+  {
+    id: "pay8",
+    contratto_id: "c2",
+    mese: "Maggio 2026",
     importo: 480,
     stato: "scaduto",
-    data_scadenza: "2026-01-05",
+    data_scadenza: "2026-05-05",
   },
 ];
 
@@ -985,3 +1082,398 @@ export const mockContratti: Contratto[] = [
 
 // Current mock user (simulates logged-in student)
 export const currentUser = mockProfiles[0];
+
+// ============ FATTURE ============
+export type FatturaStato = "inviata" | "pagata" | "scaduta" | "in_ritardo";
+
+export interface SollecitoPagamento {
+  id: string;
+  numero: number;        // 1-6
+  data_invio: string;    // ISO date
+  tipo: "automatico" | "manuale";
+  oggetto: string;       // email subject
+}
+
+export interface Fattura {
+  id: string;
+  contratto_id: string;
+  student_id: string;
+  student_nome: string;
+  mese: string;          // "Maggio 2026"
+  importo: number;
+  data_emissione: string;
+  data_scadenza: string;
+  stato: FatturaStato;
+  pdf_nome?: string;     // filename
+  pdf_data?: string;     // base64 content (data:application/pdf;base64,...)
+  note?: string;
+  data_pagamento?: string;
+  metodo_pagamento?: string;
+  email_inviata: boolean;
+  solleciti: SollecitoPagamento[];
+}
+
+export const FATTURE_KEY = "fatture_v1";
+
+export const mockFatture: Fattura[] = [
+  // Marco Rossi — contratto c1, student p1
+  {
+    id: "f1",
+    contratto_id: "c1",
+    student_id: "p1",
+    student_nome: "Marco Rossi",
+    mese: "Febbraio 2026",
+    importo: 480,
+    data_emissione: "2026-02-01",
+    data_scadenza: "2026-02-05",
+    stato: "pagata",
+    pdf_nome: "fattura-marco-feb2026.pdf",
+    data_pagamento: "2026-02-04",
+    metodo_pagamento: "Bonifico bancario",
+    email_inviata: true,
+    solleciti: [],
+  },
+  {
+    id: "f2",
+    contratto_id: "c1",
+    student_id: "p1",
+    student_nome: "Marco Rossi",
+    mese: "Marzo 2026",
+    importo: 480,
+    data_emissione: "2026-03-01",
+    data_scadenza: "2026-03-05",
+    stato: "pagata",
+    pdf_nome: "fattura-marco-mar2026.pdf",
+    data_pagamento: "2026-03-03",
+    metodo_pagamento: "Carta di credito",
+    email_inviata: true,
+    solleciti: [],
+  },
+  {
+    id: "f3",
+    contratto_id: "c1",
+    student_id: "p1",
+    student_nome: "Marco Rossi",
+    mese: "Aprile 2026",
+    importo: 480,
+    data_emissione: "2026-04-01",
+    data_scadenza: "2026-04-05",
+    stato: "in_ritardo",
+    pdf_nome: "fattura-marco-apr2026.pdf",
+    email_inviata: true,
+    solleciti: [
+      {
+        id: "sol1",
+        numero: 1,
+        data_invio: "2026-04-06",
+        tipo: "automatico",
+        oggetto: "Promemoria gentile - Fattura Aprile 2026",
+      },
+      {
+        id: "sol2",
+        numero: 2,
+        data_invio: "2026-04-13",
+        tipo: "automatico",
+        oggetto: "Secondo sollecito - Fattura Aprile 2026",
+      },
+    ],
+  },
+  // Sara Bianchi — contratto c2, student p2
+  {
+    id: "f4",
+    contratto_id: "c2",
+    student_id: "p2",
+    student_nome: "Sara Bianchi",
+    mese: "Febbraio 2026",
+    importo: 480,
+    data_emissione: "2026-02-01",
+    data_scadenza: "2026-02-05",
+    stato: "pagata",
+    pdf_nome: "fattura-sara-feb2026.pdf",
+    data_pagamento: "2026-02-05",
+    metodo_pagamento: "Bonifico bancario",
+    email_inviata: true,
+    solleciti: [],
+  },
+  {
+    id: "f5",
+    contratto_id: "c2",
+    student_id: "p2",
+    student_nome: "Sara Bianchi",
+    mese: "Marzo 2026",
+    importo: 480,
+    data_emissione: "2026-03-01",
+    data_scadenza: "2026-03-05",
+    stato: "inviata",
+    pdf_nome: "fattura-sara-mar2026.pdf",
+    email_inviata: true,
+    solleciti: [],
+  },
+  {
+    id: "f6",
+    contratto_id: "c2",
+    student_id: "p2",
+    student_nome: "Sara Bianchi",
+    mese: "Aprile 2026",
+    importo: 480,
+    data_emissione: "2026-04-01",
+    data_scadenza: "2026-04-05",
+    stato: "scaduta",
+    pdf_nome: "fattura-sara-apr2026.pdf",
+    email_inviata: true,
+    solleciti: [
+      {
+        id: "sol3",
+        numero: 1,
+        data_invio: "2026-04-08",
+        tipo: "automatico",
+        oggetto: "Promemoria gentile - Fattura Aprile 2026",
+      },
+    ],
+  },
+];
+
+// ─── ADMIN UTENTI ────────────────────────────────────────────────────────────
+
+export type AdminRuolo = "superadmin" | "operatore" | "lettore";
+
+export interface AdminUtente {
+  id: string;
+  nome: string;
+  email: string;
+  ruolo: AdminRuolo;
+  attivo: boolean;
+  colore: string;
+  createdAt: string;
+}
+
+export const mockAdminUtenti: AdminUtente[] = [
+  {
+    id: "au1",
+    nome: "Florian Andriciuc",
+    email: "studentatonapoleone@gmail.com",
+    ruolo: "superadmin",
+    attivo: true,
+    colore: "#1e3a5f",
+    createdAt: "2024-01-01T00:00:00.000Z",
+  },
+];
+
+export const ADMIN_UTENTI_KEY = "admin_utenti_v1";
+
+// ─── EMAIL TEMPLATE BLOCKS ───────────────────────────────────────────────────
+
+export type TemplateBlockTipo = "header" | "testo" | "bottone" | "separatore" | "footer" | "immagine" | "spaziatore";
+
+export interface TemplateBlock {
+  id: string;
+  tipo: TemplateBlockTipo;
+  // header
+  header_titolo?: string;
+  header_sottotitolo?: string;
+  header_bg?: string;
+  header_mostra_logo?: boolean;
+  header_logo_src?: string;   // custom logo base64/URL
+  header_text_color?: string;
+  header_font_family?: string;
+  // testo  (stores HTML for rich formatting, plain text also works)
+  testo_corpo?: string;
+  testo_allineamento?: "sinistra" | "centro" | "destra";
+  testo_font_family?: string;
+  testo_font_size?: number;
+  testo_colore?: string;
+  testo_bg?: string;
+  // bottone
+  btn_label?: string;
+  btn_url?: string;
+  btn_colore?: string;
+  btn_text_color?: string;
+  btn_border_radius?: number;
+  btn_full_width?: boolean;
+  // immagine
+  img_src?: string;           // base64 or URL
+  img_alt?: string;
+  img_link?: string;
+  img_width_pct?: number;     // 20–100
+  img_allineamento?: "sinistra" | "centro" | "destra";
+  img_border_radius?: number;
+  img_bg?: string;
+  // spaziatore
+  spacer_height?: number;     // px 10–100
+  spacer_bg?: string;
+  // separatore
+  sep_color?: string;
+  sep_thickness?: number;
+  sep_style?: "solid" | "dashed" | "dotted";
+  // footer
+  footer_testo?: string;
+  footer_bg?: string;
+  footer_text_color?: string;
+  footer_font_size?: number;
+}
+
+export type EmailTemplateTipo =
+  | "fattura_emessa"
+  | "sollecito_1" | "sollecito_2" | "sollecito_3" | "sollecito_4" | "sollecito_5" | "sollecito_6"
+  | "account_creato"
+  | "recupera_password";
+
+export interface EmailTemplate {
+  id: string;
+  nome: string;
+  tipo: EmailTemplateTipo;
+  oggetto: string;
+  blocks: TemplateBlock[];
+}
+
+export const TEMPLATE_VARIABILI: { var: string; desc: string }[] = [
+  { var: "{{nome_studente}}", desc: "Nome e cognome dello studente" },
+  { var: "{{email_studente}}", desc: "Email dello studente" },
+  { var: "{{mese}}", desc: "Mese della fattura (es. Maggio 2026)" },
+  { var: "{{importo}}", desc: "Importo in euro" },
+  { var: "{{data_scadenza}}", desc: "Data scadenza pagamento" },
+  { var: "{{link_fattura}}", desc: "Link per scaricare il PDF" },
+  { var: "{{numero_sollecito}}", desc: "Numero del sollecito (1–6)" },
+  { var: "{{giorni_ritardo}}", desc: "Giorni di ritardo nel pagamento" },
+  { var: "{{link_accesso}}", desc: "Link di accesso al portale studenti" },
+  { var: "{{link_reset_password}}", desc: "Link per reimpostare la password" },
+  { var: "{{nome_struttura}}", desc: "Nome della struttura" },
+];
+
+export const EMAIL_TEMPLATES_KEY = "email_templates_v1";
+
+export const defaultEmailTemplates: EmailTemplate[] = [
+  {
+    id: "tpl_fattura",
+    nome: "📄 Fattura Emessa",
+    tipo: "fattura_emessa",
+    oggetto: "📄 Fattura {{mese}} – Studentato Napoleone",
+    blocks: [
+      { id: "b_f1", tipo: "header", header_titolo: "Studentato Napoleone", header_sottotitolo: "La tua fattura mensile è pronta", header_bg: "#1e3a5f", header_mostra_logo: true },
+      { id: "b_f2", tipo: "testo", testo_corpo: "Ciao {{nome_studente}},\n\nla fattura per il mese di {{mese}} è stata emessa. Trovi il PDF allegato a questa email.\n\n💰  Importo: €{{importo}}\n📅  Scadenza pagamento: {{data_scadenza}}\n\nPuoi pagare tramite bonifico bancario alle coordinate che trovi nel contratto. Per qualsiasi dubbio siamo qui!", testo_allineamento: "sinistra" },
+      { id: "b_f3", tipo: "bottone", btn_label: "Scarica Fattura PDF", btn_url: "{{link_fattura}}", btn_colore: "#1e3a5f" },
+      { id: "b_f4", tipo: "separatore" },
+      { id: "b_f5", tipo: "footer", footer_testo: "Studentato Napoleone Padova  ·  studentatonapoleone@gmail.com  ·  +39 392 3634188\nPer non ricevere più queste email contattaci direttamente." },
+    ],
+  },
+  {
+    id: "tpl_sol1",
+    nome: "🔔 Sollecito 1 — Promemoria",
+    tipo: "sollecito_1",
+    oggetto: "🔔 Promemoria pagamento – {{mese}}",
+    blocks: [
+      { id: "b_s1_1", tipo: "header", header_titolo: "Studentato Napoleone", header_sottotitolo: "Promemoria di pagamento", header_bg: "#1e3a5f", header_mostra_logo: true },
+      { id: "b_s1_2", tipo: "testo", testo_corpo: "Ciao {{nome_studente}},\n\nvolevo ricordarti che la fattura di {{mese}} (€{{importo}}) risulta ancora da pagare.\n\nNessun problema, può capitare! Se hai già effettuato il bonifico ignora questa email. 😊\n\nPer qualsiasi domanda siamo disponibili.", testo_allineamento: "sinistra" },
+      { id: "b_s1_3", tipo: "bottone", btn_label: "Visualizza Fattura", btn_url: "{{link_fattura}}", btn_colore: "#2563eb" },
+      { id: "b_s1_4", tipo: "footer", footer_testo: "Studentato Napoleone Padova  ·  studentatonapoleone@gmail.com  ·  +39 392 3634188" },
+    ],
+  },
+  {
+    id: "tpl_sol2",
+    nome: "📌 Sollecito 2 — Secondo avviso",
+    tipo: "sollecito_2",
+    oggetto: "📌 Secondo avviso pagamento – {{mese}}",
+    blocks: [
+      { id: "b_s2_1", tipo: "header", header_titolo: "Studentato Napoleone", header_sottotitolo: "Secondo avviso di pagamento", header_bg: "#1d4ed8", header_mostra_logo: true },
+      { id: "b_s2_2", tipo: "testo", testo_corpo: "Ciao {{nome_studente}},\n\nti contatto nuovamente per la fattura di {{mese}} (€{{importo}}) non ancora saldata ({{giorni_ritardo}} giorni di ritardo).\n\nTi chiediamo di provvedere il prima possibile. Se hai problemi economici temporanei, scrivici e troviamo una soluzione insieme.", testo_allineamento: "sinistra" },
+      { id: "b_s2_3", tipo: "bottone", btn_label: "Contattaci", btn_url: "mailto:studentatonapoleone@gmail.com", btn_colore: "#2563eb" },
+      { id: "b_s2_4", tipo: "footer", footer_testo: "Studentato Napoleone Padova  ·  studentatonapoleone@gmail.com  ·  +39 392 3634188" },
+    ],
+  },
+  {
+    id: "tpl_sol3",
+    nome: "⚠️ Sollecito 3 — Urgente",
+    tipo: "sollecito_3",
+    oggetto: "⚠️ Pagamento in ritardo – {{mese}} – Azione richiesta",
+    blocks: [
+      { id: "b_s3_1", tipo: "header", header_titolo: "Studentato Napoleone", header_sottotitolo: "Pagamento urgente richiesto", header_bg: "#d97706", header_mostra_logo: true },
+      { id: "b_s3_2", tipo: "testo", testo_corpo: "Gentile {{nome_studente}},\n\nla fattura di {{mese}} (€{{importo}}) è ora in ritardo di {{giorni_ritardo}} giorni.\n\nTi chiediamo di regolarizzare la posizione entro i prossimi 5 giorni per evitare la sospensione dei servizi accessori (lavanderia, sala studio, WiFi).\n\nSe hai già pagato, invia la ricevuta bancaria rispondendo a questa email.", testo_allineamento: "sinistra" },
+      { id: "b_s3_3", tipo: "bottone", btn_label: "Invia ricevuta di pagamento", btn_url: "mailto:studentatonapoleone@gmail.com?subject=Ricevuta pagamento {{mese}}", btn_colore: "#d97706" },
+      { id: "b_s3_4", tipo: "footer", footer_testo: "Studentato Napoleone Padova  ·  studentatonapoleone@gmail.com  ·  +39 392 3634188" },
+    ],
+  },
+  {
+    id: "tpl_sol4",
+    nome: "🚨 Sollecito 4 — Formale",
+    tipo: "sollecito_4",
+    oggetto: "🚨 URGENTE: Pagamento {{mese}} in grave ritardo",
+    blocks: [
+      { id: "b_s4_1", tipo: "header", header_titolo: "Studentato Napoleone", header_sottotitolo: "Comunicazione formale di mora", header_bg: "#dc2626", header_mostra_logo: true },
+      { id: "b_s4_2", tipo: "testo", testo_corpo: "Gentile {{nome_studente}},\n\nnonostante i precedenti avvisi, la fattura di {{mese}} (€{{importo}}) risulta ancora impagata con un ritardo di {{giorni_ritardo}} giorni.\n\nCon la presente comunichiamo formalmente che, in assenza di pagamento entro 48 ore, procederemo con la sospensione dei servizi prevista dall'art. 8 del contratto di locazione.\n\nInvitiamo a contattarci immediatamente.", testo_allineamento: "sinistra" },
+      { id: "b_s4_3", tipo: "bottone", btn_label: "Chiama ora: +39 392 3634188", btn_url: "tel:+393923634188", btn_colore: "#dc2626" },
+      { id: "b_s4_4", tipo: "footer", footer_testo: "Studentato Napoleone Padova  ·  studentatonapoleone@gmail.com  ·  +39 392 3634188" },
+    ],
+  },
+  {
+    id: "tpl_sol5",
+    nome: "❌ Sollecito 5 — Sospensione",
+    tipo: "sollecito_5",
+    oggetto: "❌ Sospensione servizi – Fattura {{mese}} non pagata",
+    blocks: [
+      { id: "b_s5_1", tipo: "header", header_titolo: "Studentato Napoleone", header_sottotitolo: "Sospensione servizi in corso", header_bg: "#7f1d1d", header_mostra_logo: true },
+      { id: "b_s5_2", tipo: "testo", testo_corpo: "Gentile {{nome_studente}},\n\na causa del mancato pagamento della fattura di {{mese}} (€{{importo}}, ritardo: {{giorni_ritardo}} giorni), abbiamo proceduto con la sospensione dei servizi accessori come previsto contrattualmente.\n\nPer il ripristino immediato è necessario saldare l'importo dovuto più gli interessi di mora. Contattaci entro oggi.", testo_allineamento: "sinistra" },
+      { id: "b_s5_3", tipo: "separatore" },
+      { id: "b_s5_4", tipo: "footer", footer_testo: "Studentato Napoleone Padova  ·  studentatonapoleone@gmail.com  ·  +39 392 3634188" },
+    ],
+  },
+  {
+    id: "tpl_sol6",
+    nome: "⛔ Sollecito 6 — Ultimo avviso",
+    tipo: "sollecito_6",
+    oggetto: "⛔ ULTIMO AVVISO prima di procedere legalmente – {{mese}}",
+    blocks: [
+      { id: "b_s6_1", tipo: "header", header_titolo: "Studentato Napoleone", header_sottotitolo: "Ultimo avviso prima di azione legale", header_bg: "#450a0a", header_mostra_logo: true },
+      { id: "b_s6_2", tipo: "testo", testo_corpo: "Gentile {{nome_studente}},\n\nquesto è l'ultimo avviso prima di procedere per vie legali per il recupero del credito relativo alla fattura di {{mese}} (€{{importo}}, ritardo: {{giorni_ritardo}} giorni).\n\nSe entro 72 ore non riceviamo il pagamento o un accordo scritto, l'incarico sarà affidato al nostro legale con addebito delle spese legali a Vs. carico, come da art. 12 del contratto.\n\nÈ ancora possibile evitare questa situazione contattandoci immediatamente.", testo_allineamento: "sinistra" },
+      { id: "b_s6_3", tipo: "bottone", btn_label: "Contatta subito la direzione", btn_url: "mailto:studentatonapoleone@gmail.com?subject=Urgente - Pagamento {{mese}}", btn_colore: "#450a0a" },
+      { id: "b_s6_4", tipo: "footer", footer_testo: "Studentato Napoleone Padova  ·  studentatonapoleone@gmail.com  ·  +39 392 3634188" },
+    ],
+  },
+  {
+    id: "tpl_account",
+    nome: "👋 Account Creato",
+    tipo: "account_creato",
+    oggetto: "👋 Benvenuto/a {{nome_studente}}! Il tuo account è pronto",
+    blocks: [
+      { id: "b_ac1", tipo: "header", header_titolo: "Benvenuto/a al Studentato!", header_sottotitolo: "Il tuo account è stato creato con successo", header_bg: "#1e3a5f", header_mostra_logo: true },
+      { id: "b_ac2", tipo: "testo", testo_corpo: "Ciao <strong>{{nome_studente}}</strong>,\n\nsiamo felici di darti il benvenuto al Studentato Napoleone Padova! 🎉\n\nIl tuo account è stato creato. Usa il link qui sotto per accedere al portale studenti dove puoi:\n• Visualizzare il tuo contratto e le fatture\n• Aprire ticket di supporto\n• Connetterti con la comunità\n\n📧 Email: {{email_studente}}", testo_allineamento: "sinistra" },
+      { id: "b_ac3", tipo: "bottone", btn_label: "Accedi al portale studenti →", btn_url: "{{link_accesso}}", btn_colore: "#1e3a5f", btn_border_radius: 8 },
+      { id: "b_ac4", tipo: "separatore" },
+      { id: "b_ac5", tipo: "testo", testo_corpo: "Hai domande? Scrivici a studentatonapoleone@gmail.com o chiamaci al +39 392 3634188. Siamo qui per aiutarti! 😊", testo_font_size: 14, testo_colore: "#6b7280", testo_allineamento: "centro" },
+      { id: "b_ac6", tipo: "footer", footer_testo: "Studentato Napoleone Padova  ·  studentatonapoleone@gmail.com  ·  +39 392 3634188" },
+    ],
+  },
+  {
+    id: "tpl_password",
+    nome: "🔑 Recupera Password",
+    tipo: "recupera_password",
+    oggetto: "🔑 Reimposta la tua password – Studentato Napoleone",
+    blocks: [
+      { id: "b_pw1", tipo: "header", header_titolo: "Studentato Napoleone", header_sottotitolo: "Reimpostazione password", header_bg: "#374151", header_mostra_logo: true },
+      { id: "b_pw2", tipo: "testo", testo_corpo: "Ciao <strong>{{nome_studente}}</strong>,\n\nhai richiesto di reimpostare la password del tuo account. Clicca sul pulsante qui sotto per crearne una nuova.\n\n⏳ Il link è valido per <strong>24 ore</strong>.\n\nSe non hai richiesto questa email, puoi ignorarla tranquillamente — il tuo account è al sicuro.", testo_allineamento: "sinistra" },
+      { id: "b_pw3", tipo: "bottone", btn_label: "Reimposta password", btn_url: "{{link_reset_password}}", btn_colore: "#374151", btn_border_radius: 6 },
+      { id: "b_pw4", tipo: "separatore" },
+      { id: "b_pw5", tipo: "footer", footer_testo: "Studentato Napoleone Padova  ·  studentatonapoleone@gmail.com\nSe non hai richiesto questa email, ignora questo messaggio. Nessuna azione è richiesta." },
+    ],
+  },
+];
+
+// ─── EMAIL CAMPAIGNS ─────────────────────────────────────────────────────────
+
+export type CampagnaStato = "bozza" | "programmata" | "inviata";
+export type CampagnaDestinatari = "tutti" | "attivi" | "in_uscita" | "ex_studenti";
+
+export interface EmailCampaign {
+  id: string;
+  nome: string;
+  oggetto: string;
+  preview_text?: string;
+  blocks: TemplateBlock[];
+  destinatari: CampagnaDestinatari;
+  stato: CampagnaStato;
+  created_at: string;
+  scheduled_at?: string;
+  sent_at?: string;
+  inviati_count?: number;
+}
+
+export const EMAIL_CAMPAIGNS_KEY = "email_campaigns_v1";

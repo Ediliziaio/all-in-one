@@ -22,7 +22,7 @@ const features = [
   {
     icon: MessageSquare,
     title: "Bacheca community",
-    description: "Scambia libri, organizza viaggi, trova compagni di palestra o per un caffè.",
+    description: "Scambia libri, organizza viaggi, trova compagni di studio o per un caffè.",
     color: "text-accent",
     bg: "bg-accent/10",
   },

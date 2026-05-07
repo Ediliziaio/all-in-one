@@ -1,4 +1,5 @@
 import { useState, useMemo, useRef, useEffect } from "react";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { formatDistanceToNow } from "date-fns";
@@ -15,7 +16,8 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuLabel, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { Search, Send, Inbox, Clock, CheckCircle2, Timer, MoreVertical, Zap, X, List, Kanban, AlertTriangle, UserCheck, Plus, ArrowRight, Flag, Lock, MessageCircle, Phone, Mail, BedDouble, Calendar, ChevronDown, ExternalLink, User as UserIcon } from "lucide-react";
-import { mockTickets as initialTickets, mockProfiles, mockOperatori, mockRichieste, type SupportTicket, type TicketMessage, type TicketActivity } from "@/data/mockData";
+import { mockTickets as initialTickets, mockProfiles, mockAdminUtenti, ADMIN_UTENTI_KEY, type AdminUtente, type SupportTicket, type TicketMessage, type TicketActivity } from "@/data/mockData";
+import { loadLeads } from "@/data/leadsStore";
 import { toast } from "sonner";
 import { PageTransition, FadeIn } from "@/components/motion/MotionWrappers";
 import { cn } from "@/lib/utils";
@@ -84,7 +86,7 @@ function relTime(iso: string) {
   }
 }
 
-const CURRENT_OPERATOR = "Giulia Marchetti";
+// currentOperator is resolved dynamically inside the component from localStorage
 
 type SLAColor = "green" | "yellow" | "red";
 
@@ -116,7 +118,7 @@ type SortKey = "recenti" | "vecchi" | "priorita";
 const priorityOrder: Record<string, number> = { urgente: 0, alta: 1, normale: 2, bassa: 3 };
 
 export default function AdminSupporto() {
-  const [tickets, setTickets] = useState<SupportTicket[]>(initialTickets);
+  const [tickets, setTickets] = useLocalStorage<SupportTicket[]>("sn_tickets_v1", initialTickets);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [reply, setReply] = useState("");
   const [search, setSearch] = useState("");
@@ -136,6 +138,33 @@ export default function AdminSupporto() {
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
+
+  // Resolve the "current" operator from localStorage settings (falls back to mock superadmin)
+  const currentOperator = useMemo<string>(() => {
+    try {
+      const saved = localStorage.getItem(ADMIN_UTENTI_KEY);
+      if (saved) {
+        const utenti: AdminUtente[] = JSON.parse(saved);
+        const superadmin = utenti.find((u) => u.ruolo === "superadmin" && u.attivo);
+        if (superadmin) return superadmin.nome;
+        const first = utenti.find((u) => u.attivo);
+        if (first) return first.nome;
+      }
+    } catch {}
+    return mockAdminUtenti[0]?.nome ?? "Admin";
+  }, []);
+
+  // Operators list for "assign to" dropdowns
+  const operatori = useMemo<string[]>(() => {
+    try {
+      const saved = localStorage.getItem(ADMIN_UTENTI_KEY);
+      if (saved) {
+        const utenti: AdminUtente[] = JSON.parse(saved);
+        return utenti.filter((u) => u.attivo && u.ruolo !== "lettore").map((u) => u.nome);
+      }
+    } catch {}
+    return mockAdminUtenti.map((u) => u.nome);
+  }, []);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -169,7 +198,7 @@ export default function AdminSupporto() {
       if (fStato !== "all" && t.stato !== fStato) return false;
       if (fPrio !== "all" && t.priorita !== fPrio) return false;
       if (fCat !== "all" && t.categoria !== fCat) return false;
-      if (onlyMine && t.assignedTo !== CURRENT_OPERATOR) return false;
+      if (onlyMine && t.assignedTo !== currentOperator) return false;
       if (onlyUrgent && !getSLA(t).urgent) return false;
       if (search.trim()) {
         const q = search.toLowerCase();
@@ -184,7 +213,7 @@ export default function AdminSupporto() {
       return sort === "recenti" ? bT.localeCompare(aT) : aT.localeCompare(bT);
     });
     return list;
-  }, [tickets, fStato, fPrio, fCat, search, sort, onlyMine, onlyUrgent]);
+  }, [tickets, fStato, fPrio, fCat, search, sort, onlyMine, onlyUrgent, currentOperator]);
 
   useEffect(() => {
     if (selected && messagesEndRef.current) {
@@ -245,7 +274,7 @@ export default function AdminSupporto() {
     addActivity(selected.id, {
       tipo: stato === "risolto" ? "chiusura" : "cambio_stato",
       testo: stato === "risolto" ? "Ticket chiuso come Risolto" : `Stato cambiato in ${statoLabel[stato]}`,
-      autore: CURRENT_OPERATOR,
+      autore: currentOperator,
       meta: { from, to: stato },
     });
     toast.success(`Stato cambiato in ${statoLabel[stato]}`);
@@ -259,7 +288,7 @@ export default function AdminSupporto() {
     addActivity(selected.id, {
       tipo: "cambio_priorita",
       testo: `Priorità cambiata in ${priorita.charAt(0).toUpperCase() + priorita.slice(1)}`,
-      autore: CURRENT_OPERATOR,
+      autore: currentOperator,
       meta: { from, to: priorita },
     });
     toast.success(`Priorità cambiata in ${priorita}`);
@@ -273,7 +302,7 @@ export default function AdminSupporto() {
     addActivity(ticketId, {
       tipo: "assegnazione",
       testo: operator ? `Assegnato a ${operator}` : "Assegnazione rimossa",
-      autore: CURRENT_OPERATOR,
+      autore: currentOperator,
       meta: { from, to: operator },
     });
     toast.success(operator ? `Assegnato a ${operator}` : "Assegnazione rimossa");
@@ -297,7 +326,7 @@ export default function AdminSupporto() {
     addActivity(ticketId, {
       tipo: newStato === "risolto" ? "chiusura" : "cambio_stato",
       testo: newStato === "risolto" ? "Ticket chiuso come Risolto" : `Stato cambiato in ${statoLabel[newStato]}`,
-      autore: CURRENT_OPERATOR,
+      autore: currentOperator,
       meta: { from, to: newStato },
     });
     toast.success(`Ticket spostato in ${statoLabel[newStato]}`);
@@ -307,10 +336,10 @@ export default function AdminSupporto() {
 
   const studentProfile = selected ? mockProfiles.find((p) => p.id === selected.student_id) : null;
   const studentContract = selected
-    ? mockRichieste.find((r) => r.student_id === selected.student_id && r.stato === "approvata")
+    ? loadLeads().find((r) => r.student_id === selected.student_id && r.stato === "approvata")
     : null;
   const studentPhone = studentContract?.telefono
-    || (selected ? mockRichieste.find((r) => r.student_id === selected.student_id)?.telefono : undefined);
+    || (selected ? loadLeads().find((r) => r.student_id === selected.student_id)?.telefono : undefined);
 
   const fmtDate = (iso?: string) => {
     if (!iso) return "—";
@@ -360,9 +389,9 @@ export default function AdminSupporto() {
               <DropdownMenuItem onClick={() => handleChangePrio("bassa")}>Bassa</DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuLabel>Assegna a</DropdownMenuLabel>
-              {mockOperatori.map((op) => (
+              {operatori.map((op) => (
                 <DropdownMenuItem key={op} onClick={() => handleAssign(selected.id, op)}>
-                  {op === CURRENT_OPERATOR ? `${op} (io)` : op}
+                  {op === currentOperator ? `${op} (io)` : op}
                 </DropdownMenuItem>
               ))}
               <DropdownMenuItem onClick={() => handleAssign(selected.id, undefined)} className="text-muted-foreground">
@@ -410,10 +439,10 @@ export default function AdminSupporto() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">
-              {mockOperatori.map((op) => (
+              {operatori.map((op) => (
                 <DropdownMenuItem key={op} onClick={() => handleAssign(selected.id, op)}>
                   <Avatar className="h-5 w-5 mr-2"><AvatarFallback className="text-[9px]">{op[0]}</AvatarFallback></Avatar>
-                  {op === CURRENT_OPERATOR ? `${op} (io)` : op}
+                  {op === currentOperator ? `${op} (io)` : op}
                 </DropdownMenuItem>
               ))}
               <DropdownMenuSeparator />
@@ -681,7 +710,7 @@ export default function AdminSupporto() {
                 size="sm"
                 className="h-8 px-2.5 text-xs gap-1.5"
                 onClick={() => setOnlyMine((v) => !v)}
-                title={`Mostra solo ticket assegnati a ${CURRENT_OPERATOR}`}
+                title={`Mostra solo ticket assegnati a ${currentOperator}`}
               >
                 <UserCheck className="h-3.5 w-3.5" /> I miei
               </Button>
@@ -833,10 +862,10 @@ export default function AdminSupporto() {
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="start">
                                   <DropdownMenuLabel>Assegna a</DropdownMenuLabel>
-                                  {mockOperatori.map((op) => (
+                                  {operatori.map((op) => (
                                     <DropdownMenuItem key={op} onClick={() => handleAssign(t.id, op)}>
                                       <Avatar className="h-5 w-5 mr-2"><AvatarFallback className="text-[9px]">{op[0]}</AvatarFallback></Avatar>
-                                      {op === CURRENT_OPERATOR ? `${op} (io)` : op}
+                                      {op === currentOperator ? `${op} (io)` : op}
                                     </DropdownMenuItem>
                                   ))}
                                   <DropdownMenuSeparator />
@@ -1025,10 +1054,10 @@ function TicketCardContent({
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="start">
                         <DropdownMenuLabel>Assegna a</DropdownMenuLabel>
-                        {mockOperatori.map((op) => (
+                        {operatori.map((op) => (
                           <DropdownMenuItem key={op} onClick={() => onAssign(ticket.id, op)}>
                             <Avatar className="h-5 w-5 mr-2"><AvatarFallback className="text-[9px]">{op[0]}</AvatarFallback></Avatar>
-                            {op === CURRENT_OPERATOR ? `${op} (io)` : op}
+                            {op === currentOperator ? `${op} (io)` : op}
                           </DropdownMenuItem>
                         ))}
                         <DropdownMenuSeparator />

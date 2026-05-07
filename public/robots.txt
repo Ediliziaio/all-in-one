@@ -12,3 +12,9 @@ Allow: /
 
 User-agent: *
 Allow: /
+Disallow: /admin/
+Disallow: /studente/
+Disallow: /login
+Disallow: /register
+
+Sitemap: https://studentatonapoleone.com/sitemap.xml

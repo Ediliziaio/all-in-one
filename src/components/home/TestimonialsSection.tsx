@@ -5,9 +5,9 @@ import { Button } from "@/components/ui/button";
 
 const testimonials = [
   { name: "Marco Rossi", course: "Ingegneria Informatica", rating: 5, text: "Ho risparmiato €180/mese rispetto al mio vecchio affitto. WiFi che funziona davvero, bollette incluse, zero sorprese. Non torno più indietro.", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=face" },
-  { name: "Giulia Bianchi", course: "Medicina", rating: 5, text: "In 3 anni non ho mai avuto un problema irrisolto per più di 24 ore. L'assistenza è reale, non un numero che non risponde mai.", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&h=80&fit=crop&crop=face" },
-  { name: "Ahmed El Fassi", course: "Economia", rating: 5, text: "Il 98% rinnova il contratto. Io l'ho rinnovato 3 volte. La community, la palestra, la posizione — non trovi niente di simile a Padova.", avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&h=80&fit=crop&crop=face" },
-  { name: "Sofia Chen", course: "Architettura", rating: 5, text: "Camera spaziosa, luminosa, perfetta per i miei progetti. A 5 minuti dall'università ho guadagnato 2 ore al giorno di vita.", avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&h=80&fit=crop&crop=face" },
+  { name: "Giulia Bianchi", course: "Medicina", rating: 5, text: "In 3 anni ogni problema è stato risolto. Lo staff su WhatsApp è disponibile e ti risponde in orario di ufficio senza farti aspettare.", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&h=80&fit=crop&crop=face" },
+  { name: "Ahmed El Fassi", course: "Economia", rating: 5, text: "Il 98% rinnova il contratto. Io l'ho rinnovato 3 volte. La community, la cucina comune, la posizione — non trovi niente di simile a Padova.", avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&h=80&fit=crop&crop=face" },
+  { name: "Sofia Chen", course: "Architettura", rating: 5, text: "Camera spaziosa, luminosa, perfetta per disegnare e studiare. Vicina a tutto ciò che mi serve, ho guadagnato ore di vita ogni giorno.", avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&h=80&fit=crop&crop=face" },
   { name: "Luca Moretti", course: "Giurisprudenza", rating: 5, text: "Prima pagavo €650 tra affitto e bollette per un buco. Ora pago meno, vivo meglio, e non devo litigare con il proprietario.", avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=80&h=80&fit=crop&crop=face" },
   { name: "Maria T.", course: "Genitore", rating: 5, text: "Come mamma, finalmente dormo tranquilla. So che mia figlia è al sicuro, il contratto è regolare, e se ha un problema lo risolvono subito.", avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=80&h=80&fit=crop&crop=face" },
 ];
@@ -79,11 +79,11 @@ export function TestimonialsSection() {
       <div className="container">
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-12">
           <h2 className="font-heading text-3xl md:text-4xl font-bold text-foreground">
-            Cosa Dicono<br />
-            <span className="text-primary">i Nostri Studenti</span>
+            Chi Vive qui<br />
+            <span className="text-primary">Non Torna Indietro</span>
           </h2>
           <p className="text-muted-foreground mt-3">
-            <strong className="text-foreground">127 recensioni Google — media 4.9★</strong>
+            <strong className="text-foreground">127 recensioni Google verificate — media 4.9★</strong> · Studenti da Ingegneria, Medicina, Economia e altro
           </p>
         </motion.div>
 

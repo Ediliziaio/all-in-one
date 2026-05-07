@@ -106,9 +106,9 @@ export default function ProfiloStudente() {
                   </a>
                 </Button>
               )}
-              {privacy.allowWhatsApp && (
+              {privacy.allowWhatsApp && profile.whatsapp && (
                 <Button size="sm" className="bg-green-600 text-white hover:bg-green-700" asChild>
-                  <a href="https://api.whatsapp.com" target="_blank" rel="noopener noreferrer">
+                  <a href={`https://wa.me/${profile.whatsapp.replace(/\D/g, "")}`} target="_blank" rel="noopener noreferrer">
                     <MessageCircle className="h-4 w-4 mr-1" /> WhatsApp
                   </a>
                 </Button>

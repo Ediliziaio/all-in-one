@@ -18,7 +18,7 @@ export function MapSection() {
           viewport={{ once: true }}
           className="text-center mb-12"
         >
-          <h2 className="font-heading text-3xl md:text-4xl font-bold text-foreground inline-block border-b-4 border-[hsl(var(--google-blue))] pb-2">Posizione strategica</h2>
+          <h2 className="font-heading text-3xl md:text-4xl font-bold text-foreground inline-block border-b-4 border-[hsl(var(--google-blue))] pb-2">Dove siamo</h2>
           <p className="text-muted-foreground mt-3">Nel cuore di Padova, a due passi da tutto.</p>
         </motion.div>
 

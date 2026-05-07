@@ -174,8 +174,7 @@ export default function AdminContratti() {
     if (!selected) return null;
     const months = monthsBetween(selected.data_inizio, selected.data_fine);
     const totale = months * selected.canone_mensile;
-    // Mock: link payments only for richiesta_id pren1 (Marco Rossi)
-    const pagamenti = selected.richiesta_id === "pren1" ? mockPagamenti : [];
+    const pagamenti = mockPagamenti.filter((p) => p.contratto_id === selected.id);
     const incassato = pagamenti.filter(p => p.stato === "pagato").reduce((a, p) => a + p.importo, 0);
     const residuo = Math.max(0, totale - incassato);
     const student = findStudentByName(selected.student_nome);
@@ -301,6 +300,7 @@ export default function AdminContratti() {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b text-muted-foreground bg-muted/30">
+                      <th className="py-3 px-2 w-8" />
                       <th className="text-left py-3 px-4 font-medium">Studente</th>
                       <th className="text-left py-3 px-4 font-medium">Camera</th>
                       <th className="text-left py-3 px-4 font-medium">Periodo</th>
@@ -349,7 +349,7 @@ export default function AdminContratti() {
                 </div>
 
                 <Tabs defaultValue="riepilogo">
-                  <TabsList className="grid grid-cols-4 w-full">
+                  <TabsList className="grid grid-cols-2 md:grid-cols-4 w-full h-auto gap-1 p-1">
                     <TabsTrigger value="riepilogo">Riepilogo</TabsTrigger>
                     <TabsTrigger value="pagamenti">Pagamenti</TabsTrigger>
                     <TabsTrigger value="documento">Documento</TabsTrigger>

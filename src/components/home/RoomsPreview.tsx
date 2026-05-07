@@ -6,11 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { rooms } from "@/data/rooms";
 
+const singole = rooms.filter((r) => r.type === "singola");
+const doppie = rooms.filter((r) => r.type === "doppia");
+
 const previewRooms = [
-  { room: rooms.find((r) => r.type === "singola")!, remaining: 7, badge: null as string | null },
-  { room: rooms.find((r) => r.type === "singola-plus")!, remaining: 3, badge: "Più richiesta" },
-  { room: rooms.find((r) => r.type === "doppia")!, remaining: 2, badge: null },
-];
+  singole[0] ? { room: singole[0], badge: "Più richiesta" as string | null } : null,
+  (singole[1] || singole[0]) ? { room: singole[1] ?? singole[0]!, badge: null as string | null } : null,
+  doppie[0] ? { room: doppie[0], badge: null as string | null } : null,
+].filter((item): item is NonNullable<typeof item> => item !== null);
 
 function TiltCard({ children }: { children: React.ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -58,11 +61,11 @@ export function RoomsPreview() {
             Scegli la Tua Camera<br />
             <span className="text-primary">(Prima Che Lo Faccia Qualcun Altro)</span>
           </h2>
-          <p className="text-muted-foreground mt-3">Prezzi chiari. Tutto incluso. €0 extra, mai.</p>
+          <p className="text-muted-foreground mt-3">Camere singole e doppie a Padova. WiFi + utenze + cucina inclusi. €0 extra, mai.</p>
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
-          {previewRooms.map(({ room, remaining, badge }, i) => (
+          {previewRooms.map(({ room, badge }, i) => (
             <motion.div
               key={room.id}
               initial={{ opacity: 0, y: 30 }}
@@ -85,15 +88,6 @@ export function RoomsPreview() {
                           ⭐ {badge}
                         </Badge>
                       )}
-                      <motion.div
-                        animate={{ scale: [1, 1.06, 1] }}
-                        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                        className="absolute top-3 right-3"
-                      >
-                        <Badge className="bg-destructive text-destructive-foreground text-xs shadow-md">
-                          Solo {remaining} rimaste
-                        </Badge>
-                      </motion.div>
                     </div>
                     <div className="p-5">
                       <h3 className="font-heading font-semibold text-lg text-card-foreground">{room.name}</h3>

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useLocation } from "react-router-dom";
 import { Search, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -11,8 +12,44 @@ interface DashboardHeaderProps {
   userInitials: string;
 }
 
+const PAGE_TITLES: Record<string, string> = {
+  "/admin":                 "Dashboard",
+  "/admin/richieste":       "Richieste & Lead",
+  "/admin/studenti":        "Studenti",
+  "/admin/fatture":         "Fatture",
+  "/admin/supporto":        "Supporto",
+  "/admin/camere":          "Camere",
+  "/admin/buoni":           "Buoni",
+  "/admin/guide":           "Guide",
+  "/admin/blog":            "Blog & SEO",
+  "/admin/impostazioni":    "Impostazioni",
+  "/studente":              "Home",
+  "/studente/camera":       "La Mia Camera",
+  "/studente/prenota":      "Richiedi Camera",
+  "/studente/pagamenti":    "Pagamenti",
+  "/studente/documenti":    "Documenti",
+  "/studente/supporto":     "Supporto",
+  "/studente/community":    "Community",
+  "/studente/guide":        "Guide",
+  "/studente/buoni":        "Buoni",
+  "/studente/profilo":      "Il Mio Profilo",
+  "/studente/community/profili": "Profili",
+};
+
+function getPageTitle(pathname: string): string {
+  if (PAGE_TITLES[pathname]) return PAGE_TITLES[pathname];
+  // Fallback: match prefix for nested routes
+  const match = Object.keys(PAGE_TITLES)
+    .filter((k) => k !== "/admin" && k !== "/studente")
+    .sort((a, b) => b.length - a.length)
+    .find((k) => pathname.startsWith(k));
+  return match ? PAGE_TITLES[match] : "Napoleone";
+}
+
 export function DashboardHeader({ userName, userAvatar, userInitials }: DashboardHeaderProps) {
   const [searchOpen, setSearchOpen] = useState(false);
+  const location = useLocation();
+  const pageTitle = getPageTitle(location.pathname);
 
   return (
     <header className="sticky top-0 z-40 bg-card/80 backdrop-blur-md border-b px-4 md:px-6 py-3">
@@ -23,7 +60,7 @@ export function DashboardHeader({ userName, userAvatar, userInitials }: Dashboar
           <Input placeholder="Cerca..." className="pl-9 h-9 bg-muted/50 border-none" />
         </div>
 
-        {/* Mobile: brand + search toggle */}
+        {/* Mobile: page title + search toggle */}
         <div className="md:hidden flex items-center gap-2 flex-1 min-w-0">
           {searchOpen ? (
             <div className="relative flex-1">
@@ -34,7 +71,7 @@ export function DashboardHeader({ userName, userAvatar, userInitials }: Dashboar
               </button>
             </div>
           ) : (
-            <span className="font-heading font-bold text-base truncate">Area Studente</span>
+            <span className="font-heading font-bold text-base truncate">{pageTitle}</span>
           )}
         </div>
 

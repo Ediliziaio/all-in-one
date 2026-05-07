@@ -1,11 +1,12 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { isAppDomain } from "@/lib/domain";
 
 // Public
 import Index from "./pages/Index";
@@ -13,9 +14,12 @@ import Camere from "./pages/Camere";
 import CameraDettaglio from "./pages/CameraDettaglio";
 import Servizi from "./pages/Servizi";
 import Vantaggi from "./pages/Vantaggi";
-import CommunityPublic from "./pages/Community";
+// CommunityPublic disabled — redirects to home
+// import CommunityPublic from "./pages/Community";
 import Contatti from "./pages/Contatti";
 import NotFound from "./pages/NotFound";
+import Blog from "./pages/Blog";
+import BlogArticolo from "./pages/BlogArticolo";
 
 // Auth
 import LoginPage from "./pages/auth/LoginPage";
@@ -32,6 +36,8 @@ import AdminBuoni from "./pages/admin/AdminBuoni";
 import AdminGuide from "./pages/admin/AdminGuide";
 import AdminImpostazioni from "./pages/admin/AdminImpostazioni";
 import AdminContratti from "./pages/admin/AdminContratti";
+import AdminFatture from "./pages/admin/AdminFatture";
+import AdminBlog from "./pages/admin/AdminBlog";
 
 // Studente
 import StudenteLayout from "./layouts/StudenteLayout";
@@ -55,57 +61,67 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <BrowserRouter>
+      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <AuthProvider>
           <ScrollToTop />
           <Routes>
-            {/* Public */}
-            <Route path="/" element={<Index />} />
-            <Route path="/camere" element={<Camere />} />
-            <Route path="/camere/:id" element={<CameraDettaglio />} />
-            <Route path="/servizi" element={<Servizi />} />
-            <Route path="/vantaggi" element={<Vantaggi />} />
-            <Route path="/community" element={<CommunityPublic />} />
-            <Route path="/contatti" element={<Contatti />} />
+            {isAppDomain ? (
+              /* ── APP DOMAIN (app.studentatonapoleone.com) ── */
+              <>
+                <Route path="/" element={<Navigate to="/login" replace />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/register" element={<RegisterPage />} />
 
-            {/* Auth */}
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
+                <Route element={<ProtectedRoute requiredRole="admin" />}>
+                  <Route path="/admin" element={<AdminLayout />}>
+                    <Route index element={<AdminDashboard />} />
+                    <Route path="camere" element={<AdminCamere />} />
+                    <Route path="richieste" element={<AdminPrenotazioni />} />
+                    <Route path="contratti" element={<Navigate to="/admin/studenti" replace />} />
+                    <Route path="studenti" element={<AdminStudenti />} />
+                    <Route path="fatture" element={<AdminFatture />} />
+                    <Route path="supporto" element={<AdminSupporto />} />
+                    <Route path="buoni" element={<AdminBuoni />} />
+                    <Route path="guide" element={<AdminGuide />} />
+                    <Route path="blog" element={<AdminBlog />} />
+                    <Route path="impostazioni" element={<AdminImpostazioni />} />
+                  </Route>
+                </Route>
 
-            {/* Admin — richiede login + ruolo admin */}
-            <Route element={<ProtectedRoute requiredRole="admin" />}>
-              <Route path="/admin" element={<AdminLayout />}>
-                <Route index element={<AdminDashboard />} />
-                <Route path="camere" element={<AdminCamere />} />
-                <Route path="richieste" element={<AdminPrenotazioni />} />
-                <Route path="contratti" element={<AdminContratti />} />
-                <Route path="studenti" element={<AdminStudenti />} />
-                <Route path="supporto" element={<AdminSupporto />} />
-                <Route path="buoni" element={<AdminBuoni />} />
-                <Route path="guide" element={<AdminGuide />} />
-                <Route path="impostazioni" element={<AdminImpostazioni />} />
-              </Route>
-            </Route>
+                <Route element={<ProtectedRoute requiredRole="student" />}>
+                  <Route path="/studente" element={<StudenteLayout />}>
+                    <Route index element={<StudenteHome />} />
+                    <Route path="camera" element={<MiaCamera />} />
+                    <Route path="prenota" element={<PrenotaCamera />} />
+                    <Route path="community" element={<Community />} />
+                    <Route path="community/profili" element={<Profili />} />
+                    <Route path="community/profilo/:id" element={<ProfiloStudente />} />
+                    <Route path="profilo" element={<MioProfilo />} />
+                    <Route path="guide" element={<Guide />} />
+                    <Route path="buoni" element={<Buoni />} />
+                    <Route path="pagamenti" element={<Pagamenti />} />
+                    <Route path="documenti" element={<Documenti />} />
+                    <Route path="supporto" element={<Supporto />} />
+                  </Route>
+                </Route>
 
-            {/* Studente — richiede login + ruolo student */}
-            <Route element={<ProtectedRoute requiredRole="student" />}>
-              <Route path="/studente" element={<StudenteLayout />}>
-                <Route index element={<StudenteHome />} />
-                <Route path="camera" element={<MiaCamera />} />
-                <Route path="prenota" element={<PrenotaCamera />} />
-                <Route path="community" element={<Community />} />
-                <Route path="community/profili" element={<Profili />} />
-                <Route path="community/profilo/:id" element={<ProfiloStudente />} />
-                <Route path="profilo" element={<MioProfilo />} />
-                <Route path="guide" element={<Guide />} />
-                <Route path="buoni" element={<Buoni />} />
-                <Route path="pagamenti" element={<Pagamenti />} />
-                <Route path="documenti" element={<Documenti />} />
-                <Route path="supporto" element={<Supporto />} />
-              </Route>
-            </Route>
-
-            <Route path="*" element={<NotFound />} />
+                <Route path="*" element={<Navigate to="/login" replace />} />
+              </>
+            ) : (
+              /* ── SITO PUBBLICO (studentatonapoleone.com) ── */
+              <>
+                <Route path="/" element={<Index />} />
+                <Route path="/camere" element={<Camere />} />
+                <Route path="/camere/:id" element={<CameraDettaglio />} />
+                <Route path="/servizi" element={<Servizi />} />
+                <Route path="/vantaggi" element={<Vantaggi />} />
+                <Route path="/community" element={<Navigate to="/" replace />} />
+                <Route path="/contatti" element={<Contatti />} />
+                <Route path="/blog" element={<Blog />} />
+                <Route path="/blog/:slug" element={<BlogArticolo />} />
+                <Route path="*" element={<NotFound />} />
+              </>
+            )}
           </Routes>
         </AuthProvider>
       </BrowserRouter>

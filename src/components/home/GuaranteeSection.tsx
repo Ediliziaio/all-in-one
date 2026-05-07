@@ -2,10 +2,9 @@ import { motion } from "framer-motion";
 import { ShieldCheck, CheckCircle, FileText, Clock, Coins } from "lucide-react";
 
 const guarantees = [
-  { icon: FileText, text: "Contratto regolare e registrato — nessuna zona grigia" },
-  { icon: Coins, text: "Zero costi nascosti — il prezzo che vedi è quello che paghi" },
-  { icon: Clock, text: "Disdetta con 1 mese di preavviso — nessun vincolo capestro" },
-  { icon: CheckCircle, text: "Cauzione restituita al 100% se la camera è in ordine" },
+  { icon: FileText, text: "Locazione registrata all'Agenzia delle Entrate — tutto in regola" },
+  { icon: Coins, text: "Il canone mensile è fisso — luce, gas, acqua e WiFi già inclusi" },
+  { icon: CheckCircle, text: "Cauzione restituita integralmente a fine contratto se la camera è in ordine" },
 ];
 
 export function GuaranteeSection() {
@@ -22,16 +21,14 @@ export function GuaranteeSection() {
             <ShieldCheck className="h-8 w-8 text-[hsl(var(--google-green))]" />
           </div>
           <h2 className="font-heading text-3xl md:text-4xl font-bold text-foreground">
-            La Nostra Promessa:<br />
-            <span className="text-[hsl(var(--google-green))]">Se Non Sei Soddisfatto</span>
+            Contratto Registrato,<br /><span className="text-[hsl(var(--google-green))]">Prezzo Fisso</span>
           </h2>
           <p className="text-muted-foreground mt-4 max-w-2xl mx-auto text-lg">
-            Se nelle prime 2 settimane non ti trovi bene, ti aiutiamo a trovare una soluzione. 
-            Nessuna penale, nessun vincolo nascosto. Il rischio è tutto nostro.
+            Nessuna zona grigia, nessun costo nascosto. Il canone che vedi include tutto: luce, gas, acqua e WiFi.
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {guarantees.map((g, i) => (
             <motion.div
               key={i}
@@ -56,7 +53,7 @@ export function GuaranteeSection() {
           transition={{ delay: 0.5 }}
           className="text-center mt-8 text-sm text-muted-foreground"
         >
-          Più di 500 studenti si sono già fidati. Il 98% ha rinnovato il contratto.
+          Oltre 500 studenti ospitati. Il 98% ha rinnovato il contratto l'anno successivo.
         </motion.p>
       </div>
     </section>

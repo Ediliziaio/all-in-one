@@ -1,8 +1,9 @@
 import { Link } from "react-router-dom";
 import { Layout } from "@/components/Layout";
+import { Seo } from "@/components/Seo";
+import { Schema } from "@/components/Schema";
 import { Button } from "@/components/ui/button";
 import {
-  MapPin,
   Banknote,
   Users,
   HeadphonesIcon,
@@ -18,41 +19,38 @@ import {
 import { PageTransition, FadeIn, StaggerContainer, StaggerItem, CountUp } from "@/components/motion/MotionWrappers";
 
 const heroStats = [
+  { value: 390, prefix: "€", suffix: "", label: "prezzo di partenza/mese" },
   { value: 100, prefix: "€", suffix: "+", label: "risparmiati al mese" },
-  { value: 5, suffix: " min", label: "a piedi dall'università" },
   { value: 0, suffix: "", label: "bollette extra" },
 ];
 
 const vantaggi = [
-  { icon: MapPin, title: "A 5 minuti dall'uni", desc: "Esci di casa e sei in aula. Niente bus affollati, niente sveglie alle 6.", stat: "5 min a piedi" },
-  { icon: Banknote, title: "Un prezzo, tutto dentro", desc: "Canone unico con utenze, WiFi, pulizia e manutenzione. Zero sorprese.", stat: "da €480/mese" },
-  { icon: Users, title: "Community vera", desc: "Vivi con altri studenti, partecipa a eventi e gruppi studio. Le amicizie nascono da sole.", stat: "100+ studenti" },
-  { icon: HeadphonesIcon, title: "Supporto vero", desc: "Si è rotto qualcosa? Scrivi su WhatsApp e interveniamo. Niente attese.", stat: "Risposta in 1h" },
-  { icon: FileText, title: "Contratti senza trappole", desc: "Durata semestrale o annuale, disdici con un mese di preavviso. Tutto regolare.", stat: "Disdetta 30gg" },
-  { icon: CalendarHeart, title: "Eventi ogni settimana", desc: "Serate cinema, tornei, aperitivi, workshop. La tua esperienza non è solo lezioni.", stat: "4+ eventi/mese" },
+  { icon: Banknote, title: "Un prezzo, tutto dentro", desc: "Canone unico con utenze, WiFi, pulizia e manutenzione. Zero sorprese.", stat: "da €390/mese" },
+  { icon: Users, title: "Community vera", desc: "Vivi con altri studenti, partecipa a eventi e gruppi studio. Le amicizie nascono da sole.", stat: "Comunità attiva" },
+  { icon: HeadphonesIcon, title: "Supporto vero", desc: "Si è rotto qualcosa? Scrivi su WhatsApp e interveniamo. Lun–Ven 9–17.", stat: "Lun–Ven 9–17" },
+  { icon: FileText, title: "Contratto regolare", desc: "Locazione registrata, conforme alla normativa. Nessuna zona grigia.", stat: "Tutto in regola" },
 ];
 
 const costBreakdown = {
   traditional: [
-    { label: "Affitto camera singola", value: 350 },
+    { label: "Affitto posto letto", value: 300 },
     { label: "Bollette (luce, gas, acqua)", value: 150 },
     { label: "Internet WiFi", value: 40 },
-    { label: "Palestra esterna", value: 60 },
   ],
-  us: [{ label: "Canone tutto incluso", value: 480 }],
+  us: [{ label: "Canone tutto incluso", value: 390 }],
 };
 const tradTotal = costBreakdown.traditional.reduce((s, i) => s + i.value, 0);
 const usTotal = costBreakdown.us.reduce((s, i) => s + i.value, 0);
 const saving = tradTotal - usTotal;
 
 const comparison = [
-  { feature: "Costo mensile medio", usText: "da €480 tutto incluso", tradText: "€350 + ~€150 bollette", note: "Niente sorprese a fine mese" },
+  { feature: "Costo mensile medio", usText: "da €390 tutto incluso", tradText: "€300 + ~€150 bollette", note: "Niente sorprese a fine mese" },
   { feature: "Utenze incluse", us: true, trad: false, note: "Luce, gas, acqua già nel canone" },
-  { feature: "WiFi Fibra 1Gbps", us: true, trad: false, note: "Lezioni online senza lag" },
+  { feature: "WiFi incluso", us: true, trad: false, note: "Lezioni online senza lag" },
   { feature: "Manutenzione inclusa", us: true, trad: false, note: "Interveniamo entro 24h" },
   { feature: "Community e eventi", us: true, trad: false, note: "Aperitivi, gruppi studio, tornei" },
-  { feature: "Contratto flessibile", us: true, trad: false, note: "Disdici con 30 giorni di preavviso" },
-  { feature: "Palestra e sale studio", us: true, trad: false, note: "Senza abbonamenti extra" },
+  { feature: "Contratto registrato", us: true, trad: false, note: "Locazione regolare, nessuna zona grigia" },
+  { feature: "Cucina comune e sala studio", us: true, trad: false, note: "Cucine attrezzate e sala studio 24/7" },
   { feature: "Libertà di scelta zona", us: false, trad: true, note: "Noi siamo solo in centro" },
   { feature: "Nessuna regola condominiale", us: false, trad: true, note: "Qui ci sono regole di convivenza" },
 ];
@@ -68,7 +66,7 @@ const testimonials = [
     name: "Marco T.",
     course: "Ingegneria, 2° anno",
     avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop",
-    text: "Nel mio vecchio appartamento spendevo €40/mese solo di WiFi lento. Qui ho fibra 1Gbps, palestra e pulizia inclusi. Il confronto non regge.",
+    text: "Nel mio vecchio appartamento spendevo €40/mese solo di WiFi lento e dovevo cucinare ogni giorno da solo. Qui ho WiFi, cucina attrezzata e pulizia inclusi. Il confronto non regge.",
   },
   {
     name: "Sofia L.",
@@ -78,8 +76,46 @@ const testimonials = [
   },
 ];
 
+const vantaggiFaqs = [
+  {
+    q: "Quanto costa uno studentato a Padova rispetto a un appartamento?",
+    a: "Uno studentato a Padova come il Napoleone parte da €390/mese tutto incluso (WiFi, utenze, pulizie). Un appartamento privato in media costa €300 solo di affitto più €150–€200 di bollette, quindi almeno €490–€500 al mese. Con noi risparmi fino a €100 al mese.",
+  },
+  {
+    q: "Cosa include il canone dello studentato?",
+    a: "Il canone mensile include: WiFi fibra, utenze (luce, gas, acqua), pulizia delle parti comuni, manutenzione ordinaria, uso della cucina comune, sala studio 24/7 e lavanderia. Nessun costo nascosto.",
+  },
+  {
+    q: "Il contratto di affitto è regolare?",
+    a: "Sì. Tutti i contratti sono locazioni registrate, conformi alla normativa italiana. Non ci sono zone grigie: ricevi un contratto ufficiale firmato prima dell'ingresso.",
+  },
+  {
+    q: "Posso trovare una stanza singola a Padova a meno di €500 al mese con utenze incluse?",
+    a: "Sì. Le nostre camere singole partono da €480/mese con WiFi, luce, gas, acqua e pulizie già incluse. È una delle soluzioni più convenienti per studenti a Padova con tutte le spese coperte.",
+  },
+  {
+    q: "Lo studentato è vicino all'Università di Padova?",
+    a: "Sì, la struttura si trova in zona centrale a Padova, a pochi minuti dalle principali facoltà dell'Università di Padova, dai trasporti pubblici e dai servizi essenziali.",
+  },
+];
+
 const Vantaggi = () => (
   <Layout>
+    <Seo
+      title="Studentato vs Appartamento Padova — Risparmia Fino a €100 al Mese"
+      description="Perché scegliere lo Studentato Napoleone di Padova? Prezzo all-inclusive da €390/mese, utenze incluse, contratto regolare. Confronto reale con affitto tradizionale: scopri quanto risparmi."
+      canonical="/vantaggi"
+      keywords="perché scegliere studentato Padova, vantaggi studentato vs appartamento, affitto tutto incluso studenti Padova, risparmio studentato Padova"
+    />
+    <Schema data={{
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      mainEntity: vantaggiFaqs.map((f) => ({
+        "@type": "Question",
+        name: f.q,
+        acceptedAnswer: { "@type": "Answer", text: f.a },
+      })),
+    }} />
     <PageTransition>
       {/* Hero */}
       <section className="relative py-12 md:py-24 overflow-hidden">
@@ -98,11 +134,11 @@ const Vantaggi = () => (
               Vantaggi reali, numeri reali
             </div>
             <h1 className="font-heading text-3xl sm:text-4xl md:text-6xl font-bold text-foreground max-w-2xl leading-tight">
-              Più di un posto letto.<br />
-              <span className="text-accent">La base</span> della tua vita universitaria.
+              Studentato o Appartamento?<br />
+              <span className="text-accent">Ecco</span> la risposta onesta.
             </h1>
             <p className="text-muted-foreground mt-4 text-base md:text-lg max-w-xl">
-              Risparmi, comodità, community. Ecco cosa cambia davvero scegliendo Studentato Napoleone.
+              Confronto reale tra lo Studentato Napoleone e un appartamento privato a Padova. Costi, servizi, contratti: tutto a nudo.
             </p>
           </FadeIn>
 
@@ -130,9 +166,9 @@ const Vantaggi = () => (
                 <TrendingDown className="h-3.5 w-3.5" />
                 Calcolo onesto
               </div>
-              <h2 className="font-heading text-3xl md:text-4xl font-bold text-foreground">Quanto risparmi davvero</h2>
+              <h2 className="font-heading text-3xl md:text-4xl font-bold text-foreground">Studentato vs Appartamento: quanto spendi davvero</h2>
               <p className="text-muted-foreground mt-3 max-w-xl mx-auto">
-                Confronto basato sui prezzi medi di un appartamento studentesco a Padova.
+                Confronto basato sui prezzi medi di un posto letto in appartamento privato a Padova nel 2026.
               </p>
             </div>
           </FadeIn>
@@ -175,7 +211,7 @@ const Vantaggi = () => (
                       <span className="font-mono text-foreground">€{item.value}</span>
                     </li>
                   ))}
-                  {["Utenze (luce/gas/acqua)", "WiFi 1Gbps", "Palestra", "Pulizia comuni", "Manutenzione"].map((extra) => (
+                  {["Utenze (luce/gas/acqua)", "WiFi", "Cucina comune + frigo privato", "Pulizia comuni", "Manutenzione"].map((extra) => (
                     <li key={extra} className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground flex items-center gap-2">
                         <Check className="h-3.5 w-3.5 text-success" /> {extra}
@@ -211,8 +247,8 @@ const Vantaggi = () => (
         <div className="container">
           <FadeIn>
             <div className="text-center mb-12">
-              <h2 className="font-heading text-3xl md:text-4xl font-bold text-foreground">6 motivi concreti per sceglierci</h2>
-              <p className="text-muted-foreground mt-3">Niente promesse vaghe. Solo cose che cambiano la tua giornata.</p>
+              <h2 className="font-heading text-3xl md:text-4xl font-bold text-foreground">Perché scegliere lo Studentato Napoleone</h2>
+              <p className="text-muted-foreground mt-3">I vantaggi concreti che fanno la differenza quando studi lontano da casa.</p>
             </div>
           </FadeIn>
           <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -299,8 +335,8 @@ const Vantaggi = () => (
         <div className="container">
           <FadeIn>
             <div className="text-center mb-12">
-              <h2 className="font-heading text-3xl md:text-4xl font-bold text-foreground">Storie reali, non slogan</h2>
-              <p className="text-muted-foreground mt-3">Parola di chi vive qui ogni giorno.</p>
+              <h2 className="font-heading text-3xl md:text-4xl font-bold text-foreground">Cosa dicono gli studenti che vivono qui</h2>
+              <p className="text-muted-foreground mt-3">Recensioni reali di studenti dell'Università di Padova che hanno scelto il Napoleone.</p>
             </div>
           </FadeIn>
 
@@ -336,11 +372,11 @@ const Vantaggi = () => (
           <div className="container text-center">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/20 text-accent-foreground bg-accent/90 text-sm font-medium mb-4">
               <CalendarHeart className="h-4 w-4" />
-              Solo 12 posti ancora disponibili per Settembre
+              Posti limitati — scrivici per verificare disponibilità
             </div>
-            <h2 className="font-heading text-3xl md:text-4xl font-bold">Pronto? Il tuo posto ti aspetta</h2>
+            <h2 className="font-heading text-3xl md:text-4xl font-bold">Hai scelto. La tua camera a Padova ti aspetta.</h2>
             <p className="opacity-80 mt-3 max-w-md mx-auto">
-              Esplora le camere e prenota una visita. Risposta entro 24 ore.
+              Vedi le camere disponibili e richiedi una visita. Ti rispondiamo entro 24 ore lavorative.
             </p>
             <div className="flex flex-wrap justify-center gap-3 mt-8">
               <Button size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90" asChild>
@@ -351,7 +387,7 @@ const Vantaggi = () => (
               <Button
                 size="lg"
                 variant="outline"
-                className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10"
+                className="bg-transparent border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10"
                 asChild
               >
                 <Link to="/contatti">Scrivici ora</Link>

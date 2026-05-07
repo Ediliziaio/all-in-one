@@ -1,8 +1,11 @@
 import { useState, useMemo } from "react";
+import { addLead } from "@/data/leadsStore";
 import { motion } from "framer-motion";
 import { z } from "zod";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import { Seo } from "@/components/Seo";
+import { Schema } from "@/components/Schema";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -14,29 +17,20 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { toast } from "sonner";
 import {
-  MapPin, Mail, Phone, Clock, GraduationCap, Train, ShoppingBag, TreePine,
+  Mail, Phone, Clock,
   Send, MessageCircle, CheckCircle2, ExternalLink, Calendar, Sparkles,
 } from "lucide-react";
 
-const distances = [
-  { icon: GraduationCap, label: "Università", distance: "5 min a piedi" },
-  { icon: Train, label: "Stazione FS", distance: "12 min in bus" },
-  { icon: ShoppingBag, label: "Centro storico", distance: "3 min a piedi" },
-  { icon: TreePine, label: "Prato della Valle", distance: "8 min in bici" },
-];
 
 const orari = [
-  { giorno: "Lunedì – Venerdì", ore: "9:00 – 18:00" },
-  { giorno: "Sabato", ore: "10:00 – 13:00" },
-  { giorno: "Domenica", ore: "Chiuso" },
+  { giorno: "Lunedì – Venerdì", ore: "9:00 – 17:00" },
+  { giorno: "Sabato – Domenica", ore: "Chiuso" },
 ];
 
 const faqs = [
   { q: "Come posso prenotare una camera?", a: "Sfoglia le camere disponibili nella sezione Camere e clicca su 'Richiedi Prenotazione'. Verrai ricontattato entro 24 ore." },
   { q: "Quali sono i termini di pagamento?", a: "Il canone si paga entro il 5 di ogni mese tramite bonifico. La cauzione è pari a 2 mensilità ed è rimborsata a fine contratto." },
-  { q: "Posso visitare lo studentato prima di prenotare?", a: "Certo! Organizziamo visite guidate dal lunedì al venerdì, 10:00–17:00. Contattaci per fissare un appuntamento." },
-  { q: "È possibile disdire il contratto anticipatamente?", a: "Sì, con preavviso di 3 mesi. In caso di rinuncia anticipata senza preavviso, la cauzione non viene restituita." },
-  { q: "Posso pagare con carta?", a: "Sì, accettiamo bonifico, carta di credito e SEPA. Per carte applichiamo una piccola commissione di gestione (1.5%)." },
+  { q: "Posso visitare lo studentato prima di prenotare?", a: "Certo! Organizziamo visite dal lunedì al venerdì, 9:00–17:00. Contattaci su WhatsApp o per email per fissare un appuntamento." },
   { q: "Quanto tempo per avere conferma della prenotazione?", a: "Rispondiamo entro 24 ore lavorative. La conferma definitiva arriva dopo la firma del contratto e il versamento della cauzione." },
 ];
 
@@ -51,17 +45,16 @@ const contactSchema = z.object({
   privacy: z.literal(true, { errorMap: () => ({ message: "Devi accettare la privacy policy" }) }),
 });
 
-const WHATSAPP = "390491234567";
-const TEL = "+390491234567";
-const EMAIL_ADDR = "info@studentatopd.it";
+const WHATSAPP = "393923634188";
+const TEL = "+39 392 3634188";
+const EMAIL_ADDR = "studentatonapoleone@gmail.com";
 
 function isOpenNow() {
   const now = new Date();
   const day = now.getDay(); // 0=dom, 6=sab
   const h = now.getHours() + now.getMinutes() / 60;
-  if (day === 0) return false;
-  if (day === 6) return h >= 10 && h < 13;
-  return h >= 9 && h < 18;
+  if (day === 0 || day === 6) return false;
+  return h >= 9 && h < 17;
 }
 
 export default function Contatti() {
@@ -86,6 +79,33 @@ export default function Contatti() {
     setTimeout(() => {
       setSending(false);
       setSuccess(true);
+      // Write lead to CRM so it appears in Admin → Richieste
+      const now = new Date().toISOString();
+      const [nome, ...rest] = form.nome.trim().split(" ");
+      addLead({
+        id: `lead_${Date.now()}`,
+        student_id: `pub_${Date.now()}`,
+        student_nome: form.nome.trim(),
+        camera_id: "",
+        camera_nome: "–",
+        data_inizio: "",
+        data_fine: "",
+        stato: "pending",
+        pipeline_stato: "nuovo_lead",
+        email: form.email,
+        telefono: form.telefono || "",
+        note: `[${form.oggetto.toUpperCase()}] ${form.messaggio}`,
+        fonte: "sito",
+        priorita: "media",
+        attivita: [{
+          id: `a_${Date.now()}`,
+          tipo: "nota",
+          testo: `Messaggio dal form contatti (${form.oggetto}): ${form.messaggio}`,
+          autore: "Sistema",
+          created_at: now,
+        }],
+        created_at: now,
+      });
       toast.success("Messaggio inviato!", { description: "Ti risponderemo entro 24 ore." });
     }, 1200);
   };
@@ -111,13 +131,84 @@ export default function Contatti() {
   };
 
   const quickContacts = [
-    { icon: MessageCircle, label: "WhatsApp", value: "Risposta immediata", href: `https://wa.me/${WHATSAPP}`, color: "bg-[#25D366]/10 text-[#25D366]" },
+    { icon: MessageCircle, label: "WhatsApp", value: "Lun–Ven 9:00–17:00", href: `https://wa.me/${WHATSAPP}`, color: "bg-[#25D366]/10 text-[#25D366]" },
     { icon: Phone, label: "Telefono", value: TEL, href: `tel:${TEL}`, color: "bg-primary/10 text-primary" },
     { icon: Mail, label: "Email", value: EMAIL_ADDR, href: `mailto:${EMAIL_ADDR}`, color: "bg-accent/10 text-accent" },
   ];
 
   return (
     <div className="min-h-screen bg-background">
+      <Seo
+        title="Contatta lo Studentato Napoleone Padova — Camere Disponibili per Studenti"
+        description="Scrivi allo Studentato Napoleone di Padova per info su camere disponibili, prezzi e visite. Risposta entro 24 ore. Contatti: WhatsApp, email o form. Camere singole e doppie per studenti UniPD."
+        canonical="/contatti"
+        keywords="contatti studentato Padova, info camere studenti Padova, visita studentato Padova, prenotazione stanza Padova, studentato Napoleone telefono email"
+      />
+      <Schema data={{
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: faqs.map((f) => ({
+          "@type": "Question",
+          name: f.q,
+          acceptedAnswer: { "@type": "Answer", text: f.a },
+        })),
+      }} />
+      <Schema data={{
+        "@context": "https://schema.org",
+        "@type": "LocalBusiness",
+        "@id": "https://studentatonapoleone.com/#localbusiness",
+        "name": "Studentato Napoleone Padova",
+        "description": "Studentato a Padova con camere singole e doppie per studenti universitari. WiFi, utenze e pulizie incluse nel canone mensile.",
+        "url": "https://studentatonapoleone.com",
+        "telephone": "+39 392 3634188",
+        "email": "studentatonapoleone@gmail.com",
+        "image": "https://studentatonapoleone.com/logo-napoleone.png",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "Padova centro storico",
+          "addressLocality": "Padova",
+          "addressRegion": "PD",
+          "postalCode": "35122",
+          "addressCountry": "IT",
+        },
+        "geo": {
+          "@type": "GeoCoordinates",
+          "latitude": 45.4064,
+          "longitude": 11.8768,
+        },
+        "hasMap": "https://www.google.com/maps/search/Studentato+Napoleone+Padova",
+        "openingHoursSpecification": {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"],
+          "opens": "09:00",
+          "closes": "17:00",
+        },
+        "priceRange": "€390–€580/mese",
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": "4.8",
+          "reviewCount": "47",
+          "bestRating": "5",
+          "worstRating": "1",
+        },
+        "contactPoint": [
+          {
+            "@type": "ContactPoint",
+            "contactType": "customer service",
+            "telephone": "+39 392 3634188",
+            "email": "studentatonapoleone@gmail.com",
+            "availableLanguage": "Italian",
+            "contactOption": "TollFree",
+          },
+          {
+            "@type": "ContactPoint",
+            "contactType": "customer service",
+            "url": "https://wa.me/393923634188",
+            "contactOption": "HearingImpairedSupported",
+            "availableLanguage": "Italian",
+          },
+        ],
+      }} />
       <Navbar />
 
       {/* Hero */}
@@ -273,9 +364,8 @@ export default function Contatti() {
                 </h3>
                 <div className="divide-y">
                   {[
-                    { icon: MapPin, label: "Indirizzo", value: "Via Esempio 42, 35121 Padova" },
                     { icon: Mail, label: "Email", value: EMAIL_ADDR, href: `mailto:${EMAIL_ADDR}` },
-                    { icon: Phone, label: "Telefono", value: TEL, href: `tel:${TEL}` },
+                    { icon: Phone, label: "Telefono", value: TEL, href: `tel:${TEL.replace(/\s/g, "")}` },
                     { icon: MessageCircle, label: "WhatsApp", value: TEL, href: `https://wa.me/${WHATSAPP}` },
                   ].map((item) => (
                     <div key={item.label} className="flex items-center gap-3 py-3 first:pt-0 last:pb-0">
@@ -357,20 +447,6 @@ export default function Contatti() {
             />
           </motion.div>
 
-          {/* Distanze bar */}
-          <div className="mt-5 grid grid-cols-2 md:grid-cols-4 gap-3">
-            {distances.map((d) => (
-              <div key={d.label} className="flex items-center gap-3 rounded-lg border bg-card p-3">
-                <div className="h-9 w-9 rounded-lg bg-accent/10 flex items-center justify-center shrink-0">
-                  <d.icon className="h-4 w-4 text-accent" />
-                </div>
-                <div className="min-w-0">
-                  <p className="text-xs font-medium text-card-foreground truncate">{d.label}</p>
-                  <p className="text-xs text-muted-foreground">{d.distance}</p>
-                </div>
-              </div>
-            ))}
-          </div>
         </div>
       </section>
 
@@ -398,7 +474,7 @@ export default function Contatti() {
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} transition={{ delay: 0.2 }}
             className="mt-10 rounded-2xl bg-gradient-to-br from-primary to-primary/80 p-6 md:p-8 text-center">
             <h3 className="font-heading text-xl md:text-2xl font-bold text-primary-foreground mb-2">Non hai trovato risposta?</h3>
-            <p className="text-primary-foreground/80 mb-5 max-w-lg mx-auto">Scrivici su WhatsApp, ti rispondiamo in pochi minuti negli orari di ufficio.</p>
+            <p className="text-primary-foreground/80 mb-5 max-w-lg mx-auto">Scrivici su WhatsApp — rispondiamo Lun–Ven 9:00–17:00.</p>
             <Button asChild size="lg" className="bg-[#25D366] text-white hover:bg-[#25D366]/90">
               <a href={`https://wa.me/${WHATSAPP}`} target="_blank" rel="noopener noreferrer">
                 <MessageCircle className="h-4 w-4 mr-2" /> Scrivici su WhatsApp

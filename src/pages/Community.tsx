@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Layout } from "@/components/Layout";
+import { Seo } from "@/components/Seo";
 import { Button } from "@/components/ui/button";
 import {
   Sparkles,
@@ -152,6 +153,11 @@ const heightClass: Record<string, string> = {
 
 const Community = () => (
   <Layout>
+    <Seo
+      title="Community Studenti Padova — Vita nello Studentato Napoleone"
+      description="Entra nella community dello Studentato Napoleone di Padova. Eventi, aperitivi, workshop e una rete di studenti universitari da tutta Italia. Non solo una stanza — una casa."
+      canonical="/community"
+    />
     <PageTransition>
       {/* Hero immersivo */}
       <section className="relative min-h-[60vh] md:min-h-[70vh] flex items-center overflow-hidden">

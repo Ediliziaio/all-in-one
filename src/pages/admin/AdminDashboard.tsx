@@ -1,18 +1,23 @@
-import { BedDouble, CalendarCheck, Headphones, Users, TrendingUp, ArrowUpRight } from "lucide-react";
+import { useMemo } from "react";
+import { BedDouble, CalendarCheck, Headphones, TrendingUp, ArrowUpRight, AlertTriangle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { mockRichieste, mockTickets, mockProfiles } from "@/data/mockData";
-import { rooms } from "@/data/rooms";
+import { mockFatture, FATTURE_KEY, type Fattura } from "@/data/mockData";
+import { loadRooms } from "@/data/roomsStore";
+import { loadLeads } from "@/data/leadsStore";
+import { loadAllTickets } from "@/data/ticketsStore";
+import { formatEUR } from "@/lib/csv";
 import { PageTransition, FadeIn, StaggerContainer, StaggerItem, HoverCard, CountUp } from "@/components/motion/MotionWrappers";
 
-const kpis = [
-  { label: "Camere disponibili", value: `${rooms.filter(r => r.available).length}/${rooms.length}`, icon: BedDouble, color: "text-accent" },
-  { label: "Richieste in attesa", value: mockRichieste.filter(p => p.stato === "pending").length.toString(), icon: CalendarCheck, color: "text-yellow-500" },
-  { label: "Ticket aperti", value: mockTickets.filter(t => t.stato !== "risolto").length.toString(), icon: Headphones, color: "text-red-500" },
-  { label: "Studenti attivi", value: mockProfiles.filter(p => p.role === "student").length.toString(), icon: Users, color: "text-green-500" },
-];
+function loadFatture(): Fattura[] {
+  try {
+    const s = localStorage.getItem(FATTURE_KEY);
+    if (s) return JSON.parse(s) as Fattura[];
+  } catch {}
+  return mockFatture;
+}
 
 const occupancy = [
   { month: "Gen", value: 85 }, { month: "Feb", value: 88 }, { month: "Mar", value: 90 },
@@ -20,8 +25,21 @@ const occupancy = [
 ];
 
 export default function AdminDashboard() {
+  // Read live state from localStorage stores on every mount
+  const rooms = useMemo(() => loadRooms(), []);
+  const leads = useMemo(() => loadLeads(), []);
+  const allTickets = useMemo(() => loadAllTickets(), []);
+  const fatture = useMemo(() => loadFatture(), []);
+
+  const kpis = useMemo(() => [
+    { label: "Camere disponibili", value: `${rooms.filter(r => r.available).length}/${rooms.length}`, icon: BedDouble, color: "text-accent" },
+    { label: "Richieste in attesa", value: leads.filter(p => p.stato === "pending").length.toString(), icon: CalendarCheck, color: "text-yellow-500" },
+    { label: "Ticket aperti", value: allTickets.filter(t => t.stato !== "risolto").length.toString(), icon: Headphones, color: "text-red-500" },
+    { label: "Fatture scadute", value: fatture.filter(f => f.stato === "scaduta" || f.stato === "in_ritardo").length.toString(), icon: AlertTriangle, color: "text-orange-500" },
+  ], [leads, allTickets, rooms, fatture]);
+
   return (
-    <PageTransition className="p-6 space-y-6">
+    <PageTransition className="p-4 md:p-6 space-y-4 md:space-y-6">
       <FadeIn>
         <h1 className="font-heading text-2xl font-bold text-foreground">Dashboard</h1>
         <p className="text-sm text-muted-foreground">Panoramica generale dello studentato</p>
@@ -75,9 +93,9 @@ export default function AdminDashboard() {
               <CardContent>
                 <div className="space-y-3">
                   {[
-                    { label: "Singole", count: rooms.filter(r => r.type === "singola").length, pct: 33 },
-                    { label: "Singole Plus", count: rooms.filter(r => r.type === "singola-plus").length, pct: 33 },
-                    { label: "Doppie", count: rooms.filter(r => r.type === "doppia").length, pct: 33 },
+                    { label: "Singole",      count: rooms.filter(r => r.type === "singola").length,       pct: Math.round(rooms.filter(r => r.type === "singola").length / rooms.length * 100) },
+                    { label: "Singole Plus", count: rooms.filter(r => r.type === "singola-plus").length,  pct: Math.round(rooms.filter(r => r.type === "singola-plus").length / rooms.length * 100) },
+                    { label: "Doppie",       count: rooms.filter(r => r.type === "doppia").length,        pct: Math.round(rooms.filter(r => r.type === "doppia").length / rooms.length * 100) },
                   ].map((t) => (
                     <div key={t.label} className="space-y-1">
                       <div className="flex justify-between text-sm"><span>{t.label}</span><span className="font-medium">{t.count}</span></div>
@@ -102,7 +120,7 @@ export default function AdminDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {mockRichieste.slice(0, 4).map((p) => (
+                  {leads.slice(0, 4).map((p) => (
                     <div key={p.id} className="flex items-center justify-between text-sm">
                       <div>
                         <p className="font-medium">{p.student_nome}</p>
@@ -128,7 +146,7 @@ export default function AdminDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {mockTickets.map((t) => (
+                  {allTickets.slice(0, 5).map((t) => (
                     <div key={t.id} className="flex items-center justify-between text-sm">
                       <div>
                         <p className="font-medium">{t.titolo}</p>

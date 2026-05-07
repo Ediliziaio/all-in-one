@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Skeleton } from "@/components/ui/skeleton";
 import { Search, FileText, BookOpen, Smartphone, PiggyBank, Bike, BookX } from "lucide-react";
 import { mockGuide, type Guida } from "@/data/mockData";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { PageTransition, FadeIn, StaggerContainer, StaggerItem, HoverCard } from "@/components/motion/MotionWrappers";
 
 const iconMap: Record<string, React.ElementType> = { FileText, BookOpen, Smartphone, PiggyBank, Bike };
@@ -16,13 +17,14 @@ export default function Guide() {
   const [cat, setCat] = useState("Tutte");
   const [selected, setSelected] = useState<Guida | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [guide] = useLocalStorage<Guida[]>("sn_guide_v1", mockGuide);
 
   useEffect(() => {
     const t = setTimeout(() => setIsLoading(false), 800);
     return () => clearTimeout(t);
   }, []);
 
-  const filtered = mockGuide.filter((g) =>
+  const filtered = guide.filter((g) =>
     g.attiva && (cat === "Tutte" || g.categoria === cat) && g.titolo.toLowerCase().includes(search.toLowerCase())
   );
 

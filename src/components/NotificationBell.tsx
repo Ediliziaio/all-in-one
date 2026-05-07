@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -13,7 +13,7 @@ const tipoIcon: Record<string, string> = {
 };
 
 export function NotificationBell() {
-  const [notifications, setNotifications] = useState(mockNotifications);
+  const [notifications, setNotifications] = useLocalStorage("sn_notifications_v1", mockNotifications);
   const unread = notifications.filter((n) => !n.letta).length;
 
   const markAllRead = () => {

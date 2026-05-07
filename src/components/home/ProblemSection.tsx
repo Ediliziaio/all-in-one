@@ -27,8 +27,7 @@ export function ProblemSection() {
             <span className="text-destructive">può essere complicato.</span>
           </h2>
           <p className="text-muted-foreground mt-4 max-w-2xl mx-auto text-lg">
-            Ogni anno tanti studenti si ritrovano a fare i conti con situazioni che rendono
-            la vita universitaria più difficile del necessario.
+            Ogni anno migliaia di studenti arrivano a Padova e si scontrano con gli stessi ostacoli: bollette impreviste, proprietari spariti e contratti che nascondono sorprese.
           </p>
         </motion.div>
 
@@ -69,7 +68,7 @@ export function ProblemSection() {
             <ArrowDown className="h-5 w-5 text-primary" />
           </motion.div>
           <p className="text-center text-xl md:text-2xl font-bold text-foreground">
-            Noi abbiamo eliminato <span className="text-primary">ognuno</span> di questi problemi.
+            Allo Studentato Napoleone abbiamo risolto <span className="text-primary">ognuno</span> di questi problemi.
           </p>
         </motion.div>
       </div>

@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Layout } from "@/components/Layout";
+import { Seo } from "@/components/Seo";
+import { Schema } from "@/components/Schema";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -9,7 +11,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { getRoomById, getRoomTypeLabel, rooms } from "@/data/rooms";
+import { getRoomTypeLabel } from "@/data/rooms";
+import { loadRooms, getRoomByIdLive } from "@/data/roomsStore";
 import { PageTransition, FadeIn, HoverCard as MotionHoverCard } from "@/components/motion/MotionWrappers";
 import { toast } from "sonner";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -25,7 +28,7 @@ const featureIcon = (f: string) => {
   if (k.includes("wifi")) return Wifi;
   if (k.includes("bagno")) return Bath;
   if (k.includes("aria") || k.includes("clima")) return Wind;
-  if (k.includes("scrivania") || k.includes("studio")) return BedDouble;
+  if (k.includes("scrivania") || k.includes("studio")) return GraduationCap;
   if (k.includes("tv")) return Sparkles;
   if (k.includes("balcone") || k.includes("vista")) return Sun;
   return Check;
@@ -33,7 +36,7 @@ const featureIcon = (f: string) => {
 
 const CameraDettaglio = () => {
   const { id } = useParams<{ id: string }>();
-  const room = getRoomById(id || "");
+  const room = getRoomByIdLive(id || "");
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
   const [bookingOpen, setBookingOpen] = useState(false);
@@ -67,7 +70,7 @@ const CameraDettaglio = () => {
     );
   }
 
-  const similar = rooms.filter((r) => r.id !== room.id && r.type === room.type).slice(0, 2);
+  const similar = loadRooms().filter((r) => r.id !== room.id && r.type === room.type).slice(0, 2);
 
   const openLightbox = (index: number) => {
     setLightboxIndex(index);
@@ -86,6 +89,54 @@ const CameraDettaglio = () => {
 
   return (
     <Layout>
+      <Seo
+        title={`${room.name} — Affitto Studenti Padova ${room.price}€/mese`}
+        description={`${room.name}: camera ${getRoomTypeLabel(room.type).toLowerCase()} in affitto a Padova per studenti universitari. €${room.price}/mese tutto incluso (WiFi, utenze). ${room.sqm}m², piano ${room.floor}. Servizi: ${room.features.slice(0, 3).join(", ")}. ${room.available ? "Disponibile ora" : "Disponibile prossimamente"}.`}
+        canonical={`/camere/${room.id}`}
+        keywords={`${room.name} Padova, affitto ${getRoomTypeLabel(room.type).toLowerCase()} Padova studenti, camera ${room.type} studentato Padova €${room.price}`}
+      />
+      <Schema data={{
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Home", item: "https://studentatonapoleone.com/" },
+          { "@type": "ListItem", position: 2, name: "Camere", item: "https://studentatonapoleone.com/camere" },
+          { "@type": "ListItem", position: 3, name: room.name, item: `https://studentatonapoleone.com/camere/${room.id}` },
+        ],
+      }} />
+      <Schema data={{
+        "@context": "https://schema.org",
+        "@type": "Accommodation",
+        name: room.name,
+        description: room.description,
+        url: `https://studentatonapoleone.com/camere/${room.id}`,
+        floorSize: { "@type": "QuantitativeValue", value: room.sqm, unitCode: "MTK" },
+        numberOfRooms: 1,
+        amenityFeature: room.features.map((f) => ({
+          "@type": "LocationFeatureSpecification",
+          name: f,
+          value: true,
+        })),
+        containedInPlace: {
+          "@type": "LodgingBusiness",
+          name: "Studentato Napoleone Padova",
+          url: "https://studentatonapoleone.com",
+        },
+        offers: {
+          "@type": "Offer",
+          price: room.price,
+          priceCurrency: "EUR",
+          availability: room.available
+            ? "https://schema.org/InStock"
+            : "https://schema.org/OutOfStock",
+          priceSpecification: {
+            "@type": "UnitPriceSpecification",
+            price: room.price,
+            priceCurrency: "EUR",
+            unitText: "mese",
+          },
+        },
+      }} />
       <PageTransition>
         <section className="py-6 md:py-8">
           <div className="container">
@@ -196,9 +247,9 @@ const CameraDettaglio = () => {
                     <ul className="space-y-3">
                       {[
                         { icon: Zap, label: "Utenze", desc: "Luce, gas, acqua sempre incluse" },
-                        { icon: Wifi, label: "Internet Fibra", desc: "1 Gbps in tutta la struttura" },
-                        { icon: Droplets, label: "Pulizie aree comuni", desc: "Bisettimanali" },
-                        { icon: Shield, label: "Manutenzione", desc: "Interventi entro 48 ore" },
+                        { icon: Wifi, label: "WiFi incluso", desc: "Connessione wireless in tutta la struttura" },
+                        { icon: Droplets, label: "Pulizie aree comuni", desc: "Incluse nel canone" },
+                        { icon: Shield, label: "Manutenzione", desc: "Segnalazione via WhatsApp" },
                       ].map((item) => (
                         <li key={item.label} className="flex items-start gap-3 p-3 rounded-lg border bg-card/40">
                           <div className="h-9 w-9 rounded-lg bg-success/10 flex items-center justify-center shrink-0">
@@ -217,7 +268,7 @@ const CameraDettaglio = () => {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {[
                         { icon: Moon, label: "Silenzio dalle 22:00", ok: true },
-                        { icon: Users, label: "Ospiti consentiti (max 1 notte)", ok: true },
+                        { icon: Users, label: "Ospiti consentiti (solo di giorno)", ok: true },
                         { icon: Cigarette, label: "Vietato fumare", ok: false },
                         { icon: PawPrint, label: "Animali non ammessi", ok: false },
                       ].map((r) => (
@@ -280,8 +331,8 @@ const CameraDettaglio = () => {
                     <Button className="w-full text-base font-semibold" size="lg" onClick={() => setBookingOpen(true)}>
                       Richiedi Prenotazione
                     </Button>
-                    <Button variant="outline" className="w-full" size="lg">
-                      Prenota una visita
+                    <Button variant="outline" className="w-full" size="lg" asChild>
+                      <Link to="/contatti">Prenota una visita</Link>
                     </Button>
 
                     <div className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
@@ -289,7 +340,7 @@ const CameraDettaglio = () => {
                       Risposta entro 24 ore lavorative
                     </div>
 
-                    <p className="text-xs text-muted-foreground text-center">Tutti i servizi inclusi. Nessun costo nascosto.</p>
+                    <p className="text-xs text-muted-foreground text-center">Utenze e WiFi inclusi. Lavanderia disponibile a pagamento.</p>
                   </div>
                 </div>
               </FadeIn>

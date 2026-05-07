@@ -1,11 +1,11 @@
 import { Link } from "react-router-dom";
 import { Layout } from "@/components/Layout";
+import { Seo } from "@/components/Seo";
 import { Button } from "@/components/ui/button";
 import {
   Wifi,
   WashingMachine,
   UtensilsCrossed,
-  Dumbbell,
   Shield,
   BookOpen,
   CheckCircle,
@@ -21,90 +21,79 @@ import {
   Heart,
 } from "lucide-react";
 import { PageTransition, FadeIn, StaggerContainer, StaggerItem, CountUp } from "@/components/motion/MotionWrappers";
+import { Schema } from "@/components/Schema";
 
 const heroStats = [
-  { value: 12, suffix: "+", label: "servizi inclusi" },
-  { value: 24, suffix: "/7", label: "sempre disponibili" },
+  { value: 5, suffix: "", label: "servizi inclusi" },
+  { value: 1, suffix: "", label: "sala studio 24/7" },
   { value: 0, prefix: "€", label: "costi extra" },
 ];
 
 const highlights = [
-  { icon: Wifi, label: "WiFi 1Gbps" },
-  { icon: Dumbbell, label: "Palestra" },
+  { icon: Wifi, label: "WiFi incluso" },
   { icon: WashingMachine, label: "Lavanderia" },
-  { icon: UtensilsCrossed, label: "Cucina" },
-  { icon: BookOpen, label: "Sale studio" },
-  { icon: Shield, label: "Sicurezza" },
+  { icon: UtensilsCrossed, label: "Cucina comune" },
+  { icon: BookOpen, label: "Sala studio" },
+  { icon: Shield, label: "Videosorveglianza" },
 ];
 
 const services = [
   {
     icon: Wifi,
     title: "WiFi che non ti lascia mai",
-    description: "Lezioni online, Netflix, videochiamate: tutto senza lag.",
+    description: "Lezioni online, videochiamate e streaming in ogni stanza e nelle aree comuni.",
     image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&h=500&fit=crop",
-    bullets: ["Fibra 1Gbps in ogni camera", "Copertura totale aree comuni", "Rete protetta WPA3"],
+    bullets: ["WiFi incluso in ogni camera", "Copertura totale aree comuni", "Rete protetta con password"],
   },
   {
     icon: WashingMachine,
-    title: "Lava quando vuoi",
-    description: "Lavatrici e asciugatrici 24/7, prenotabili dall'app.",
+    title: "Lavanderia disponibile",
+    description: "2 lavatrici + 2 asciugatrici con detersivo fornito. Servizio a pagamento.",
     image: "https://images.unsplash.com/photo-1545173168-9f1947eebb7f?w=800&h=500&fit=crop",
-    bullets: ["6 lavatrici + 4 asciugatrici", "Prenotazione via app", "Detersivo eco fornito"],
+    bullets: ["2 lavatrici + 2 asciugatrici", "Detersivo fornito", "Servizio a pagamento"],
   },
   {
     icon: UtensilsCrossed,
-    title: "Cucina come a casa",
-    description: "Piani induzione, forno, microonde e frigo su ogni piano.",
+    title: "Cucine comuni attrezzate",
+    description: "3 cucine comuni attrezzate. Frigo privato in ogni stanza.",
     image: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&h=500&fit=crop",
-    bullets: ["Cucina attrezzata per piano", "Frigo personale per studente", "Pulizia quotidiana inclusa"],
-  },
-  {
-    icon: Dumbbell,
-    title: "Allenati sotto casa",
-    description: "Cardio e pesi liberi inclusi nel canone, dalle 6 alle 23.",
-    image: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&h=500&fit=crop",
-    bullets: ["Tapis, ellittiche, manubri", "Aperta 6:00 - 23:00", "Spogliatoi con docce"],
+    bullets: ["3 cucine comuni con attrezzatura completa", "Frigorifero privato in ogni stanza", "Pulizia delle parti comuni inclusa"],
   },
   {
     icon: Shield,
-    title: "Sicurezza totale",
-    description: "Badge elettronico, telecamere e portineria. Sempre al sicuro.",
+    title: "Sicurezza garantita",
+    description: "Videosorveglianza attiva per la tua tranquillità e quella dei tuoi genitori.",
     image: "https://images.unsplash.com/photo-1558002038-1055907df827?w=800&h=500&fit=crop",
-    bullets: ["Accesso solo con badge", "Videosorveglianza H24", "Portineria diurna"],
+    bullets: ["Videosorveglianza delle aree comuni"],
   },
   {
     icon: BookOpen,
-    title: "Sessione d'esame? Ci pensiamo noi",
-    description: "Sale silenziose prenotabili con prese, luce perfetta e ergonomia.",
+    title: "Sala studio 24/7",
+    description: "Uno spazio silenzioso accessibile in qualsiasi momento, anche di notte.",
     image: "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=800&h=500&fit=crop",
-    bullets: ["3 sale studio prenotabili", "Wi-Fi dedicato", "Aperte fino a mezzanotte"],
+    bullets: ["1 sala studio accessibile 24/7", "WiFi dedicato", "Prese e illuminazione ottimale"],
   },
 ];
 
 const dayInLife = [
-  { time: "07:00", icon: Dumbbell, label: "Palestra", desc: "Risveglio attivo prima delle lezioni" },
+  { time: "08:00", icon: UtensilsCrossed, label: "Cucina", desc: "Colazione in cucina comune prima delle lezioni" },
   { time: "09:00", icon: BookOpen, label: "Sala studio", desc: "Sessione concentrata pre-esame" },
   { time: "13:00", icon: UtensilsCrossed, label: "Cucina", desc: "Pranzo veloce con i coinquilini" },
   { time: "18:00", icon: WashingMachine, label: "Lavanderia", desc: "Lavatrice mentre studi" },
-  { time: "21:00", icon: Coffee, label: "Lounge", desc: "Aperitivo in area comune" },
+  { time: "21:00", icon: Coffee, label: "Lounge", desc: "Relax in area comune" },
 ];
 
 const parentTrust = [
   { icon: ShieldCheck, title: "Contratto regolare", desc: "Locazione registrata, conforme alla normativa." },
-  { icon: Clock, title: "Assistenza sempre disponibile", desc: "Reperibilità per emergenze, anche nei weekend." },
+  { icon: Clock, title: "Supporto via WhatsApp", desc: "Rispondiamo su WhatsApp, Lun–Ven 9:00–17:00." },
   { icon: FileText, title: "Trasparenza totale", desc: "Prezzo chiaro all'ingresso. Quello che vedi è quello che paghi." },
   { icon: Heart, title: "Cura quotidiana", desc: "Pulizia aree comuni, manutenzione e supporto inclusi." },
 ];
 
 const faqs = [
   {
-    q: "Posso disdire il contratto in anticipo?",
-    a: "Sì. Basta dare 30 giorni di preavviso. Nessuna penale, nessun trucco.",
-  },
-  {
     q: "Posso ricevere ospiti?",
-    a: "Certo. Gli amici sono benvenuti negli orari diurni e con registrazione in portineria. Per il pernottamento basta avvisarci.",
+    a: "Sì, durante il giorno. Il pernottamento di ospiti non è consentito.",
   },
   {
     q: "Cosa succede se si rompe qualcosa?",
@@ -112,12 +101,27 @@ const faqs = [
   },
   {
     q: "Sono coperto da assicurazione?",
-    a: "Sì. La struttura è coperta da polizza RC e i tuoi effetti personali da assicurazione base inclusa.",
+    a: "La struttura è coperta da polizza RC. Per la copertura dei tuoi effetti personali ti consigliamo di stipulare una polizza individuale.",
   },
 ];
 
 const Servizi = () => (
   <Layout>
+    <Seo
+      title="Servizi Inclusi Studentato Padova — WiFi, Cucina, Sala Studio 24/7"
+      description="Allo Studentato Napoleone di Padova trovi WiFi fibra, 3 cucine comuni, sala studio 24/7, lavanderia, videosorveglianza e pulizie incluse nel canone. Un prezzo, zero bollette extra. Scopri tutto."
+      canonical="/servizi"
+      keywords="servizi studentato Padova, WiFi incluso affitto Padova, utenze incluse affitto studenti, sala studio 24 ore Padova, cucina comune studentato Padova"
+    />
+    <Schema data={{
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      mainEntity: faqs.map((f) => ({
+        "@type": "Question",
+        name: f.q,
+        acceptedAnswer: { "@type": "Answer", text: f.a },
+      })),
+    }} />
     <PageTransition>
       {/* Hero */}
       <section className="relative py-12 md:py-24 overflow-hidden">
@@ -136,11 +140,11 @@ const Servizi = () => (
               Tutto incluso, sempre
             </div>
             <h1 className="font-heading text-3xl sm:text-4xl md:text-6xl font-bold text-foreground max-w-2xl leading-tight">
-              I servizi che servono.<br />
-              <span className="text-accent">Niente</span> di superfluo.
+              Tutto Incluso nel Canone.<br />
+              <span className="text-accent">Zero</span> Bollette Extra.
             </h1>
             <p className="text-muted-foreground mt-4 text-base md:text-lg max-w-xl">
-              12+ servizi pensati per la vita universitaria. Un canone, zero sorprese.
+              WiFi fibra, cucina comune, sala studio 24/7, lavanderia e pulizie. Un solo prezzo mensile, nessuna sorpresa.
             </p>
           </FadeIn>
 
@@ -180,8 +184,8 @@ const Servizi = () => (
         <div className="container">
           <FadeIn>
             <div className="text-center mb-12">
-              <h2 className="font-heading text-3xl md:text-4xl font-bold text-foreground">Cosa trovi qui</h2>
-              <p className="text-muted-foreground mt-3">Servizi reali, non un brochure di promesse.</p>
+              <h2 className="font-heading text-3xl md:text-4xl font-bold text-foreground">Cosa include il canone</h2>
+              <p className="text-muted-foreground mt-3">Ogni servizio è incluso nel canone mensile, senza costi aggiuntivi.</p>
             </div>
           </FadeIn>
 
@@ -231,7 +235,7 @@ const Servizi = () => (
                 <Sun className="h-3.5 w-3.5" />
                 Una giornata tipo
               </div>
-              <h2 className="font-heading text-3xl md:text-4xl font-bold text-foreground">Come usi i servizi durante la giornata</h2>
+              <h2 className="font-heading text-3xl md:text-4xl font-bold text-foreground">Una giornata tipo allo Studentato Napoleone</h2>
               <p className="text-muted-foreground mt-3">Dalla sveglia alla buonanotte, tutto quello che serve è qui.</p>
             </div>
           </FadeIn>
@@ -283,10 +287,10 @@ const Servizi = () => (
                   Per i genitori
                 </div>
                 <h2 className="font-heading text-3xl md:text-4xl font-bold text-foreground">
-                  Sappiamo che spesso siete voi a cercare
+                  Per i genitori che cercano il meglio
                 </h2>
                 <p className="text-muted-foreground mt-3 mb-8">
-                  Vostro figlio è la priorità. La nostra è farvi stare tranquilli.
+                  Sappiamo che spesso siete voi a scegliere l'alloggio. Ecco perché vi diciamo esattamente cosa aspettarvi.
                 </p>
                 <StaggerContainer className="space-y-4">
                   {parentTrust.map((item) => (
@@ -318,7 +322,7 @@ const Servizi = () => (
                 <HelpCircle className="h-3.5 w-3.5" />
                 Le domande più frequenti
               </div>
-              <h2 className="font-heading text-3xl md:text-4xl font-bold text-foreground">Risposte chiare, niente sorprese</h2>
+              <h2 className="font-heading text-3xl md:text-4xl font-bold text-foreground">Domande frequenti sullo studentato</h2>
             </div>
           </FadeIn>
           <StaggerContainer className="space-y-3">
@@ -343,11 +347,11 @@ const Servizi = () => (
       <FadeIn>
         <section className="py-20 bg-gradient-to-br from-primary to-primary/80 text-primary-foreground">
           <div className="container text-center">
-            <h2 className="font-heading text-3xl md:text-4xl font-bold">Pronto a trasferirti?</h2>
-            <p className="opacity-80 mt-3 max-w-md mx-auto">Scopri le camere disponibili e richiedi il tuo posto.</p>
+            <h2 className="font-heading text-3xl md:text-4xl font-bold">Pronto a trasferirti a Padova?</h2>
+            <p className="opacity-80 mt-3 max-w-md mx-auto">Guarda le camere disponibili e invia la tua richiesta. Ti rispondiamo entro 24 ore.</p>
             <div className="inline-flex items-center gap-2 mt-6 px-4 py-2 rounded-full bg-accent/90 text-accent-foreground text-sm font-medium">
               <CalendarHeart className="h-4 w-4" />
-              Posti limitati per Settembre 2025
+              Posti limitati per Settembre {new Date().getFullYear() + (new Date().getMonth() >= 8 ? 1 : 0)}
             </div>
             <div className="flex flex-wrap justify-center gap-3 mt-6">
               <Button size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90" asChild>
@@ -355,8 +359,7 @@ const Servizi = () => (
               </Button>
               <Button
                 size="lg"
-                variant="outline"
-                className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10"
+                className="bg-transparent border border-primary-foreground/60 text-primary-foreground hover:bg-primary-foreground/15"
                 asChild
               >
                 <Link to="/contatti">Richiedi info</Link>

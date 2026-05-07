@@ -1,4 +1,5 @@
 import { Layout } from "@/components/Layout";
+import { Seo } from "@/components/Seo";
 import { HeroSection } from "@/components/home/HeroSection";
 import { ProblemSection } from "@/components/home/ProblemSection";
 import { ServicesSection } from "@/components/home/ServicesSection";
@@ -6,10 +7,8 @@ import { RoomsPreview } from "@/components/home/RoomsPreview";
 import { HowItWorksSection } from "@/components/home/HowItWorksSection";
 import { GuaranteeSection } from "@/components/home/GuaranteeSection";
 import { TestimonialsSection } from "@/components/home/TestimonialsSection";
-import { CommunitySection } from "@/components/home/CommunitySection";
 import { UrgencySection } from "@/components/home/UrgencySection";
 import { AboutSection } from "@/components/home/AboutSection";
-import { MapSection } from "@/components/home/MapSection";
 import { WaveDivider, ZigzagDivider, DiagonalDivider } from "@/components/motion/MotionWrappers";
 
 type Variant = "wave" | "zigzag" | "diagonal";
@@ -40,6 +39,12 @@ const Divider = ({
 
 const Index = () => (
   <Layout>
+    <Seo
+      title="Alloggio Studenti Padova — Camere Singole e Doppie da €390/mese"
+      description="Studentato Napoleone a Padova: camere singole e doppie per studenti universitari vicino all'Università di Padova. WiFi, utenze, cucina e pulizie incluse. Posti disponibili per l'a.a. 2026-27. Richiedi ora."
+      canonical="/"
+      keywords="alloggio studenti Padova 2026, camere singole Padova università, affitto posto letto Padova, studentato vicino UniPD"
+    />
     <HeroSection />
     <Divider fill="hsl(var(--google-red) / 0.05)" variant="wave" />
     <ProblemSection />
@@ -53,14 +58,10 @@ const Index = () => (
     <GuaranteeSection />
     <Divider fill="hsl(var(--muted) / 0.3)" variant="diagonal" direction="right" />
     <TestimonialsSection />
-    <Divider fill="hsl(var(--google-blue) / 0.08)" variant="wave" />
-    <CommunitySection />
     <Divider fill="hsl(var(--primary))" variant="wave" flip />
     <UrgencySection />
     <Divider fill="hsl(var(--muted) / 0.3)" variant="wave" flip />
     <AboutSection />
-    <Divider fill="hsl(var(--muted) / 0.5)" variant="diagonal" direction="left" />
-    <MapSection />
   </Layout>
 );
 

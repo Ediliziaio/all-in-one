@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { addLead } from "@/data/leadsStore";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,8 +7,10 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
-import { rooms, getRoomTypeLabel } from "@/data/rooms";
+import { getRoomTypeLabel } from "@/data/rooms";
+import { loadRooms } from "@/data/roomsStore";
 import { currentUser } from "@/data/mockData";
+import { formatEUR } from "@/lib/csv";
 import { Check, ChevronRight, ChevronLeft, BedDouble, Calendar, ClipboardList, PartyPopper } from "lucide-react";
 import { toast } from "sonner";
 import { PageTransition, FadeIn } from "@/components/motion/MotionWrappers";
@@ -22,12 +25,17 @@ const steps = [
 export default function PrenotaCamera() {
   const [step, setStep] = useState(0);
   const [selectedRoom, setSelectedRoom] = useState<string | null>(null);
-  const [dataInizio, setDataInizio] = useState("2025-09-01");
-  const [dataFine, setDataFine] = useState("2026-07-31");
+  const nextSept = new Date().getMonth() >= 8
+    ? `${new Date().getFullYear() + 1}-09-01`
+    : `${new Date().getFullYear()}-09-01`;
+  const nextJuly = `${parseInt(nextSept.slice(0, 4)) + 1}-07-31`;
+  const [dataInizio, setDataInizio] = useState(nextSept);
+  const [dataFine, setDataFine] = useState(nextJuly);
   const [note, setNote] = useState("");
 
-  const available = rooms.filter((r) => r.available);
-  const room = rooms.find((r) => r.id === selectedRoom);
+  const allRooms = loadRooms();
+  const available = allRooms.filter((r) => r.available);
+  const room = allRooms.find((r) => r.id === selectedRoom);
 
   const canNext = () => {
     if (step === 0) return !!selectedRoom;
@@ -36,6 +44,34 @@ export default function PrenotaCamera() {
   };
 
   const handleConfirm = () => {
+    const now = new Date().toISOString();
+    if (room) {
+      addLead({
+        id: `lead_${Date.now()}`,
+        student_id: currentUser.id,
+        student_nome: `${currentUser.nome} ${currentUser.cognome}`,
+        camera_id: room.id,
+        camera_nome: room.name,
+        data_inizio: dataInizio,
+        data_fine: dataFine,
+        stato: "pending",
+        pipeline_stato: "nuovo_lead",
+        email: currentUser.email,
+        telefono: currentUser.telefono || "",
+        corso_universita: currentUser.corso,
+        note: note || undefined,
+        fonte: "sito",
+        priorita: "alta",
+        attivita: [{
+          id: `a_${Date.now()}`,
+          tipo: "nota",
+          testo: `Richiesta camera "${room.name}" dal portale studente. Periodo: ${dataInizio} → ${dataFine}.${note ? ` Note: ${note}` : ""}`,
+          autore: "Sistema",
+          created_at: now,
+        }],
+        created_at: now,
+      });
+    }
     setStep(3);
     toast.success("Richiesta inviata con successo!");
   };
@@ -127,7 +163,7 @@ export default function PrenotaCamera() {
                 <div>
                   <p className="font-heading font-semibold">{room.name}</p>
                   <p className="text-sm text-muted-foreground">{getRoomTypeLabel(room.type)} · {room.sqm}mq · Piano {room.floor}</p>
-                  <p className="font-bold text-primary mt-1">{room.price}€/mese</p>
+                  <p className="font-bold text-primary mt-1">{formatEUR(room.price)}/mese</p>
                 </div>
               </div>
               <Separator />

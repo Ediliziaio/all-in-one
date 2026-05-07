@@ -3,7 +3,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Copy, Gift } from "lucide-react";
-import { mockBuoni } from "@/data/mockData";
+import { mockBuoni, type Buono } from "@/data/mockData";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { useToast } from "@/hooks/use-toast";
 import { PageTransition, FadeIn, StaggerContainer, StaggerItem, HoverCard } from "@/components/motion/MotionWrappers";
 
@@ -13,13 +14,17 @@ export default function Buoni() {
   const [cat, setCat] = useState("Tutte");
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
+  const [buoni] = useLocalStorage<Buono[]>("sn_buoni_v1", mockBuoni);
 
   useEffect(() => {
     const t = setTimeout(() => setIsLoading(false), 800);
     return () => clearTimeout(t);
   }, []);
 
-  const filtered = mockBuoni.filter((b) => b.attivo && (cat === "Tutte" || b.categoria === cat));
+  const today = new Date().toISOString().slice(0, 10);
+  const filtered = buoni.filter(
+    (b) => b.attivo && b.scadenza >= today && (cat === "Tutte" || b.categoria === cat),
+  );
 
   return (
     <PageTransition className="p-4 md:p-6 space-y-5 md:space-y-6">

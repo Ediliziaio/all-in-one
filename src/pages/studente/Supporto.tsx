@@ -15,7 +15,8 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Plus, MessageSquare, Phone, Search, Send, Paperclip, Star, RotateCcw, CheckCircle2, Clock, Inbox } from "lucide-react";
-import { mockTickets, currentUser, type SupportTicket, type TicketMessage } from "@/data/mockData";
+import { currentUser, type SupportTicket, type TicketMessage } from "@/data/mockData";
+import { loadAllTickets, saveAllTickets } from "@/data/ticketsStore";
 import { useToast } from "@/hooks/use-toast";
 import { PageTransition, FadeIn, StaggerContainer, StaggerItem } from "@/components/motion/MotionWrappers";
 import { cn } from "@/lib/utils";
@@ -23,20 +24,22 @@ import { cn } from "@/lib/utils";
 const statoColors: Record<string, string> = {
   aperto: "bg-blue-100 text-blue-700 border-blue-200",
   in_corso: "bg-yellow-100 text-yellow-700 border-yellow-200",
+  attesa_studente: "bg-orange-100 text-orange-700 border-orange-200",
   risolto: "bg-green-100 text-green-700 border-green-200",
 };
 
 const statoLabel: Record<string, string> = {
   aperto: "Aperto",
   in_corso: "In corso",
+  attesa_studente: "In attesa tua",
   risolto: "Risolto",
 };
 
 const faqs = [
   { q: "Come connettermi al WiFi?", a: "Rete: 'Studentato-PD', password fornita al check-in. Se non funziona, riavvia il dispositivo o apri un ticket WiFi." },
   { q: "Il riscaldamento non funziona, cosa faccio?", a: "Controlla che il termostato in stanza sia attivo. Se il problema persiste, apri un ticket di Manutenzione con priorità alta." },
-  { q: "Quando vengono fatte le pulizie?", a: "Aree comuni: lunedì, mercoledì e venerdì mattina. Bagni privati: ogni due settimane su prenotazione." },
-  { q: "Ho perso le chiavi della stanza, cosa faccio?", a: "Contatta subito la reception via WhatsApp. La sostituzione costa 30€ e viene addebitata in fattura." },
+  { q: "Quando vengono fatte le pulizie?", a: "Aree comuni: lunedì, mercoledì e venerdì mattina. Per la tua stanza sei tu responsabile della pulizia." },
+  { q: "Ho perso le chiavi della stanza, cosa faccio?", a: "Contatta subito lo staff via WhatsApp. La sostituzione costa 30€ e viene addebitata in fattura." },
   { q: "Quando devo pagare la rata?", a: "Entro il 5 di ogni mese tramite bonifico SEPA. Trovi tutti i dettagli nella sezione Pagamenti." },
 ];
 
@@ -49,8 +52,9 @@ function relTime(iso: string) {
 }
 
 export default function Supporto() {
+  // Load ALL tickets from shared localStorage store, display only current student's
   const [tickets, setTickets] = useState<SupportTicket[]>(() =>
-    mockTickets.filter((t) => t.student_id === currentUser.id)
+    loadAllTickets().filter((t) => t.student_id === currentUser.id)
   );
   const [showForm, setShowForm] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -90,6 +94,14 @@ export default function Supporto() {
       })
       .sort((a, b) => (b.updatedAt || b.created_at).localeCompare(a.updatedAt || a.created_at));
   }, [tickets, filter, search]);
+
+  // Sync student tickets back into the shared store on every change
+  // so AdminSupporto sees new tickets and replies in real time (next page load)
+  useEffect(() => {
+    const all = loadAllTickets();
+    const others = all.filter((t) => t.student_id !== currentUser.id);
+    saveAllTickets([...tickets, ...others]);
+  }, [tickets]);
 
   useEffect(() => {
     if (selected && messagesEndRef.current) {
@@ -136,7 +148,7 @@ export default function Supporto() {
     setTickets((prev) => [newTicket, ...prev]);
     setShowForm(false);
     resetForm();
-    toast({ title: "Ticket inviato!", description: "Riceverai una risposta entro 24h." });
+    toast({ title: "Ticket inviato!", description: "Riceverai una risposta entro 24 ore lavorative (Lun–Ven 9–17)." });
   };
 
   const handleSendReply = () => {
@@ -291,10 +303,10 @@ export default function Supporto() {
             </div>
             <div className="flex-1 min-w-0">
               <p className="font-semibold text-sm">Hai bisogno subito di aiuto?</p>
-              <p className="text-xs text-muted-foreground">Scrivici su WhatsApp, rispondiamo entro 30 minuti</p>
+              <p className="text-xs text-muted-foreground">Scrivici su WhatsApp — disponibili Lun–Ven 9:00–17:00</p>
             </div>
             <Button asChild className="bg-green-600 hover:bg-green-700 text-white w-full sm:w-auto">
-              <a href="https://wa.me/393331234567" target="_blank" rel="noopener noreferrer">
+              <a href="https://wa.me/393923634188" target="_blank" rel="noopener noreferrer">
                 <Phone className="h-4 w-4 mr-2" /> WhatsApp
               </a>
             </Button>

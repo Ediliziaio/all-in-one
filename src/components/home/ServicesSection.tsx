@@ -1,13 +1,13 @@
 import { motion } from "framer-motion";
-import { Wifi, WashingMachine, UtensilsCrossed, Dumbbell, Zap, BookOpen } from "lucide-react";
+import { Wifi, WashingMachine, UtensilsCrossed, Zap, BookOpen, Sparkles } from "lucide-react";
 
 const services = [
-  { icon: Wifi, title: "WiFi Fibra 1Gbps", desc: "Lezioni online, streaming, videochiamate: tutto fluido, in ogni stanza." },
-  { icon: Dumbbell, title: "Palestra 24/7", desc: "Cardio e pesi liberi inclusi nel canone. Nessun abbonamento extra." },
-  { icon: WashingMachine, title: "Lavanderia", desc: "Lavatrici e asciugatrici prenotabili comodamente dall'app." },
-  { icon: BookOpen, title: "Sale studio", desc: "Ambienti silenziosi con prese e luce perfetta, prenotabili dall'app." },
+  { icon: Wifi, title: "WiFi incluso", desc: "Lezioni online, streaming, videochiamate: tutto fluido, in ogni stanza." },
+  { icon: WashingMachine, title: "Lavanderia", desc: "2 lavatrici + 2 asciugatrici con detersivo fornito. Servizio a pagamento." },
+  { icon: UtensilsCrossed, title: "Cucina attrezzata", desc: "3 cucine comuni con frigo condiviso. Ogni stanza ha anche il proprio frigo privato." },
+  { icon: BookOpen, title: "Sala studio", desc: "1 sala studio silenziosa accessibile 24/7 con prese e luce perfetta." },
   { icon: Zap, title: "Utenze incluse", desc: "Luce, gas e acqua sono nel canone. D'inverno come d'estate, il prezzo non cambia." },
-  { icon: UtensilsCrossed, title: "Cucina attrezzata", desc: "Piani induzione, forno e frigo su ogni piano per i tuoi piatti preferiti." },
+  { icon: Sparkles, title: "Pulizia parti comuni", desc: "Le aree comuni vengono pulite regolarmente. Pensiamo noi alla manutenzione." },
 ];
 
 const fadeUp = {
@@ -33,11 +33,11 @@ export function ServicesSection() {
           className="text-center mb-12"
         >
           <h2 className="font-heading text-3xl md:text-4xl font-bold text-foreground">
-            Tutto Incluso<br />
-            <span className="text-primary">nel Canone</span>
+            WiFi, Utenze e Cucina<br />
+            <span className="text-primary">già nel Canone</span>
           </h2>
           <p className="text-muted-foreground mt-3 max-w-lg mx-auto">
-            Un canone mensile, nessuna sorpresa. Ecco cosa è compreso nella tua camera.
+            Un prezzo fisso ogni mese. Luce, gas, acqua, internet e pulizie: già dentro. Zero bollette da pagare, zero sorprese.
           </p>
         </motion.div>
 
@@ -76,10 +76,10 @@ export function ServicesSection() {
           viewport={{ once: true }}
           className="mt-12 rounded-2xl border bg-muted/50 p-8 text-center"
         >
-          <p className="text-muted-foreground text-lg mb-2">Tutto questo è già incluso nel canone mensile</p>
-          <p className="text-4xl font-extrabold text-primary">da €480/mese</p>
+          <p className="text-muted-foreground text-lg mb-2">Tutto questo — WiFi, utenze, cucina, sala studio — è già incluso</p>
+          <p className="text-4xl font-extrabold text-primary">da €390/mese</p>
           <p className="text-sm text-muted-foreground mt-3">
-            Nessun costo aggiuntivo per bollette, WiFi, palestra o lavanderia.
+            Luce, gas, acqua e WiFi sempre inclusi. Lavanderia disponibile a pagamento.
           </p>
         </motion.div>
       </div>

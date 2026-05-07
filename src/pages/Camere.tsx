@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { format } from "date-fns";
 import { it } from "date-fns/locale";
 import { Layout } from "@/components/Layout";
+import { Seo } from "@/components/Seo";
+import { Schema } from "@/components/Schema";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
@@ -10,9 +12,10 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Calendar } from "@/components/ui/calendar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { rooms, getRoomTypeLabel, type Room } from "@/data/rooms";
+import { getRoomTypeLabel, type Room } from "@/data/rooms";
+import { loadRooms } from "@/data/roomsStore";
 import {
-  SlidersHorizontal, X, Wifi, Snowflake, Bath, Tv, CalendarIcon,
+  SlidersHorizontal, X, Wifi, Snowflake, Bath, CalendarIcon,
   RotateCcw, SearchX, LayoutGrid, List, CheckCircle2
 } from "lucide-react";
 import { PageTransition, FadeIn, StaggerContainer, StaggerItem, HoverCard } from "@/components/motion/MotionWrappers";
@@ -22,16 +25,18 @@ type RoomType = Room["type"];
 type SortOption = "price-asc" | "price-desc" | "sqm" | "floor";
 
 const featureIcons: Record<string, React.ReactNode> = {
-  "WiFi Fibra": <Wifi className="h-3.5 w-3.5" />,
+  "WiFi": <Wifi className="h-3.5 w-3.5" />,
   "Aria condizionata": <Snowflake className="h-3.5 w-3.5" />,
   "Bagno privato": <Bath className="h-3.5 w-3.5" />,
-  "Smart TV": <Tv className="h-3.5 w-3.5" />,
 };
 
-const serviceFilters = ["Bagno privato", "Aria condizionata", "Smart TV", "Balcone"];
-const roomTypes: RoomType[] = ["singola", "singola-plus", "doppia"];
+const serviceFilters = ["Bagno privato", "Aria condizionata"];
+const roomTypes: RoomType[] = ["singola", "doppia"];
 
 const Camere = () => {
+  // Read live room list (includes admin edits to availability, price, etc.)
+  const rooms = useMemo(() => loadRooms(), []);
+
   const [priceRange, setPriceRange] = useState([200, 800]);
   const [types, setTypes] = useState<RoomType[]>([]);
   const [floors, setFloors] = useState<number[]>([]);
@@ -78,6 +83,11 @@ const Camere = () => {
       if (floors.length > 0 && !floors.includes(r.floor)) return false;
       if (onlyAvailable && !r.available) return false;
       if (selectedServices.length > 0 && !selectedServices.every((s) => r.features.includes(s))) return false;
+      // Filter by check-in date: room must be available on or before the selected date
+      if (checkInDate && r.availableFrom) {
+        const availFrom = new Date(r.availableFrom);
+        if (availFrom > checkInDate) return false;
+      }
       return true;
     });
 
@@ -92,7 +102,7 @@ const Camere = () => {
     });
 
     return result;
-  }, [priceRange, types, floors, onlyAvailable, selectedServices, sortBy]);
+  }, [priceRange, types, floors, onlyAvailable, selectedServices, sortBy, checkInDate]);
 
   const formatAvailableDate = (dateStr: string) => {
     const date = new Date(dateStr);
@@ -106,9 +116,29 @@ const Camere = () => {
   selectedServices.forEach(s => activeChips.push({ label: s, onRemove: () => toggleService(s) }));
   if (onlyAvailable) activeChips.push({ label: "Solo disponibili", onRemove: () => setOnlyAvailable(false) });
   if (priceRange[0] !== 200 || priceRange[1] !== 800) activeChips.push({ label: `€${priceRange[0]}–€${priceRange[1]}`, onRemove: () => setPriceRange([200, 800]) });
+  if (checkInDate) activeChips.push({ label: `Da ${format(checkInDate, "dd/MM/yyyy")}`, onRemove: () => setCheckInDate(undefined) });
 
   return (
     <Layout>
+      <Seo
+        title="Affitto Camera Studenti Padova — Singole da €480, Doppie da €390/mese"
+        description="Trova la tua stanza allo Studentato Napoleone di Padova. Camere singole da €480/mese e doppie da €390/mese con WiFi, utenze e pulizie incluse. Disponibili da settembre 2026. Prenota subito."
+        canonical="/camere"
+        keywords="affitto camera singola Padova studenti, posto letto doppia Padova università, stanza affitto Padova 2026, camera studenti Padova prezzi"
+      />
+      <Schema data={{
+        "@context": "https://schema.org",
+        "@type": "ItemList",
+        name: "Camere Studentato Napoleone Padova",
+        description: "Camere singole e doppie per studenti universitari a Padova",
+        numberOfItems: rooms.length,
+        itemListElement: rooms.map((r, i) => ({
+          "@type": "ListItem",
+          position: i + 1,
+          url: `https://studentatonapoleone.com/camere/${r.id}`,
+          name: r.name,
+        })),
+      }} />
       <PageTransition>
         {/* Hero */}
         <section className="relative py-12 md:py-20 overflow-hidden">
@@ -118,9 +148,9 @@ const Camere = () => {
           </div>
           <div className="container relative z-10">
             <FadeIn>
-              <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl font-bold text-foreground max-w-xl">Trova la tua camera ideale</h1>
+              <h1 className="font-heading text-3xl sm:text-4xl md:text-5xl font-bold text-foreground max-w-xl">Camere in Affitto a Padova<br className="hidden sm:block" /> per Studenti Universitari</h1>
               <p className="text-muted-foreground mt-3 text-base md:text-lg max-w-lg">
-                Esplora le nostre camere singole, plus e doppie. Tutte arredate, con servizi inclusi e a pochi passi dall'università.
+                Camere singole da €480/mese e posti letto in doppia da €390/mese. Tutte arredate. WiFi, utenze e pulizie già incluse nel canone.
               </p>
             </FadeIn>
           </div>
@@ -397,12 +427,12 @@ const Camere = () => {
         <FadeIn>
           <section className="py-16 bg-muted/50">
             <div className="container text-center">
-              <h2 className="font-heading text-2xl md:text-3xl font-bold text-foreground">Non trovi la camera giusta?</h2>
+              <h2 className="font-heading text-2xl md:text-3xl font-bold text-foreground">Nessuna camera si adatta alle tue esigenze?</h2>
               <p className="text-muted-foreground mt-2 max-w-md mx-auto">
-                Scrivici e ti aiuteremo a trovare la soluzione perfetta per le tue esigenze.
+                Scrivici indicando il tuo budget e le date di ingresso: ti proponiamo la soluzione migliore in meno di 24 ore.
               </p>
               <Button size="lg" className="mt-6 bg-accent text-accent-foreground hover:bg-accent/90" asChild>
-                <Link to="/contatti">Scrivici — ti aiutiamo a scegliere</Link>
+                <Link to="/contatti">Contattaci — risposta in 24 ore</Link>
               </Button>
             </div>
           </section>

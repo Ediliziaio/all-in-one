@@ -1,18 +1,18 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { APP_URL } from "@/lib/domain";
 import {
   Menu,
   Phone,
   Mail,
-  MapPin,
   ArrowRight,
   User,
   Bed,
   Sparkles,
   Heart,
-  Users,
   MessageSquare,
   MessageCircle,
+  BookOpen,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -24,15 +24,15 @@ const navLinks = [
   { label: "Camere", href: "/camere", icon: Bed },
   { label: "Servizi", href: "/servizi", icon: Sparkles },
   { label: "Vantaggi", href: "/vantaggi", icon: Heart },
-  { label: "Community", href: "/community", icon: Users },
+  { label: "Blog", href: "/blog", icon: BookOpen },
   { label: "Contatti", href: "/contatti", icon: MessageSquare },
 ];
 
-const PHONE = "049 123 4567";
-const PHONE_HREF = "tel:+390491234567";
-const EMAIL = "info@napoleonepd.it";
-const EMAIL_HREF = "mailto:info@napoleonepd.it";
-const WHATSAPP_HREF = "https://wa.me/390491234567";
+const PHONE = "+39 392 3634188";
+const PHONE_HREF = "tel:+393923634188";
+const EMAIL = "studentatonapoleone@gmail.com";
+const EMAIL_HREF = "mailto:studentatonapoleone@gmail.com";
+const WHATSAPP_HREF = "https://wa.me/393923634188";
 
 export function Navbar() {
   const [open, setOpen] = useState(false);
@@ -82,14 +82,9 @@ export function Navbar() {
                   <Mail className="h-3.5 w-3.5" />
                   <span>{EMAIL}</span>
                 </a>
-                <span className="opacity-40">·</span>
-                <span className="inline-flex items-center gap-1.5 opacity-90">
-                  <MapPin className="h-3.5 w-3.5" />
-                  Padova centro
-                </span>
               </div>
               <div className="flex items-center gap-4 opacity-90">
-                <span>Lun–Ven 9:00–18:00</span>
+                <span>Lun–Ven 9:00–17:00</span>
               </div>
             </div>
           </motion.div>
@@ -108,14 +103,6 @@ export function Navbar() {
             alt="Studentato Napoleone Padova"
             className="h-10 md:h-14 w-auto"
           />
-          <div className="hidden md:flex flex-col leading-tight">
-            <span className="font-display font-bold text-lg tracking-tight text-primary">
-              Napoleone
-            </span>
-            <span className="text-[11px] uppercase tracking-[0.15em] font-medium text-muted-foreground">
-              Studentato · Padova
-            </span>
-          </div>
         </Link>
 
         {/* Desktop nav */}
@@ -149,10 +136,10 @@ export function Navbar() {
         {/* Desktop CTAs */}
         <div className="hidden md:flex items-center gap-2">
           <Button variant="ghost" size="sm" asChild>
-            <Link to="/login">
+            <a href={`${APP_URL}/login`}>
               <User className="h-4 w-4" />
               Accedi
-            </Link>
+            </a>
           </Button>
           <Button
             size="sm"
@@ -196,7 +183,7 @@ export function Navbar() {
                       Napoleone
                     </div>
                     <div className="text-xs opacity-80">
-                      La tua casa a Padova
+                      La tua stanza a Padova
                     </div>
                   </div>
                 </div>
@@ -264,10 +251,10 @@ export function Navbar() {
                   asChild
                   onClick={() => setOpen(false)}
                 >
-                  <Link to="/login">
+                  <a href={`${APP_URL}/login`}>
                     <User className="h-4 w-4" />
                     Accedi
-                  </Link>
+                  </a>
                 </Button>
                 <Button
                   className="w-full bg-accent hover:bg-accent/90 text-accent-foreground shadow-md"

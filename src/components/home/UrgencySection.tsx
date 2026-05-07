@@ -7,9 +7,8 @@ import { CountUp, Parallax } from "@/components/motion/MotionWrappers";
 import padovaBg from "@/assets/padova-twilight.jpg";
 
 const availability = [
-  { type: "Camere Singole", remaining: 7, total: 24 },
-  { type: "Singole Plus", remaining: 3, total: 12 },
-  { type: "Camere Doppie", remaining: 2, total: 8 },
+  { type: "Camere Singole", remaining: 5, total: 27 },
+  { type: "Posti in Doppia", remaining: 4, total: 48 },
 ];
 
 function getNextSeptemberFirst() {
@@ -100,7 +99,7 @@ export function UrgencySection() {
             I Posti Per Settembre {targetYear}<br />Stanno Finendo
           </h2>
           <p className="mt-5 text-lg opacity-85 max-w-2xl mx-auto">
-            Ogni settimana riceviamo <strong className="text-[hsl(var(--google-yellow))]">40+ richieste</strong>. Non aspettare l'ultimo giorno.
+            Le richieste arrivano <strong className="text-[hsl(var(--google-yellow))]">ogni settimana</strong>. Non aspettare l'ultimo giorno.
           </p>
         </motion.div>
 
@@ -150,11 +149,11 @@ export function UrgencySection() {
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[hsl(var(--google-yellow))] opacity-75" />
               <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[hsl(var(--google-yellow))]" />
             </span>
-            Aggiornato oggi
+            Disponibilità indicativa
           </div>
         </motion.div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-12 max-w-2xl mx-auto w-full">
           {availability.map((item, i) => {
             const isLast = item.remaining <= 3;
             const takenPct = ((item.total - item.remaining) / item.total) * 100;
@@ -201,7 +200,7 @@ export function UrgencySection() {
             </Link>
           </Button>
           <Button asChild size="lg" variant="outline" className="text-base border-background/40 bg-background/5 text-background hover:bg-background/15 hover:text-background backdrop-blur-md">
-            <a href="https://wa.me/390000000000" target="_blank" rel="noopener noreferrer">
+            <a href="https://wa.me/393923634188" target="_blank" rel="noopener noreferrer">
               <MessageCircle className="mr-2 h-4 w-4 text-[hsl(var(--google-green))]" /> Scrivici su WhatsApp
             </a>
           </Button>

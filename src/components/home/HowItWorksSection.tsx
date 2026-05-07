@@ -9,19 +9,19 @@ const steps = [
     icon: Search,
     number: "1",
     title: "Scegli la camera",
-    desc: "Sfoglia il catalogo, confronta le opzioni e trova quella giusta per te.",
+    desc: "Sfoglia camere singole e doppie, confronta prezzi e servizi, scegli quella che fa per te.",
   },
   {
     icon: FileText,
     number: "2",
     title: "Ricevi conferma",
-    desc: "Ti rispondiamo rapidamente con tutti i dettagli e le informazioni necessarie.",
+    desc: "Ti rispondiamo entro 24 ore con disponibilità, prezzi e info per organizzare una visita.",
   },
   {
     icon: Key,
     number: "3",
     title: "Firma e trasferisciti",
-    desc: "Contratto chiaro e trasparente. Prendi le chiavi e sei a casa.",
+    desc: "Contratto di locazione registrato, cauzione e sei dentro. Le chiavi ti aspettano.",
   },
 ];
 
@@ -49,13 +49,13 @@ export function HowItWorksSection() {
           className="text-center mb-14"
         >
           <h2 className="font-heading text-3xl md:text-4xl font-bold text-foreground">
-            Come{" "}
+            Come Prenotare<br />
             <span className="bg-gradient-to-r from-primary via-accent to-primary bg-[length:200%_auto] bg-clip-text text-transparent animate-[gradient_4s_linear_infinite]">
-              Funziona
+              la Tua Stanza
             </span>
           </h2>
           <p className="text-muted-foreground mt-3 max-w-md mx-auto">
-            Tre semplici passi per trovare la tua nuova casa.
+            Tre passi per avere la tua camera a Padova — veloce, chiaro, senza stress.
           </p>
         </motion.div>
 
@@ -97,7 +97,7 @@ export function HowItWorksSection() {
           transition={{ delay: 0.5 }}
           className="text-center mt-10"
         >
-          <p className="text-muted-foreground mb-4">Vuoi vedere gli spazi di persona?</p>
+          <p className="text-muted-foreground mb-4">Vuoi vedere la struttura di persona?</p>
           <Button asChild variant="outline" size="lg">
             <Link to="/contatti">
               <Eye className="mr-2 h-4 w-4" /> Prenota una visita gratuita

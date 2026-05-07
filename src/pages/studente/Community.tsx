@@ -8,7 +8,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { mockPosts, mockProfiles, currentUser } from "@/data/mockData";
+import { mockPosts, mockProfiles, currentUser, type CommunityPost } from "@/data/mockData";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { useToast } from "@/hooks/use-toast";
 import { PageTransition, FadeIn, StaggerContainer, StaggerItem } from "@/components/motion/MotionWrappers";
 
@@ -31,8 +32,10 @@ export default function Community() {
   const [tipo, setTipo] = useState("post");
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
+  const [posts, setPosts] = useLocalStorage<CommunityPost[]>("sn_posts_v1", mockPosts);
+  const [likedIds, setLikedIds] = useLocalStorage<string[]>("sn_liked_posts_v1", []);
   const onlineStudents = mockProfiles.filter((p) => p.role === "student").slice(0, 3);
-  const eventi = mockPosts.filter((p) => p.data_evento);
+  const eventi = posts.filter((p) => p.data_evento);
 
   useEffect(() => {
     const t = setTimeout(() => setIsLoading(false), 800);
@@ -44,8 +47,25 @@ export default function Community() {
       toast({ title: "Scrivi qualcosa prima di pubblicare", variant: "destructive" });
       return;
     }
+    const entry: CommunityPost = {
+      id: `post_${Date.now()}`,
+      author: currentUser,
+      tipo: tipo as CommunityPost["tipo"],
+      contenuto: newPost.trim(),
+      likes: 0,
+      created_at: new Date().toISOString(),
+    };
+    setPosts((prev) => [entry, ...prev]);
     setNewPost("");
     toast({ title: "Post pubblicato!" });
+  };
+
+  const handleLike = (postId: string) => {
+    const already = likedIds.includes(postId);
+    setLikedIds((prev) => already ? prev.filter((id) => id !== postId) : [...prev, postId]);
+    setPosts((prev) =>
+      prev.map((p) => p.id === postId ? { ...p, likes: p.likes + (already ? -1 : 1) } : p),
+    );
   };
 
   return (
@@ -133,7 +153,9 @@ export default function Community() {
             </div>
           ) : (
             <StaggerContainer className="space-y-4">
-              {mockPosts.map((post) => (
+              {posts.map((post) => {
+                const liked = likedIds.includes(post.id);
+                return (
                 <StaggerItem key={post.id}>
                   <motion.div whileHover={{ y: -2 }} transition={{ type: "spring", stiffness: 300 }}>
                     <Card>
@@ -160,8 +182,12 @@ export default function Community() {
                           </div>
                         )}
                         <div className="flex items-center gap-4 pt-2 border-t">
-                          <motion.button whileTap={{ scale: 1.3 }} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-red-500 transition-colors">
-                            <Heart className="h-4 w-4" /> {post.likes}
+                          <motion.button
+                            whileTap={{ scale: 1.3 }}
+                            onClick={() => handleLike(post.id)}
+                            className={`flex items-center gap-1 text-sm transition-colors ${liked ? "text-red-500" : "text-muted-foreground hover:text-red-500"}`}
+                          >
+                            <Heart className={`h-4 w-4 ${liked ? "fill-red-500" : ""}`} /> {post.likes}
                           </motion.button>
                           <button className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors">
                             <MessageCircle className="h-4 w-4" /> Commenta
@@ -174,7 +200,8 @@ export default function Community() {
                     </Card>
                   </motion.div>
                 </StaggerItem>
-              ))}
+                );
+              })}
             </StaggerContainer>
           )}
         </div>

@@ -4,8 +4,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Check, FileText, Headphones, Calendar, MapPin } from "lucide-react";
-import { currentUser, mockProfiles, mockRichieste } from "@/data/mockData";
+import { currentUser, mockProfiles } from "@/data/mockData";
+import { loadLeads } from "@/data/leadsStore";
 import { getRoomById } from "@/data/rooms";
+import { formatEUR } from "@/lib/csv";
 import { PageTransition, FadeIn } from "@/components/motion/MotionWrappers";
 
 export default function MiaCamera() {
@@ -13,7 +15,7 @@ export default function MiaCamera() {
   if (!room) return <div className="p-6 text-center text-muted-foreground">Nessuna camera assegnata</div>;
 
   const neighbors = mockProfiles.filter((p) => p.role === "student" && p.piano === currentUser.piano && p.id !== currentUser.id);
-  const contratto = mockRichieste.find((r) => r.student_id === currentUser.id && r.stato === "approvata");
+  const contratto = loadLeads().find((r) => r.student_id === currentUser.id && r.stato === "approvata");
 
   return (
     <PageTransition className="p-4 md:p-6 space-y-5 md:space-y-6">
@@ -50,7 +52,7 @@ export default function MiaCamera() {
           <div className="space-y-4">
             <div>
               <h2 className="font-heading text-lg md:text-xl font-bold">{room.name}</h2>
-              <p className="text-sm text-muted-foreground">Piano {room.floor} · {room.sqm}mq · {room.price}€/mese</p>
+              <p className="text-sm text-muted-foreground">Piano {room.floor} · {room.sqm}mq · {formatEUR(room.price)}/mese</p>
             </div>
             <p className="text-sm leading-relaxed">{room.description}</p>
 
