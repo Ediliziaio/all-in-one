@@ -8,14 +8,19 @@
 
   <url>
     <loc>https://studentatonapoleone.com/</loc>
-    <lastmod>2026-05-07</lastmod>
+    <lastmod>2026-05-11</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://studentatonapoleone.com/logo-napoleone.png</image:loc>
+      <image:title>Studentato Napoleone Padova — Alloggio Studenti Universitari</image:title>
+      <image:caption>Studentato a Padova con camere singole e doppie per studenti universitari. Da €390/mese tutto incluso.</image:caption>
+    </image:image>
   </url>
 
   <url>
     <loc>https://studentatonapoleone.com/camere</loc>
-    <lastmod>2026-05-07</lastmod>
+    <lastmod>2026-05-11</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.95</priority>
     <image:image>
@@ -27,7 +32,7 @@
 
   <url>
     <loc>https://studentatonapoleone.com/camere/singola-101</loc>
-    <lastmod>2026-05-07</lastmod>
+    <lastmod>2026-05-11</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.85</priority>
     <image:image>
@@ -38,7 +43,7 @@
 
   <url>
     <loc>https://studentatonapoleone.com/camere/singola-205</loc>
-    <lastmod>2026-05-07</lastmod>
+    <lastmod>2026-05-11</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.85</priority>
     <image:image>
@@ -49,7 +54,7 @@
 
   <url>
     <loc>https://studentatonapoleone.com/camere/doppia-103</loc>
-    <lastmod>2026-05-07</lastmod>
+    <lastmod>2026-05-11</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.85</priority>
     <image:image>
@@ -60,7 +65,7 @@
 
   <url>
     <loc>https://studentatonapoleone.com/camere/doppia-204</loc>
-    <lastmod>2026-05-07</lastmod>
+    <lastmod>2026-05-11</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.85</priority>
     <image:image>
@@ -71,37 +76,51 @@
 
   <url>
     <loc>https://studentatonapoleone.com/servizi</loc>
-    <lastmod>2026-05-07</lastmod>
+    <lastmod>2026-05-11</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.80</priority>
+    <image:image>
+      <image:loc>https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1200&amp;h=630&amp;fit=crop</image:loc>
+      <image:title>Servizi inclusi Studentato Napoleone Padova — WiFi, Cucina, Sala Studio</image:title>
+      <image:caption>WiFi fibra, cucine comuni, sala studio 24/7, lavanderia e videosorveglianza inclusi nel canone</image:caption>
+    </image:image>
   </url>
 
   <url>
     <loc>https://studentatonapoleone.com/vantaggi</loc>
-    <lastmod>2026-05-07</lastmod>
+    <lastmod>2026-05-11</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.75</priority>
+    <priority>0.80</priority>
+    <image:image>
+      <image:loc>https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=1200&amp;h=630&amp;fit=crop</image:loc>
+      <image:title>Vantaggi studentato vs appartamento Padova — risparmio fino a €100/mese</image:title>
+      <image:caption>Confronto reale costi: studentato all-inclusive vs appartamento privato a Padova</image:caption>
+    </image:image>
   </url>
 
   <url>
     <loc>https://studentatonapoleone.com/contatti</loc>
-    <lastmod>2026-05-07</lastmod>
+    <lastmod>2026-05-11</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.75</priority>
+    <image:image>
+      <image:loc>https://studentatonapoleone.com/logo-napoleone.png</image:loc>
+      <image:title>Contatta Studentato Napoleone Padova — WhatsApp, Email, Form</image:title>
+    </image:image>
   </url>
 
   <!-- ── BLOG ──────────────────────────────────────────────────── -->
 
   <url>
     <loc>https://studentatonapoleone.com/blog</loc>
-    <lastmod>2026-05-07</lastmod>
+    <lastmod>2026-05-11</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.85</priority>
   </url>
 
   <url>
     <loc>https://studentatonapoleone.com/blog/come-trovare-stanza-padova-studenti</loc>
-    <lastmod>2026-05-07</lastmod>
+    <lastmod>2026-05-11</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.90</priority>
     <image:image>
@@ -112,18 +131,18 @@
 
   <url>
     <loc>https://studentatonapoleone.com/blog/costo-vita-padova-studenti-2026</loc>
-    <lastmod>2026-05-07</lastmod>
+    <lastmod>2026-05-11</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.85</priority>
     <image:image>
-      <image:loc>https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=1200&amp;h=630&amp;fit=crop</image:loc>
+      <image:loc>https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=1200&amp;h=630&amp;fit=crop</image:loc>
       <image:title>Costo della vita a Padova per studenti universitari 2026</image:title>
     </image:image>
   </url>
 
   <url>
     <loc>https://studentatonapoleone.com/blog/studentato-vs-appartamento-padova</loc>
-    <lastmod>2026-05-07</lastmod>
+    <lastmod>2026-05-11</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.88</priority>
     <image:image>
@@ -134,18 +153,18 @@
 
   <url>
     <loc>https://studentatonapoleone.com/blog/quartieri-padova-studenti-universitari</loc>
-    <lastmod>2026-05-07</lastmod>
+    <lastmod>2026-05-11</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.82</priority>
     <image:image>
-      <image:loc>https://images.unsplash.com/photo-1562883676-8c7feb83f09b?w=1200&amp;h=630&amp;fit=crop</image:loc>
+      <image:loc>https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&amp;h=630&amp;fit=crop</image:loc>
       <image:title>Migliori quartieri Padova per studenti universitari</image:title>
     </image:image>
   </url>
 
   <url>
     <loc>https://studentatonapoleone.com/blog/guida-universita-padova-nuovi-iscritti</loc>
-    <lastmod>2026-05-07</lastmod>
+    <lastmod>2026-05-11</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.80</priority>
     <image:image>
@@ -156,22 +175,22 @@
 
   <url>
     <loc>https://studentatonapoleone.com/blog/checklist-trasferirsi-padova-studente</loc>
-    <lastmod>2026-05-07</lastmod>
+    <lastmod>2026-05-11</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.80</priority>
     <image:image>
-      <image:loc>https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=1200&amp;h=630&amp;fit=crop</image:loc>
+      <image:loc>https://images.unsplash.com/photo-1521791136064-7986c2920216?w=1200&amp;h=630&amp;fit=crop</image:loc>
       <image:title>Checklist per trasferirsi a Padova da studente universitario</image:title>
     </image:image>
   </url>
 
   <url>
     <loc>https://studentatonapoleone.com/blog/consigli-genitori-studenti-padova</loc>
-    <lastmod>2026-05-07</lastmod>
+    <lastmod>2026-05-11</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.75</priority>
     <image:image>
-      <image:loc>https://images.unsplash.com/photo-1543269865-cbf427effbad?w=1200&amp;h=630&amp;fit=crop</image:loc>
+      <image:loc>https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1200&amp;h=630&amp;fit=crop</image:loc>
       <image:title>Guida genitori: figlio studente a Padova — alloggi e consigli</image:title>
     </image:image>
   </url>

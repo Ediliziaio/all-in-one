@@ -2,7 +2,9 @@ import { Helmet } from "react-helmet-async";
 
 const SITE_NAME = "Studentato Napoleone Padova";
 const SITE_URL = "https://studentatonapoleone.com";
-const DEFAULT_IMAGE = "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=1200&h=630&fit=crop";
+const DEFAULT_IMAGE = "https://studentatonapoleone.com/logo-napoleone.png";
+const TWITTER_HANDLE = "@studentatonapoleone";
+const ROBOTS_DEFAULT = "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1";
 
 /** Geo coordinates of Padova city center */
 const GEO = { region: "IT-PD", placename: "Padova, Italia", icbm: "45.4064, 11.8768" };
@@ -79,7 +81,7 @@ export function Seo({
       <meta name="language" content="Italian" />
       <meta name="author" content={SITE_NAME} />
       {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
-      {noindex && <meta name="robots" content="noindex,nofollow" />}
+      <meta name="robots" content={noindex ? "noindex,nofollow" : ROBOTS_DEFAULT} />
 
       {/* Local GEO signals — Padova */}
       <meta name="geo.region" content={GEO.region} />
@@ -91,6 +93,7 @@ export function Seo({
       <meta property="og:description" content={socialDescription} />
       <meta property="og:type" content={article ? "article" : "website"} />
       <meta property="og:image" content={image} />
+      <meta property="og:image:alt" content={`${title} — ${SITE_NAME}`} />
       <meta property="og:image:width" content="1200" />
       <meta property="og:image:height" content="630" />
       {canonicalUrl && <meta property="og:url" content={canonicalUrl} />}
@@ -103,9 +106,11 @@ export function Seo({
 
       {/* Twitter Card */}
       <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:site" content={TWITTER_HANDLE} />
       <meta name="twitter:title" content={socialTitle} />
       <meta name="twitter:description" content={socialDescription} />
       <meta name="twitter:image" content={image} />
+      <meta name="twitter:image:alt" content={`${title} — ${SITE_NAME}`} />
 
       {articleSchema && (
         <script type="application/ld+json">{articleSchema}</script>

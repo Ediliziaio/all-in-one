@@ -1,15 +1,62 @@
+# ── Studentato Napoleone Padova — robots.txt ──────────────────────────────
+# Sito: https://studentatonapoleone.com
+# Aggiornato: 2026-05-11
+
+# Googlebot: accesso completo + risorse statiche
 User-agent: Googlebot
 Allow: /
+Allow: /*.js$
+Allow: /*.css$
+Allow: /*.png$
+Allow: /*.jpg$
+Allow: /*.webp$
+Allow: /*.svg$
+Disallow: /admin/
+Disallow: /studente/
+Disallow: /login
+Disallow: /register
 
+# Bingbot
 User-agent: Bingbot
 Allow: /
+Disallow: /admin/
+Disallow: /studente/
+Disallow: /login
+Disallow: /register
 
+# Social media crawlers
 User-agent: Twitterbot
 Allow: /
 
 User-agent: facebookexternalhit
 Allow: /
 
+User-agent: LinkedInBot
+Allow: /
+
+User-agent: WhatsApp
+Allow: /
+
+# Bot SEO di terze parti (crawl-delay per non sovraccaricare il server)
+User-agent: AhrefsBot
+Crawl-delay: 10
+Disallow: /admin/
+Disallow: /studente/
+
+User-agent: SemrushBot
+Crawl-delay: 10
+Disallow: /admin/
+Disallow: /studente/
+
+User-agent: MJ12bot
+Crawl-delay: 10
+Disallow: /admin/
+Disallow: /studente/
+
+User-agent: DotBot
+Crawl-delay: 10
+
+# Tutti gli altri bot
 User-agent: *
 Allow: /
 Disallow: /admin/

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Layout } from "@/components/Layout";
 import { Seo } from "@/components/Seo";
+import { Schema } from "@/components/Schema";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { articles } from "@/data/blog";
@@ -35,6 +36,36 @@ export default function Blog() {
         canonical="/blog"
         keywords="guida studenti Padova, trovare casa Padova studenti, vivere a Padova università, blog studentato Padova, consigli affitto studenti Padova"
       />
+      <Schema data={{
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Home", item: "https://studentatonapoleone.com/" },
+          { "@type": "ListItem", position: 2, name: "Blog", item: "https://studentatonapoleone.com/blog" },
+        ],
+      }} />
+      <Schema data={{
+        "@context": "https://schema.org",
+        "@type": "Blog",
+        "@id": "https://studentatonapoleone.com/blog",
+        name: "Guide per Studenti a Padova",
+        description: "Guide pratiche per studenti universitari a Padova: trovare stanza, costi, quartieri e vita universitaria.",
+        url: "https://studentatonapoleone.com/blog",
+        publisher: {
+          "@type": "Organization",
+          name: "Studentato Napoleone Padova",
+          url: "https://studentatonapoleone.com",
+          logo: { "@type": "ImageObject", url: "https://studentatonapoleone.com/logo-napoleone.png" },
+        },
+        blogPost: articles.map((a) => ({
+          "@type": "BlogPosting",
+          headline: a.seoTitle,
+          description: a.seoDescription,
+          url: `https://studentatonapoleone.com/blog/${a.slug}`,
+          datePublished: a.date,
+          image: a.image,
+        })),
+      }} />
 
       {/* Hero */}
       <section className="py-12 md:py-20 bg-gradient-to-b from-primary/5 to-background">
