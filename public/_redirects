@@ -1,1 +1,7 @@
+# www → non-www (Netlify)
+https://www.studentatonapoleone.com/*  https://studentatonapoleone.com/:splat  301!
+
+# HTTP → HTTPS già gestito da Netlify automaticamente
+
+# SPA fallback (React Router)
 /*    /index.html   200
