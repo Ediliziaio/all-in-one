@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { currentUser, mockBuoni, FATTURE_KEY, mockFatture, type Buono, type Fattura } from "@/data/mockData";
-import { getRoomById } from "@/data/rooms";
+import { getRoomByIdLive } from "@/data/roomsStore";
 import { loadAllTickets } from "@/data/ticketsStore";
 import { formatEUR } from "@/lib/csv";
 import { PageTransition, FadeIn, StaggerContainer, StaggerItem, HoverCard } from "@/components/motion/MotionWrappers";
@@ -19,7 +19,7 @@ const quickActions = [
 export default function StudenteHome() {
   const hour = new Date().getHours();
   const greeting = hour < 12 ? "Buongiorno" : hour < 18 ? "Buon pomeriggio" : "Buonasera";
-  const myRoom = currentUser.camera_id ? getRoomById(currentUser.camera_id) : null;
+  const myRoom = currentUser.camera_id ? getRoomByIdLive(currentUser.camera_id) : null;
   const myTickets = loadAllTickets().filter((t) => t.student_id === currentUser.id && t.stato !== "risolto");
   const liveBuoni: Buono[] = (() => {
     try { const s = localStorage.getItem("sn_buoni_v1"); if (s) return JSON.parse(s); } catch {}

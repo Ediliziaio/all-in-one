@@ -1,0 +1,37 @@
+# ── Studentato Napoleone Padova — Cloudflare Pages _headers ──────────────
+# Security headers + cache ottimizzata per tutti gli asset
+
+/*
+  X-Frame-Options: SAMEORIGIN
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+  X-XSS-Protection: 1; mode=block
+
+# Cache lunga per asset con hash nel nome (Vite genera hash automaticamente)
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Cache media per immagini nella root
+/*.png
+  Cache-Control: public, max-age=31536000, immutable
+/*.jpg
+  Cache-Control: public, max-age=31536000, immutable
+/*.webp
+  Cache-Control: public, max-age=31536000, immutable
+/*.svg
+  Cache-Control: public, max-age=31536000, immutable
+/*.ico
+  Cache-Control: public, max-age=31536000, immutable
+
+# Nessuna cache per index.html (sempre fresco)
+/index.html
+  Cache-Control: no-cache, no-store, must-revalidate
+
+# Cache breve per manifest e sitemap
+/manifest.json
+  Cache-Control: public, max-age=86400
+/sitemap.xml
+  Cache-Control: public, max-age=86400
+/robots.txt
+  Cache-Control: public, max-age=86400

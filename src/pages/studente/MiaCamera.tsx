@@ -6,12 +6,12 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Check, FileText, Headphones, Calendar, MapPin } from "lucide-react";
 import { currentUser, mockProfiles } from "@/data/mockData";
 import { loadLeads } from "@/data/leadsStore";
-import { getRoomById } from "@/data/rooms";
+import { getRoomByIdLive } from "@/data/roomsStore";
 import { formatEUR } from "@/lib/csv";
 import { PageTransition, FadeIn } from "@/components/motion/MotionWrappers";
 
 export default function MiaCamera() {
-  const room = currentUser.camera_id ? getRoomById(currentUser.camera_id) : null;
+  const room = currentUser.camera_id ? getRoomByIdLive(currentUser.camera_id) : null;
   if (!room) return <div className="p-6 text-center text-muted-foreground">Nessuna camera assegnata</div>;
 
   const neighbors = mockProfiles.filter((p) => p.role === "student" && p.piano === currentUser.piano && p.id !== currentUser.id);

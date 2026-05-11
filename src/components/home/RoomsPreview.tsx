@@ -1,19 +1,10 @@
 import { Link } from "react-router-dom";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
-import { useRef } from "react";
+import { useRef, useMemo } from "react";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { rooms } from "@/data/rooms";
-
-const singole = rooms.filter((r) => r.type === "singola");
-const doppie = rooms.filter((r) => r.type === "doppia");
-
-const previewRooms = [
-  singole[0] ? { room: singole[0], badge: "Più richiesta" as string | null } : null,
-  (singole[1] || singole[0]) ? { room: singole[1] ?? singole[0]!, badge: null as string | null } : null,
-  doppie[0] ? { room: doppie[0], badge: null as string | null } : null,
-].filter((item): item is NonNullable<typeof item> => item !== null);
+import { loadRooms } from "@/data/roomsStore";
 
 function TiltCard({ children }: { children: React.ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -48,6 +39,17 @@ function TiltCard({ children }: { children: React.ReactNode }) {
 }
 
 export function RoomsPreview() {
+  const previewRooms = useMemo(() => {
+    const rooms = loadRooms();
+    const singole = rooms.filter((r) => r.type === "singola");
+    const doppie = rooms.filter((r) => r.type === "doppia");
+    return [
+      singole[0] ? { room: singole[0], badge: "Più richiesta" as string | null } : null,
+      (singole[1] || singole[0]) ? { room: singole[1] ?? singole[0]!, badge: null as string | null } : null,
+      doppie[0] ? { room: doppie[0], badge: null as string | null } : null,
+    ].filter((item): item is NonNullable<typeof item> => item !== null);
+  }, []);
+
   return (
     <section className="py-12 md:py-20 bg-muted/50">
       <div className="container">

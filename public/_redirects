@@ -1,7 +1,8 @@
-# www → non-www (Netlify)
-https://www.studentatonapoleone.com/*  https://studentatonapoleone.com/:splat  301!
+# ── Studentato Napoleone Padova — Cloudflare Pages / Netlify _redirects ──
+# Nota: Cloudflare gestisce HTTPS automaticamente, non serve regola HTTP→HTTPS
 
-# HTTP → HTTPS già gestito da Netlify automaticamente
+# www → non-www (301 permanente — elimina contenuto duplicato per SEO)
+https://www.studentatonapoleone.com/*  https://studentatonapoleone.com/:splat  301
 
-# SPA fallback (React Router)
+# SPA fallback — tutte le rotte React Router → index.html
 /*    /index.html   200

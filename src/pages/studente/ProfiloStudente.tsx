@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Instagram, MessageCircle, ArrowLeft, Mail, BedDouble, EyeOff } from "lucide-react";
 import { mockProfiles, currentUser } from "@/data/mockData";
-import { getRoomById } from "@/data/rooms";
+import { getRoomByIdLive } from "@/data/roomsStore";
 import { usePrivacySettings, DEFAULT_PRIVACY, type PrivacySettings } from "@/hooks/usePrivacySettings";
 import { PageTransition, FadeIn } from "@/components/motion/MotionWrappers";
 
@@ -19,7 +19,7 @@ export default function ProfiloStudente() {
   // Privacy: il profilo corrente usa le impostazioni vere; gli altri usano i default (mock)
   const isMe = profile.id === currentUser.id;
   const privacy: PrivacySettings = isMe ? mySettings : DEFAULT_PRIVACY;
-  const room = profile.camera_id ? getRoomById(profile.camera_id) : null;
+  const room = profile.camera_id ? getRoomByIdLive(profile.camera_id) : null;
 
   // Profilo nascosto
   if (!privacy.visibleInCommunity && !isMe) {
